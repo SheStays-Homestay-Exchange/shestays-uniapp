@@ -1,0 +1,123 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.my-body.data-v-989a1478 {
+  padding: 40rpx 48rpx;
+}
+.my-body .user.data-v-989a1478 {
+  display: flex;
+  justify-content: space-between;
+}
+.my-body .user .user-icon.data-v-989a1478 {
+  display: flex;
+}
+.my-body .user .user-icon .user-image.data-v-989a1478 {
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 128rpx;
+  background-color: #eee;
+}
+.my-body .user .user-icon .user-name.data-v-989a1478 {
+  margin-left: 40rpx;
+}
+.my-body .user .user-icon .user-name .user-title.data-v-989a1478 {
+  font-size: 48rpx;
+  font-weight: 600;
+}
+.my-body .user .user-icon .user-name .user-home.data-v-989a1478 {
+  color: #D8336D;
+  font-weight: 600;
+  font-size: 28rpx;
+}
+.my-body .user .user-update.data-v-989a1478 {
+  font-size: 24rpx;
+  color: #909193;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+}
+.my-body .user .user-update .edit-icon.data-v-989a1478 {
+  width: 26rpx;
+  height: 26rpx;
+}
+.my-body .my-house.data-v-989a1478 {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  padding: 32rpx 0;
+  border-radius: 48rpx;
+  margin-top: 48rpx;
+  box-shadow: 0rpx 8rpx 30rpx 0rpx rgba(212, 212, 212, 0.6);
+}
+.my-body .my-house .left.data-v-989a1478,
+.my-body .my-house .right.data-v-989a1478 {
+  flex: 1;
+  text-align: center;
+}
+.my-body .my-house .left .my-icon.data-v-989a1478,
+.my-body .my-house .right .my-icon.data-v-989a1478 {
+  width: 94rpx;
+  height: 94rpx;
+}
+.my-body .my-house .left .house-title.data-v-989a1478,
+.my-body .my-house .right .house-title.data-v-989a1478 {
+  font-size: 24rpx;
+  font-weight: 400;
+}
+.my-body .my-house .line.data-v-989a1478 {
+  width: 1rpx;
+  height: 124rpx;
+  background-color: #D4D4D4;
+}
+.my-body .fn-body.data-v-989a1478 {
+  margin-top: 66rpx;
+}
+.my-body .fn-body .title.data-v-989a1478 {
+  font-size: 48rpx;
+  font-weight: 500;
+}
+.my-body .fn-body .fn-li.data-v-989a1478 {
+  display: flex;
+  padding: 18rpx 0;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1rpx solid #eeeeee;
+}
+.my-body .fn-body .fn-li .left.data-v-989a1478 {
+  display: flex;
+  align-items: center;
+}
+.my-body .fn-body .fn-li .left .fn-icon.data-v-989a1478 {
+  width: 44rpx;
+  height: 44rpx;
+}
+.my-body .fn-body .fn-li .left .fn-li-title.data-v-989a1478 {
+  font-size: 32rpx;
+  font-weight: 400;
+}
+.my-body .fn-body .fn-li .fn-right.data-v-989a1478 {
+  width: 48rpx;
+  height: 48rpx;
+}

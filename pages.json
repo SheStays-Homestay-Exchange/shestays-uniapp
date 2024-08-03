@@ -1,0 +1,81 @@
+{
+	"pages": [
+		// pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path" : "pages/tabBar/index/index",
+			"style" : 
+			{
+				"navigationBarTitleText" : "首页"
+			}
+		},
+		{
+			"path" : "pages/tabBar/about/about",
+			"style" : 
+			{
+				"navigationBarTitleText" : "关于SS"
+			}
+		},
+		{
+			"path" : "pages/tabBar/my/my",
+			"style" : 
+			{
+				"navigationBarTitleText" : "我的"
+			}
+		},
+		{
+			"path": "pages/tabBar/my/myHousing",
+			"style": {
+				"navigationBarTitleText": "我的房源"
+			}
+		},
+		{
+			"path": "pages/tabBar/my/uploadHousing",
+			"style": {
+				"navigationBarTitleText": "发布房源"
+			}
+		}
+	],
+	"subPackages": [],
+	"globalStyle": {
+		"pageOrientation": "portrait",
+		"navigationBarTitleText": "Hello uniapp",
+		"navigationBarTextStyle": "black",
+		"navigationBarBackgroundColor": "#fff",
+		"backgroundColor": "#000",
+		"backgroundColorTop": "#F4F5F6",
+		"backgroundColorBottom": "#F4F5F6",
+		"mp-360": {
+			"navigationStyle": "custom"
+		},
+		"h5": {
+			"maxWidth": 1190,
+			"navigationBarTextStyle": "black",
+			"navigationBarBackgroundColor": "#F1F1F1"
+		}
+
+	},
+	"tabBar": {
+		"color": "#7A7E83",
+		"selectedColor": "#007AFF",
+		"borderStyle": "black",
+		"backgroundColor": "#F8F8F8",
+		"list": [{
+				"pagePath": "pages/tabBar/index/index",
+				"iconPath": "static/component.png",
+				"selectedIconPath": "static/componentHL.png",
+				"text": "发现"
+			},
+			{
+				"pagePath": "pages/tabBar/about/about",
+				"iconPath": "static/api.png",
+				"selectedIconPath": "static/apiHL.png",
+				"text": "关于SS"
+			}, {
+				"pagePath": "pages/tabBar/my/my",
+				"iconPath": "static/home.png",
+				"selectedIconPath": "static/home-active.png",
+				"text": "我的"
+			}
+		]
+	}
+}
