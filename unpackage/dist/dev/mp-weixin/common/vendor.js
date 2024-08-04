@@ -8220,6 +8220,12 @@ const pages = [
     style: {
       navigationBarTitleText: "发布房源"
     }
+  },
+  {
+    path: "pages/login/login",
+    style: {
+      navigationBarTitleText: ""
+    }
   }
 ];
 const subPackages = [];

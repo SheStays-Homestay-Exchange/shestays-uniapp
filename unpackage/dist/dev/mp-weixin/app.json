@@ -4,7 +4,8 @@
     "pages/tabBar/about/about",
     "pages/tabBar/my/my",
     "pages/tabBar/my/myHousing",
-    "pages/tabBar/my/uploadHousing"
+    "pages/tabBar/my/uploadHousing",
+    "pages/login/login"
   ],
   "subPackages": [],
   "window": {

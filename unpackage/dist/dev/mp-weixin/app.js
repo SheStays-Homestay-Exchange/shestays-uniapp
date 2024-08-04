@@ -8,6 +8,7 @@ if (!Math) {
   "./pages/tabBar/my/my.js";
   "./pages/tabBar/my/myHousing.js";
   "./pages/tabBar/my/uploadHousing.js";
+  "./pages/login/login.js";
 }
 const _sfc_main = {
   onLaunch: function() {
