@@ -27,9 +27,16 @@
   padding-top: 180rpx;
   width: 70vw;
   margin: 0 auto;
+  display: flex;
+  align-item: center;
+  justify-content: center;
 }
-.login-logo-box image.data-v-e4e4508d {
-  width: 100%;
+.login-logo-box .icon.data-v-e4e4508d {
+  width: 128rpx;
+  height: 124rpx;
+}
+.login-logo-box .logo-text.data-v-e4e4508d {
+  width: 380rpx;
   height: 130rpx;
 }
 .login-btn.data-v-e4e4508d {
@@ -42,20 +49,28 @@
 }
 .argument.data-v-e4e4508d {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
   margin-top: 48rpx;
   flex-wrap: wrap;
   color: #000;
   font-size: 24rpx;
 }
-.argument text.data-v-e4e4508d {
+.argument-text.data-v-e4e4508d {
+  flex: 1;
+  margin-left: 16rpx;
+}
+.argument .policy.data-v-e4e4508d {
   color: #D8336D;
 }
-.argument image.data-v-e4e4508d {
-  width: 28rpx;
-  height: 28rpx;
-  margin-right: 8rpx;
+.argument label.data-v-e4e4508d {
+  width: 32rpx;
+  height: 32rpx;
+}
+.argument label radio.data-v-e4e4508d {
+  width: 32rpx;
+  height: 32rpx;
+  transform: scale(0.7);
 }
 .argument .disagree.data-v-e4e4508d {
   display: inline-block;
@@ -64,4 +79,8 @@
   width: 24rpx;
   height: 24rpx;
   margin-right: 8rpx;
+}
+.btn-img.data-v-e4e4508d {
+  width: 38rpx;
+  height: 34rpx;
 }
