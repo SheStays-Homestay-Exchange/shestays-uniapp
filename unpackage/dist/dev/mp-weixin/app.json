@@ -4,8 +4,13 @@
     "pages/tabBar/about/about",
     "pages/tabBar/my/my",
     "pages/tabBar/my/myHousing",
+    "pages/login/login",
     "pages/tabBar/my/uploadHousing",
-    "pages/login/login"
+    "pages/public/search/search",
+    "pages/public/searchAddress/searchAddress",
+    "pages/tabBar/my/housingList/housingList",
+    "pages/tabBar/my/myHome/myHome",
+    "pages/tabBar/my/updateMyInfo/updateMyInfo"
   ],
   "subPackages": [],
   "window": {

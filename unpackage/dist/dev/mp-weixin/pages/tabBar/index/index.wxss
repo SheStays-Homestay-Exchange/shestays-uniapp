@@ -32,6 +32,11 @@
   font-weight: 500;
   padding: 23rpx 0;
 }
+.home-index-body .title .title-arrow.data-v-036b8cf8 {
+  width: 32rpx;
+  height: 24rpx;
+  margin-left: 16rpx;
+}
 .home-index-body .search-body.data-v-036b8cf8 {
   background-color: #ffffff;
   height: 80rpx;
@@ -81,6 +86,7 @@
 }
 .home-index-body .book-card .content-body .left.data-v-036b8cf8 {
   flex: 1;
+  overflow: hidden;
 }
 .home-index-body .book-card .content-body .left .remark.data-v-036b8cf8 {
   font-weight: 400;
@@ -91,6 +97,21 @@
   color: #909193;
   font-size: 20rpx;
   margin-top: 10rpx;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 6rpx;
+}
+.home-index-body .book-card .content-body .left .flod-icon.data-v-036b8cf8 {
+  width: 28rpx;
+  height: 28rpx;
+}
+.home-index-body .book-card .content-body .left .wrap1.data-v-036b8cf8 {
+  white-space: nowrap;
+  /* 保持文本在一行显示 */
+  overflow: hidden;
+  /* 隐藏超出部分 */
+  text-overflow: ellipsis;
+  /* 显示省略号 */
 }
 .home-index-body .book-card .content-body .contact-button.data-v-036b8cf8 {
   width: 168rpx;
