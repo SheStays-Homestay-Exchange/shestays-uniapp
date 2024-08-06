@@ -1,4 +1,5 @@
 "use strict";
+const common_assets = require("../../../common/assets.js");
 const common_vendor = require("../../../common/vendor.js");
 const _sfc_main = {
   __name: "index",
@@ -8,9 +9,13 @@ const _sfc_main = {
       console.log("进入首页。。");
     });
     return (_ctx, _cache) => {
-      return {};
+      return {
+        a: common_assets._imports_0,
+        b: common_assets._imports_2,
+        c: common_assets._imports_2
+      };
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-036b8cf8"], ["__file", "D:/WTT/job/shestays-uniapp/pages/tabBar/index/index.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-036b8cf8"]]);
 wx.createPage(MiniProgramPage);

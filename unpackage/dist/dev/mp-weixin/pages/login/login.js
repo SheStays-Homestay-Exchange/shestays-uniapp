@@ -18,9 +18,9 @@ const _sfc_main = {
     });
     return (_ctx, _cache) => {
       return {
-        a: common_assets._imports_0,
-        b: common_assets._imports_1,
-        c: common_assets._imports_2,
+        a: common_assets._imports_0$2,
+        b: common_assets._imports_1$1,
+        c: common_assets._imports_2$2,
         d: common_vendor.o(wxLogin),
         e: checked.value,
         f: common_vendor.t(checked.value),
@@ -29,5 +29,5 @@ const _sfc_main = {
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-e4e4508d"], ["__file", "D:/WTT/job/shestays-uniapp/pages/login/login.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-e4e4508d"]]);
 wx.createPage(MiniProgramPage);
