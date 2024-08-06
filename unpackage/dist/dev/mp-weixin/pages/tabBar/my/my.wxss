@@ -112,6 +112,7 @@
 .my-body .fn-body .fn-li .left .fn-icon.data-v-989a1478 {
   width: 44rpx;
   height: 44rpx;
+  margin-right: 26rpx;
 }
 .my-body .fn-body .fn-li .left .fn-li-title.data-v-989a1478 {
   font-size: 32rpx;
