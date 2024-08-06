@@ -29,16 +29,51 @@
 			}
 		},
 		{
-			"path": "pages/tabBar/my/uploadHousing",
-			"style": {
-				"navigationBarTitleText": "发布房源"
-			}
-		},
-		{
 			"path" : "pages/login/login",
 			"style" : 
 			{
 				"navigationBarTitleText" : ""
+			}
+		},
+		{
+			"path": "pages/tabBar/my/uploadHousing",
+			"style": {
+				"navigationBarTitleText": "上传房源"
+			}
+		},
+		{
+			"path" : "pages/public/search/search",
+			"style" : 
+			{
+				"navigationBarTitleText" : "搜索房源"
+			}
+		},
+		{
+			"path" : "pages/public/searchAddress/searchAddress",
+			"style" : 
+			{
+				"navigationBarTitleText" : "选择房源地址"
+			}
+		},
+		{
+			"path" : "pages/tabBar/my/housingList/housingList",
+			"style" : 
+			{
+				"navigationBarTitleText" : "待审核房源"
+			}
+		},
+		{
+			"path" : "pages/tabBar/my/myHome/myHome",
+			"style" : 
+			{
+				"navigationBarTitleText" : "个人主页"
+			}
+		},
+		{
+			"path" : "pages/tabBar/my/updateMyInfo/updateMyInfo",
+			"style" : 
+			{
+				"navigationBarTitleText" : "编辑个人信息"
 			}
 		}
 	],

@@ -7,8 +7,13 @@ if (!Math) {
   "./pages/tabBar/about/about.js";
   "./pages/tabBar/my/my.js";
   "./pages/tabBar/my/myHousing.js";
-  "./pages/tabBar/my/uploadHousing.js";
   "./pages/login/login.js";
+  "./pages/tabBar/my/uploadHousing.js";
+  "./pages/public/search/search.js";
+  "./pages/public/searchAddress/searchAddress.js";
+  "./pages/tabBar/my/housingList/housingList.js";
+  "./pages/tabBar/my/myHome/myHome.js";
+  "./pages/tabBar/my/updateMyInfo/updateMyInfo.js";
 }
 const _sfc_main = {
   onLaunch: function() {
@@ -27,9 +32,8 @@ const _sfc_main = {
     ...common_vendor.mapMutations(["setUniverifyErrorMsg", "setUniverifyLogin"])
   }
 };
-const App = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__file", "D:/WTT/job/shestays-uniapp/App.vue"]]);
 function createApp() {
-  const app = common_vendor.createSSRApp(App);
+  const app = common_vendor.createSSRApp(_sfc_main);
   app.use(store_index.store);
   app.config.globalProperties.$adpid = "1111111111";
   app.config.globalProperties.$backgroundAudioData = {

@@ -8,7 +8,7 @@
 					<view class="user-title">
 						Lily
 					</view>
-					<view class="user-home">
+					<view class="user-home" @click="handleGoPage('/pages/tabBar/my/myHome/myHome')">
 						个人主页
 					</view>
 				</view>
@@ -27,11 +27,25 @@
 				</view>
 			</view>
 			<view class="line"></view>
-			<view class="right">
+			<view class="right" @click="handleGoPage('/pages/tabBar/my/uploadHousing')">
 				<image class="my-icon" src="../../../static/image/upload_room_icon.png" mode=""></image>
 				<view class="house-title">
 					发布房源
 				</view>
+			</view>
+		</view>
+		
+		<!-- 房屋审核管理 -->
+		<view class="fn-body">
+			<view class="title">
+				房屋审核管理
+			</view>
+			<view class="fn-li" @click="handleGoPage('/pages/tabBar/my/housingList/housingList')">
+				<view class="left">
+					<image class="fn-icon" src="../../../static/image/user-square.png" mode=""></image>
+					<text class="fn-li-title">待审核房源</text><text>(3)</text>
+				</view>
+				<image class="fn-right" src="../../../static/image/chevron-right.jpg" mode=""></image>
 			</view>
 		</view>
 		
@@ -42,14 +56,14 @@
 			</view>
 			<view class="fn-li">
 				<view class="left">
-					<image class="fn-icon" src="" mode=""></image>
+					<image class="fn-icon" src="../../../static/image/user-square.png" mode=""></image>
 					<text class="fn-li-title">个人信息</text>
 				</view>
 				<image class="fn-right" src="../../../static/image/chevron-right.jpg" mode=""></image>
 			</view>
 			<view class="fn-li">
 				<view class="left">
-					<image class="fn-icon" src="" mode=""></image>
+					<image class="fn-icon" src="../../../static/image/tool-02.png" mode=""></image>
 					<text class="fn-li-title">隐私和共享</text>
 				</view>
 				<image class="fn-right" src="../../../static/image/chevron-right.jpg" mode=""></image>
@@ -62,14 +76,14 @@
 			</view>
 			<view class="fn-li">
 				<view class="left">
-					<image class="fn-icon" src="" mode=""></image>
+					<image class="fn-icon" src="../../../static/image/mail-01.png" mode=""></image>
 					<text class="fn-li-title">联系我们</text>
 				</view>
 				<image class="fn-right" src="../../../static/image/chevron-right.jpg" mode=""></image>
 			</view>
 			<view class="fn-li">
 				<view class="left">
-					<image class="fn-icon" src="" mode=""></image>
+					<image class="fn-icon" src="../../../static/image/file-05.png" mode=""></image>
 					<text class="fn-li-title">法律条款</text>
 				</view>
 				<image class="fn-right" src="../../../static/image/chevron-right.jpg" mode=""></image>
@@ -173,6 +187,7 @@ function handleGoPage (url) {
 				.fn-icon {
 					width: 44rpx;
 					height: 44rpx;
+					margin-right: 26rpx;
 				}
 				.fn-li-title {
 					font-size: 32rpx;
