@@ -40,13 +40,6 @@
 			{
 				"navigationBarTitleText" : ""
 			}
-		},
-		{
-			"path" : "pages/tabBar/test/test",
-			"style" : 
-			{
-				"navigationBarTitleText" : ""
-			}
 		}
 	],
 	"subPackages": [],
