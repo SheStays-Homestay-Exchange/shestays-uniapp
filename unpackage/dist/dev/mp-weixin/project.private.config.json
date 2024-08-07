@@ -8,6 +8,13 @@
     "miniprogram": {
       "list": [
         {
+          "name": "pages/tabBar/my/updateMyInfo/updateMyInfo",
+          "pathName": "pages/tabBar/my/updateMyInfo/updateMyInfo",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "pages/tabBar/my/myHousing",
           "pathName": "pages/tabBar/my/myHousing",
           "query": "",

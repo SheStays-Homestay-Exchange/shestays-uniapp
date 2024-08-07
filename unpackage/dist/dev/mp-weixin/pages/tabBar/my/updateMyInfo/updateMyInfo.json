@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "编辑个人信息",
-  "usingComponents": {}
+  "usingComponents": {
+    "uni-easyinput": "../../../../uni_modules/uni-easyinput/components/uni-easyinput/uni-easyinput"
+  }
 }

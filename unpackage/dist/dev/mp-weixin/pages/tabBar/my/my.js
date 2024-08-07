@@ -14,21 +14,22 @@ const _sfc_main = {
       return {
         a: common_vendor.o(($event) => handleGoPage("/pages/tabBar/my/myHome/myHome")),
         b: common_assets._imports_0$2,
-        c: common_assets._imports_1,
-        d: common_vendor.o(($event) => handleGoPage("/pages/tabBar/my/myHousing")),
-        e: common_assets._imports_7,
-        f: common_vendor.o(($event) => handleGoPage("/pages/tabBar/my/uploadHousing")),
-        g: common_assets._imports_3$1,
-        h: common_assets._imports_4,
-        i: common_vendor.o(($event) => handleGoPage("/pages/tabBar/my/housingList/housingList")),
-        j: common_assets._imports_3$1,
-        k: common_assets._imports_4,
-        l: common_assets._imports_5$1,
-        m: common_assets._imports_4,
-        n: common_assets._imports_6,
-        o: common_assets._imports_4,
-        p: common_assets._imports_7$1,
-        q: common_assets._imports_4
+        c: common_vendor.o(($event) => handleGoPage("/pages/tabBar/my/updateMyInfo/updateMyInfo")),
+        d: common_assets._imports_1,
+        e: common_vendor.o(($event) => handleGoPage("/pages/tabBar/my/myHousing")),
+        f: common_assets._imports_7,
+        g: common_vendor.o(($event) => handleGoPage("/pages/tabBar/my/uploadHousing")),
+        h: common_assets._imports_3$1,
+        i: common_assets._imports_1$1,
+        j: common_vendor.o(($event) => handleGoPage("/pages/tabBar/my/housingList/housingList")),
+        k: common_assets._imports_3$1,
+        l: common_assets._imports_1$1,
+        m: common_assets._imports_5$1,
+        n: common_assets._imports_1$1,
+        o: common_assets._imports_6,
+        p: common_assets._imports_1$1,
+        q: common_assets._imports_7$1,
+        r: common_assets._imports_1$1
       };
     };
   }
