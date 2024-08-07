@@ -13,7 +13,7 @@
 					</view>
 				</view>
 			</view>
-			<view class="user-update">
+			<view class="user-update" @click="handleGoPage('/pages/tabBar/my/updateMyInfo/updateMyInfo')">
 				<image class="edit-icon" src="../../../static/image/edit.jpg" mode=""></image>
 				个人信息
 			</view>
