@@ -75,6 +75,13 @@
 			{
 				"navigationBarTitleText" : "编辑个人信息"
 			}
+		},
+		{
+			"path" : "pages/houseDetail/houseDetail",
+			"style" : 
+			{
+				"navigationBarTitleText" : "房源详情"
+			}
 		}
 	],
 	"subPackages": [],
