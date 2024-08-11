@@ -76,9 +76,12 @@
 <script setup>
 	import { reactive, ref, onMounted  } from 'vue'
 	import { onLoad } from '@dcloudio/uni-app'
+	import { getHouseList } from '@/common/api/common'
+	
 	
 	const msg = ref('首页')
 	onLoad(()=>{
+		getHouseListFun()
 		console.log('进入首页。。')
 	})
 	
@@ -87,6 +90,18 @@
 		uni.navigateTo({
 			url: "/pages/public/search/search"
 		})
+	}
+	
+	//测试接口
+	const getHouseListFun = async ()=>{
+		try{
+			const res = await getHouseList({
+				pageIndex: 1
+			})
+			console.log('获取房源列表接口测试',res)
+		}catch(e){
+			//TODO handle the exception
+		}
 	}
 	
 	const goPage = (url)=>{
