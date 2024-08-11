@@ -2,7 +2,7 @@
 	<view class="house-detail">
 		<view class="house-banner">
 			
-			<uni-swiper-dot class="uni-swiper-dot-box" @clickItem=clickItem :info="info" :current="current" :mode="mode"
+			<uni-swiper-dot class="uni-swiper-dot-box" @clickItem="clickItem" :info="info" :current="current" :mode="mode"
 	 field="content">
 						<swiper class="swiper-box" @change="change" :current="swiperDotIndex">
 							<swiper-item v-for="(item, index) in 3" :key="index">

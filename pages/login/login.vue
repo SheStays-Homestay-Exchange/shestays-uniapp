@@ -14,7 +14,7 @@
 					<radio :value="1" :checked="checked" color="#d8336d" />
 				</label>
 				<view class="argument-text">
-					<text>{{ checked}}我确认已年满18周岁，且已认真阅读并同意</text><text class="policy">《SheStays换宿小程序隐私政策》</text>
+					<text>我确认已年满18周岁，且已认真阅读并同意</text><text class="policy" @click="goRule">《SheStays换宿小程序隐私政策》</text>
 				</view>
 			</view>
 		</view>
@@ -37,6 +37,12 @@
 		} else {
 			return Promise.resolve(true)
 		}
+	}
+	
+	const goRule = ()=>{
+		uni.navigateTo({
+			url: '/pages/rules/rules'
+		})
 	}
 	
 	const wxLogin = ()=>{
