@@ -61,7 +61,7 @@
 				</view>
 				<image class="fn-right" src="../../../static/image/chevron-right.jpg" mode=""></image>
 			</view>
-			<view class="fn-li">
+			<view class="fn-li" @click="handleGoPage('/pages/rules/rules')">
 				<view class="left">
 					<image class="fn-icon" src="../../../static/image/tool-02.png" mode=""></image>
 					<text class="fn-li-title">隐私和共享</text>
@@ -81,7 +81,7 @@
 				</view>
 				<image class="fn-right" src="../../../static/image/chevron-right.jpg" mode=""></image>
 			</view>
-			<view class="fn-li">
+			<view class="fn-li" @click="handleGoPage('/pages/rules/rules')">
 				<view class="left">
 					<image class="fn-icon" src="../../../static/image/file-05.png" mode=""></image>
 					<text class="fn-li-title">法律条款</text>

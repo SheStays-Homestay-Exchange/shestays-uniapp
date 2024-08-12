@@ -11,6 +11,7 @@
 					</swiper-item>
 				</swiper>
 			</uni-swiper-dot>
+
 			<view class="house-position">
 				<view class="left">
 					<view class="title">加拿大 - 温哥华</view>
@@ -69,7 +70,6 @@
 					</view>
 					<view @click="hanleCopy"><button>复制名片</button></view>
 				</view>
-
 			</uni-popup>
 		</view>
 	</view>

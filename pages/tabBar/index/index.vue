@@ -50,14 +50,14 @@
 				</view>
 			</view>
 		</view>
-		<view class="new-house">
+		<view class="new-house" @click="goPage('/pages/houseDetail/houseDetail')">
 			<image src="../../../static/image/Frame 48096034.png" class="house-image" mode=""></image>
 			<view class="time-body">
 				<text class="address">美国 - 洛杉矶</text>
 				<text class="time">开放时间：6月10日</text>
 			</view>
 			<view class="contact">
-				房东：Lily
+				房东：Lily11
 			</view>
 		</view>
 		<view class="new-house">
@@ -76,9 +76,12 @@
 <script setup>
 	import { reactive, ref, onMounted  } from 'vue'
 	import { onLoad } from '@dcloudio/uni-app'
+	import { getHouseList } from '@/common/api/common'
+	
 	
 	const msg = ref('首页')
 	onLoad(()=>{
+		getHouseListFun()
 		console.log('进入首页。。')
 	})
 	
@@ -86,6 +89,24 @@
 	function handleSearch() {
 		uni.navigateTo({
 			url: "/pages/public/search/search"
+		})
+	}
+	
+	//测试接口
+	const getHouseListFun = async ()=>{
+		try{
+			const res = await getHouseList({
+				pageIndex: 1
+			})
+			console.log('获取房源列表接口测试',res)
+		}catch(e){
+			//TODO handle the exception
+		}
+	}
+	
+	const goPage = (url)=>{
+		uni.navigateTo({
+			url
 		})
 	}
 </script>

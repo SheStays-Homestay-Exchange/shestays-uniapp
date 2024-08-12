@@ -66,8 +66,45 @@ var dateUtils = {
 	}
 };
 
+/**
+ * toast
+ */
+ const msg = (title = '', param = {}, cb) => {
+	if (!title) return;
+	uni.showToast({
+		title,
+		icon: param.icon || 'none',
+		success: () => {
+			if (cb) cb()
+		}
+	});
+}
+/**
+ * toast
+ */
+ const confirm = (content = '', showCancel = true) => {
+	if (!content) return;
+	return new Promise((reslove, reject) => {
+		uni.showModal({
+			content,
+			showCancel,
+			success: function(res) {
+				if (res.confirm) {
+					return reslove()
+				} else if (res.cancel) {
+					msg('您已取消操作')
+					return reject()
+				}
+			}
+		});
+	})
+
+}
+
 export {
 	formatTime,
 	formatLocation,
-	dateUtils
+	dateUtils,
+	msg,
+	confirm
 }

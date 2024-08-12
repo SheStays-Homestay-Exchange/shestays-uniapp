@@ -10,7 +10,9 @@
     "pages/public/searchAddress/searchAddress",
     "pages/tabBar/my/housingList/housingList",
     "pages/tabBar/my/myHome/myHome",
-    "pages/tabBar/my/updateMyInfo/updateMyInfo"
+    "pages/tabBar/my/updateMyInfo/updateMyInfo",
+    "pages/houseDetail/houseDetail",
+    "pages/rules/rules"
   ],
   "subPackages": [],
   "window": {
@@ -23,21 +25,21 @@
     "backgroundColorBottom": "#F4F5F6"
   },
   "tabBar": {
-    "color": "#7A7E83",
-    "selectedColor": "#007AFF",
+    "color": "#909193",
+    "selectedColor": "#D8336D",
     "borderStyle": "black",
     "backgroundColor": "#F8F8F8",
     "list": [
       {
         "pagePath": "pages/tabBar/index/index",
-        "iconPath": "static/component.png",
-        "selectedIconPath": "static/componentHL.png",
+        "iconPath": "static/search.png",
+        "selectedIconPath": "static/search-active.png",
         "text": "发现"
       },
       {
         "pagePath": "pages/tabBar/about/about",
-        "iconPath": "static/api.png",
-        "selectedIconPath": "static/apiHL.png",
+        "iconPath": "static/image/logo-icon.png",
+        "selectedIconPath": "static/image/logo-icon.png",
         "text": "关于SS"
       },
       {

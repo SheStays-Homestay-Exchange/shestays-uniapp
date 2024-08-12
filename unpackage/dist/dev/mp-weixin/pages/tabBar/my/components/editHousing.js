@@ -1,6 +1,5 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-const common_assets = require("../../../../common/assets.js");
 if (!Array) {
   const _easycom_uni_popup2 = common_vendor.resolveComponent("uni-popup");
   _easycom_uni_popup2();
@@ -25,15 +24,11 @@ const _sfc_main = {
     });
     return (_ctx, _cache) => {
       return {
-        a: common_assets._imports_0$8,
-        b: common_vendor.o(($event) => close()),
-        c: common_assets._imports_1$6,
-        d: common_assets._imports_2$3,
-        e: common_assets._imports_3$3,
-        f: common_vendor.sr(editPopup, "4b1b2bdd-0", {
+        a: common_vendor.o(($event) => close()),
+        b: common_vendor.sr(editPopup, "4b1b2bdd-0", {
           "k": "editPopup"
         }),
-        g: common_vendor.p({
+        c: common_vendor.p({
           type: "bottom",
           ["is-mask-click"]: false,
           ["safe-area"]: false
@@ -42,5 +37,5 @@ const _sfc_main = {
     };
   }
 };
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-4b1b2bdd"]]);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-4b1b2bdd"], ["__file", "D:/WTT/job/shestays-uniapp/pages/tabBar/my/components/editHousing.vue"]]);
 wx.createComponent(Component);

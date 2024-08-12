@@ -3,13 +3,7 @@ const common_vendor = require("../common/vendor.js");
 const store = common_vendor.createStore({
   state: {
     hasLogin: false,
-    isUniverifyLogin: false,
-    loginProvider: "",
     openid: null,
-    testvuex: false,
-    colorIndex: 0,
-    colorList: ["#FF0000", "#00FF00", "#0000FF"],
-    noMatchLeftWindow: true,
     active: "componentPage",
     leftWinActive: "/pages/component/view/view",
     activeOpen: "",
@@ -17,28 +11,12 @@ const store = common_vendor.createStore({
     univerifyErrorMsg: ""
   },
   mutations: {
-    login(state, provider) {
-      state.hasLogin = true;
-      state.loginProvider = provider;
-    },
     logout(state) {
       state.hasLogin = false;
       state.openid = null;
     },
     setOpenid(state, openid) {
       state.openid = openid;
-    },
-    setTestTrue(state) {
-      state.testvuex = true;
-    },
-    setTestFalse(state) {
-      state.testvuex = false;
-    },
-    setColorIndex(state, index) {
-      state.colorIndex = index;
-    },
-    setMatchLeftWindow(state, matchLeftWindow) {
-      state.noMatchLeftWindow = !matchLeftWindow;
     },
     setActive(state, tabPage) {
       state.active = tabPage;
@@ -52,19 +30,11 @@ const store = common_vendor.createStore({
     setMenu(state, menu) {
       state.menu = menu;
     },
-    setUniverifyLogin(state, payload) {
-      typeof payload !== "boolean" ? payload = !!payload : "";
-      state.isUniverifyLogin = payload;
-    },
     setUniverifyErrorMsg(state, payload = "") {
       state.univerifyErrorMsg = payload;
     }
   },
-  getters: {
-    currentColor(state) {
-      return state.colorList[state.colorIndex];
-    }
-  },
+  getters: {},
   actions: {
     // lazy loading openid
     getUserOpenId: async function({

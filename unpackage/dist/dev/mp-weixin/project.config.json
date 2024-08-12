@@ -15,11 +15,12 @@
       "ignore": [],
       "disablePlugins": [],
       "outputPath": ""
-    }
+    },
+    "condition": false
   },
   "compileType": "miniprogram",
-  "libVersion": "3.5.2",
-  "appid": "wxbee64a65d30d84e3",
+  "libVersion": "3.5.3",
+  "appid": "wx6b445bb062f6b30a",
   "projectname": "ss",
   "condition": {
     "search": {
