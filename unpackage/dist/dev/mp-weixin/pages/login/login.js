@@ -11,26 +11,15 @@ const _sfc_main = {
       });
     };
     const wxLogin = () => {
-      if (!checked.value) {
-        common_vendor.index.showToast({
-          title: "请阅读并勾选《SheStays换宿小程序隐私政策》",
-          icon: "none"
-        });
-      }
+      common_vendor.index.getUserInfo({
+        provider: "weixin",
+        success: function(infoRes) {
+          console.log("用户昵称为：", infoRes);
+        }
+      });
     };
     common_vendor.onLoad(() => {
       console.log("进入登录页。。");
-      common_vendor.index.login({
-        "provider": "weixin",
-        "onlyAuthorize": true,
-        // 微信登录仅请求授权认证
-        success(event) {
-          console.log("登录成功", event);
-        },
-        fail(err) {
-          console.log("登录失败", err);
-        }
-      });
     });
     return (_ctx, _cache) => {
       return {
@@ -45,5 +34,5 @@ const _sfc_main = {
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-e4e4508d"], ["__file", "D:/wtt/prictice/shestays-uniapp/pages/login/login.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-e4e4508d"], ["__file", "D:/WTT/job/shestays-uniapp/pages/login/login.vue"]]);
 wx.createPage(MiniProgramPage);

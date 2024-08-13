@@ -3,11 +3,11 @@ Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const common_vendor = require("./common/vendor.js");
 const store_index = require("./store/index.js");
 if (!Math) {
+  "./pages/login/login.js";
   "./pages/tabBar/index/index.js";
   "./pages/tabBar/about/about.js";
   "./pages/tabBar/my/my.js";
   "./pages/tabBar/my/myHousing.js";
-  "./pages/login/login.js";
   "./pages/tabBar/my/uploadHousing.js";
   "./pages/public/search/search.js";
   "./pages/public/searchAddress/searchAddress.js";
@@ -34,7 +34,7 @@ const _sfc_main = {
     ...common_vendor.mapMutations(["setUniverifyErrorMsg", "setUniverifyLogin"])
   }
 };
-const App = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__file", "D:/wtt/prictice/shestays-uniapp/App.vue"]]);
+const App = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__file", "D:/WTT/job/shestays-uniapp/App.vue"]]);
 function createApp() {
   const app = common_vendor.createSSRApp(App);
   app.use(store_index.store);
