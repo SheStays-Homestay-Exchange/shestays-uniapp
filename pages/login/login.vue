@@ -54,7 +54,17 @@
 		}
 	}
 	onLoad(()=>{
-		console.log('进入首页。。')
+		console.log('进入登录页。。')
+		uni.login({
+			"provider": "weixin",
+			"onlyAuthorize": true, // 微信登录仅请求授权认证
+			success(event) {
+				console.log('登录成功',event)
+			},
+			fail(err){
+				console.log('登录失败',err)
+			}
+		})
 	})
 </script>
 
