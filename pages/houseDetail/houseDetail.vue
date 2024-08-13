@@ -90,6 +90,7 @@ const houseInfo = [
 ];
 
 const handleCollect = () => {
+// add ajax 
   state.icon = state.icon === 'star' ? 'star-filled' : 'star';
   console.log('collect');
 };
@@ -148,6 +149,9 @@ onLoad(() => {
   top: 320px;
   left: 50%;
   transform: translateX(-50%);
+  .right{
+	  cursor: pointer;
+  }
 }
 
 .house-content {
