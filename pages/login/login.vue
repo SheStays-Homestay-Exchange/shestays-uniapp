@@ -7,11 +7,15 @@
 		<view class="login-btn-box">
 			<button class="login-btn" @click="wxLogin">
 				<image src="@/static/image/union.svg" class="btn-img"></image>
+<<<<<<< HEAD
 				微信授权登录
 			</button>
 			<button class="login-btn" open-type="getPhoneNumber" @getphonenumber="getphonenumber" style="margin-top: 20px;">
 				<image src="@/static/image/union.svg" class="btn-img"></image>
 				手机号码登录
+=======
+				微信获取code测试
+>>>>>>> c1596c72d753386a492b4d6e3b3fb4808dd9867a
 			</button>
 			<view class="argument" @click="handleClickChecked">
 				<!-- <text class="disagree" v-if="!checked"></text> -->
@@ -59,6 +63,7 @@
 		// }
 		
 		// #ifdef MP-WEIXIN
+<<<<<<< HEAD
 		// 获取用户信息
 		    uni.getUserProfile({
 		      desc: '个人中心展示昵称、头像',
@@ -115,6 +120,37 @@
 		// 		console.log('登录失败',err)
 		// 	}
 		// })
+=======
+		// uni.getUserProfile({
+		// 	desc:'用于完善用户信息',
+		// 	lang: 'zh_CN',
+		// 	success(res){
+		// 		console.log('获取用户信息成功',res)
+		// 	},
+		// 	fail(err){
+		// 		console.log('获取用户信息失败',err)
+		// 	}
+		// })
+		
+
+		    // 获取用户信息
+		    uni.getUserInfo({
+		      provider: 'weixin',
+		      success: function (infoRes) {
+		        console.log('用户昵称为：',infoRes);
+		      }
+		    });
+		
+		
+		// #endif
+		
+		
+
+	}
+	onLoad(()=>{
+		console.log('进入登录页。。')
+		
+>>>>>>> c1596c72d753386a492b4d6e3b3fb4808dd9867a
 	})
 </script>
 
