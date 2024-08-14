@@ -7607,6 +7607,12 @@ function getModuleByNamespace(store, helper, namespace) {
 }
 const pages = [
   {
+    path: "pages/login/login",
+    style: {
+      navigationBarTitleText: ""
+    }
+  },
+  {
     path: "pages/tabBar/index/index",
     style: {
       navigationBarTitleText: "首页"
@@ -7628,12 +7634,6 @@ const pages = [
     path: "pages/tabBar/my/myHousing",
     style: {
       navigationBarTitleText: "我的房源"
-    }
-  },
-  {
-    path: "pages/login/login",
-    style: {
-      navigationBarTitleText: ""
     }
   },
   {

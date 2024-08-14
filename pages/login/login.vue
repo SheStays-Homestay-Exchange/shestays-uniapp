@@ -7,7 +7,12 @@
 		<view class="login-btn-box">
 			<button class="login-btn" @click="wxLogin">
 				<image src="@/static/image/union.svg" class="btn-img"></image>
-				微信授权登录</button>
+				微信授权登录
+			</button>
+			<button class="login-btn" open-type="getPhoneNumber" @getphonenumber="getphonenumber" style="margin-top: 20px;">
+				<image src="@/static/image/union.svg" class="btn-img"></image>
+				手机号码登录
+			</button>
 			<view class="argument" @click="handleClickChecked">
 				<!-- <text class="disagree" v-if="!checked"></text> -->
 				<label class="radio">
@@ -46,25 +51,70 @@
 	}
 	
 	const wxLogin = ()=>{
-		if(!checked.value){
-			uni.showToast({
-				title:'请阅读并勾选《SheStays换宿小程序隐私政策》',
-				icon:'none'
-			})
-		}
-	}
-	onLoad(()=>{
-		console.log('进入登录页。。')
+		// if(!checked.value){
+		// 	uni.showToast({
+		// 		title:'请阅读并勾选《SheStays换宿小程序隐私政策》',
+		// 		icon:'none'
+		// 	})
+		// }
+		
+		// #ifdef MP-WEIXIN
+		// 获取用户信息
+		    uni.getUserProfile({
+		      desc: '个人中心展示昵称、头像',
+		      success: function (infoRes) {
+		        console.log('用户信息返回：' , infoRes);
+		      }
+		    });
+		// #endif
+		
 		uni.login({
 			"provider": "weixin",
 			"onlyAuthorize": true, // 微信登录仅请求授权认证
 			success(event) {
 				console.log('登录成功',event)
+				uni.showToast({
+					title:'获取code成功',
+					icon:'none'
+				})
 			},
 			fail(err){
 				console.log('登录失败',err)
 			}
 		})
+
+		
+	}
+	
+	const getphonenumber=(e)=>{
+		console.log('手机号返回',e)
+		uni.login({
+			"provider": "weixin",
+			"onlyAuthorize": true, // 微信登录仅请求授权认证
+			success(event) {
+				console.log('获取登录code返回：',event)
+				uni.showToast({
+					title:'获取登录code成功',
+					icon:'none'
+				})
+			},
+			fail(err){
+				console.log('登录失败',err)
+			}
+		})
+	}
+	onLoad(()=>{
+		console.log('进入登录页。。')
+		// uni.login({
+		// 	"provider": "weixin",
+		// 	"onlyAuthorize": true, // 微信登录仅请求授权认证
+		// 	success(event) {
+		// 		console.log('登录成功',event)
+		// 	},
+		// 	fail(err){
+		// 		console.log('登录失败',err)
+		// 	}
+		// })
 	})
 </script>
 

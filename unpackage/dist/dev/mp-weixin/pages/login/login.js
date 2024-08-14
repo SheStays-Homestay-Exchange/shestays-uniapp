@@ -11,26 +11,48 @@ const _sfc_main = {
       });
     };
     const wxLogin = () => {
-      if (!checked.value) {
-        common_vendor.index.showToast({
-          title: "请阅读并勾选《SheStays换宿小程序隐私政策》",
-          icon: "none"
-        });
-      }
-    };
-    common_vendor.onLoad(() => {
-      console.log("进入登录页。。");
+      common_vendor.index.getUserProfile({
+        desc: "个人中心展示昵称、头像",
+        success: function(infoRes) {
+          console.log("用户信息返回：", infoRes);
+        }
+      });
       common_vendor.index.login({
         "provider": "weixin",
         "onlyAuthorize": true,
         // 微信登录仅请求授权认证
         success(event) {
           console.log("登录成功", event);
+          common_vendor.index.showToast({
+            title: "获取code成功",
+            icon: "none"
+          });
         },
         fail(err) {
           console.log("登录失败", err);
         }
       });
+    };
+    const getphonenumber = (e) => {
+      console.log("手机号返回", e);
+      common_vendor.index.login({
+        "provider": "weixin",
+        "onlyAuthorize": true,
+        // 微信登录仅请求授权认证
+        success(event) {
+          console.log("获取登录code返回：", event);
+          common_vendor.index.showToast({
+            title: "获取登录code成功",
+            icon: "none"
+          });
+        },
+        fail(err) {
+          console.log("登录失败", err);
+        }
+      });
+    };
+    common_vendor.onLoad(() => {
+      console.log("进入登录页。。");
     });
     return (_ctx, _cache) => {
       return {
@@ -38,9 +60,11 @@ const _sfc_main = {
         b: common_assets._imports_1,
         c: common_assets._imports_2,
         d: common_vendor.o(wxLogin),
-        e: checked.value,
-        f: common_vendor.o(goRule),
-        g: common_vendor.o((...args) => _ctx.handleClickChecked && _ctx.handleClickChecked(...args))
+        e: common_assets._imports_2,
+        f: common_vendor.o(getphonenumber),
+        g: checked.value,
+        h: common_vendor.o(goRule),
+        i: common_vendor.o((...args) => _ctx.handleClickChecked && _ctx.handleClickChecked(...args))
       };
     };
   }
