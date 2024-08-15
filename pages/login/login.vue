@@ -7,15 +7,11 @@
 		<view class="login-btn-box">
 			<button class="login-btn" @click="wxLogin">
 				<image src="@/static/image/union.svg" class="btn-img"></image>
-<<<<<<< HEAD
 				微信授权登录
 			</button>
 			<button class="login-btn" open-type="getPhoneNumber" @getphonenumber="getphonenumber" style="margin-top: 20px;">
 				<image src="@/static/image/union.svg" class="btn-img"></image>
-				手机号码登录
-=======
-				微信获取code测试
->>>>>>> c1596c72d753386a492b4d6e3b3fb4808dd9867a
+				手机号快捷登录
 			</button>
 			<view class="argument" @click="handleClickChecked">
 				<!-- <text class="disagree" v-if="!checked"></text> -->
@@ -33,6 +29,7 @@
 <script setup>
 	import { reactive, ref, onMounted  } from 'vue'
 	import { onLoad } from '@dcloudio/uni-app'
+	import { userAuthor } from '@/common/api/common'
 	
 	// 打开协议勾选提示
 	const checked = ref(false)
@@ -63,7 +60,6 @@
 		// }
 		
 		// #ifdef MP-WEIXIN
-<<<<<<< HEAD
 		// 获取用户信息
 		    uni.getUserProfile({
 		      desc: '个人中心展示昵称、头像',
@@ -87,40 +83,45 @@
 				console.log('登录失败',err)
 			}
 		})
-
-		
 	}
 	
 	const getphonenumber=(e)=>{
 		console.log('手机号返回',e)
-		uni.login({
-			"provider": "weixin",
-			"onlyAuthorize": true, // 微信登录仅请求授权认证
-			success(event) {
-				console.log('获取登录code返回：',event)
-				uni.showToast({
-					title:'获取登录code成功',
-					icon:'none'
-				})
-			},
-			fail(err){
-				console.log('登录失败',err)
-			}
+		// #ifdef MP-WEIXIN
+			uni.login({
+				"provider": "weixin",
+				"onlyAuthorize": true, // 微信登录仅请求授权认证
+				success(event) {
+					console.log('登录成功',event)
+					userAuthorFun(e.detail,event.code)
+				},
+				fail(err){
+					console.log('登录失败',err)
+				}
+			})
+		// #endif
+		// #ifndef MP-WEIXIN
+		uni.showToast({
+			title:'只支持微信小程序平台',
+			icon:'none'
+		})
+		// #endif
+		
+	}
+	
+	const userAuthorFun = (param,loginCode)=>{
+		userAuthor({
+			encryptedData: param.encryptedData,
+			iv: param.iv,
+			code: loginCode
+		}).then(res=>{
+			
+		}).catch(err=>{
+			console.log('登录失败')
 		})
 	}
 	onLoad(()=>{
 		console.log('进入登录页。。')
-		// uni.login({
-		// 	"provider": "weixin",
-		// 	"onlyAuthorize": true, // 微信登录仅请求授权认证
-		// 	success(event) {
-		// 		console.log('登录成功',event)
-		// 	},
-		// 	fail(err){
-		// 		console.log('登录失败',err)
-		// 	}
-		// })
-=======
 		// uni.getUserProfile({
 		// 	desc:'用于完善用户信息',
 		// 	lang: 'zh_CN',
@@ -131,27 +132,8 @@
 		// 		console.log('获取用户信息失败',err)
 		// 	}
 		// })
-		
-
-		    // 获取用户信息
-		    uni.getUserInfo({
-		      provider: 'weixin',
-		      success: function (infoRes) {
-		        console.log('用户昵称为：',infoRes);
-		      }
-		    });
-		
-		
-		// #endif
-		
-		
-
-	}
-	onLoad(()=>{
-		console.log('进入登录页。。')
-		
->>>>>>> c1596c72d753386a492b4d6e3b3fb4808dd9867a
 	})
+
 </script>
 
 <style lang="scss" scoped>

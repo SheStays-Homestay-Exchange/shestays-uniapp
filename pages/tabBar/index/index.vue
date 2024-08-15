@@ -10,79 +10,91 @@
 			<text class="search-text">搜索目的地</text>
 		</view>
 		<!-- 房源 -->
-		<view class="book-card">
-			<view class="time-body">
-				<text class="address">德国 - 柏林</text>
-				<text class="time">开发时间：6月24日</text>
-			</view>
-			<view class="content-body">
-				<view class="left">
-					<view class="remark wrap1">
-						备注：1.爱干净，维护卫生，共用厨房设施。 2.想和欧洲的姐妹换宿 3.提供沙发床 希望能找到爱旅游和摄影的小伙 伴，我们可以一起出去旅拍，探索城市～
+		<view class="" v-if="listData.length>0">
+			<!-- 无图片房源来源于小红书 -->
+			<!-- <view class="book-card">
+				<view class="time-body">
+					<text class="address">德国 - 柏林</text>
+					<text class="time">开发时间：6月24日</text>
+				</view>
+				<view class="content-body">
+					<view class="left">
+						<view class="remark wrap1">
+							备注：1.爱干净，维护卫生，共用厨房设施。 2.想和欧洲的姐妹换宿 3.提供沙发床 希望能找到爱旅游和摄影的小伙 伴，我们可以一起出去旅拍，探索城市～
+						</view>
+						<view class="fold">
+							<image class="flod-icon" src="../../../static/image/chevron-home-right.png" mode=""></image>
+							<text>展开全部</text>
+						</view>
 					</view>
-					<view class="fold">
-						<image class="flod-icon" src="../../../static/image/chevron-home-right.png" mode=""></image>
-						<text>展开全部</text>
+					<view class="contact-button">
+						联系房东
 					</view>
 				</view>
-				<view class="contact-button">
-					联系房东
+			</view> -->
+			<!-- 来源于我们小程序 -->
+			<view class="new-house" @click="goPage('/pages/houseDetail/houseDetail')"  v-for="(item,i) in 3" :key="i">
+				<image src="../../../static/image/Frame 48096034.png" class="house-image" mode=""></image>
+				<view class="time-body">
+					<text class="address">美国 - 洛杉矶</text>
+					<text class="time">开放时间：6月10日</text>
+				</view>
+				<view class="contact">
+					房东：Lily11
+				</view>
+				<view class="content-body">
+					<view class="left">
+						<view class="remark wrap1">
+							备注：1.爱干净，维护卫生，共用厨房设施。 2.想和欧洲的姐妹换宿 3.提供沙发床 希望能找到爱旅游和摄影的小伙 伴，我们可以一起出去旅拍，探索城市～
+						</view>
+						<view class="fold">
+							<image class="flod-icon" src="../../../static/image/chevron-home-right.png" mode=""></image>
+							<text>展开全部</text>
+						</view>
+					</view>
+					<view class="contact-button">
+						联系房东
+					</view>
 				</view>
 			</view>
 		</view>
-		<view class="book-card">
-			<view class="time-body">
-				<text class="address">德国 - 柏林</text>
-				<text class="time">开发时间：6月24日</text>
-			</view>
-			<view class="content-body">
-				<view class="left">
-					<view class="remark">
-						备注：1.爱干净，维护卫生，共用厨房设施。 2.想和欧洲的姐妹换宿 3.提供沙发床 希望能找到爱旅游和摄影的小伙 伴，我们可以一起出去旅拍，探索城市～
-					</view>
-					<view class="fold">
-						<image class="flod-icon" src="../../../static/image/chevron-right.png" mode=""></image>
-						<text>折叠内容</text>
-					</view>
-				</view>
-				<view class="contact-button">
-					联系房东
-				</view>
-			</view>
-		</view>
-		<view class="new-house" @click="goPage('/pages/houseDetail/houseDetail')">
-			<image src="../../../static/image/Frame 48096034.png" class="house-image" mode=""></image>
-			<view class="time-body">
-				<text class="address">美国 - 洛杉矶</text>
-				<text class="time">开放时间：6月10日</text>
-			</view>
-			<view class="contact">
-				房东：Lily11
-			</view>
-		</view>
-		<view class="new-house">
-			<image src="../../../static/image/Frame 48096034.png" class="house-image" mode=""></image>
-			<view class="time-body">
-				<text class="address">美国 - 洛杉矶</text>
-				<text class="time">开放时间：6月10日</text>
-			</view>
-			<view class="contact">
-				房东：Lily
-			</view>
-		</view>
+		
+		<!-- 加载更多 -->
+		<uni-load-more :status="loadStatus" v-if="listData.length > 0"></uni-load-more>
+		
+		
 	</view>
 </template>
 
 <script setup>
 	import { reactive, ref, onMounted  } from 'vue'
-	import { onLoad } from '@dcloudio/uni-app'
+	import { onLoad, onReachBottom, onPullDownRefresh , onShareAppMessage } from '@dcloudio/uni-app'
 	import { getHouseList } from '@/common/api/common'
 	
 	
 	const msg = ref('首页')
 	onLoad(()=>{
 		getHouseListFun()
-		console.log('进入首页。。')
+		console.log('进入首页11111')
+	})
+	
+	onShareAppMessage(() => {
+		
+	});
+	
+	//页面触底
+	onReachBottom(()=>{
+		if(loadStatus.value != 'noMore'){
+			pages.pageIndex++
+			getHouseListFun()
+		}
+	})
+	
+	//下拉刷新
+	onPullDownRefresh(()=>{
+		pages.pageIndex = 1
+		listData.value = []
+		getHouseListFun('refresh')
 	})
 	
 	// 搜索
@@ -93,14 +105,37 @@
 	}
 	
 	//测试接口
-	const getHouseListFun = async ()=>{
+	//加载更多状态
+	const loadStatus = ref('contentdown')	
+	const listData = ref([])
+	const pages = reactive({
+		pageIndex:1,
+		totalPage: 0   //总共有多少页数据
+	})
+	const getHouseListFun = async (type)=>{
+		loadStatus.value ='loading'
 		try{
 			const res = await getHouseList({
-				pageIndex: 1
+				pageIndex: pages.pageIndex,
 			})
-			console.log('获取房源列表接口测试',res)
+			if(res.code == 200){
+				listData.value = listData.value.concat(res.data.data)
+				pages.totalPage = res.data.pageCount
+				if(type == 'refresh'){
+					uni.showToast({
+						title:'刷新成功',
+						icon:'none'
+					})
+				}
+			}
+			// 已请求完所有数据
+			if(pages.pageIndex >= res.data.pageCount){
+				loadStatus.value = 'noMore'
+			}
+			console.log('房源',listData.value)
 		}catch(e){
 			//TODO handle the exception
+			console.log('列表错误==',e)
 		}
 	}
 	
@@ -166,46 +201,47 @@
 				font-weight: 400;
 			}
 		}
-		.content-body {
-			display: flex;
-			align-items: flex-end;
-			.left {
-				flex: 1;
-				overflow: hidden;
-				.remark {
-					font-weight: 400;
-					font-size: 28rpx;
-				}
-				.fold {
-					font-weight: 400;
-					color: #909193;
-					font-size: 20rpx;
-					margin-top: 10rpx;
-					display: inline-flex;
-					align-items: center;
-					margin-right: 6rpx;
-				}
-				.flod-icon {
-					width: 28rpx;
-					height: 28rpx;
-				}
-				.wrap1 {
-					white-space: nowrap; /* 保持文本在一行显示 */
-					overflow: hidden;    /* 隐藏超出部分 */
-					text-overflow: ellipsis; /* 显示省略号 */
-				}
-			}
-			.contact-button {
-				width: 168rpx;
-				height: 64rpx;
+	}
+	
+	.content-body {
+		display: flex;
+		align-items: flex-end;
+		.left {
+			flex: 1;
+			overflow: hidden;
+			.remark {
+				font-weight: 400;
 				font-size: 28rpx;
-				font-weight: 600;
-				border-radius: 64rpx;
-				color: #ffffff;
-				text-align: center;
-				line-height:64rpx ;
-				background-color: #D8336D;
 			}
+			.fold {
+				font-weight: 400;
+				color: #909193;
+				font-size: 20rpx;
+				margin-top: 10rpx;
+				display: inline-flex;
+				align-items: center;
+				margin-right: 6rpx;
+			}
+			.flod-icon {
+				width: 28rpx;
+				height: 28rpx;
+			}
+			.wrap1 {
+				white-space: nowrap; /* 保持文本在一行显示 */
+				overflow: hidden;    /* 隐藏超出部分 */
+				text-overflow: ellipsis; /* 显示省略号 */
+			}
+		}
+		.contact-button {
+			width: 168rpx;
+			height: 64rpx;
+			font-size: 28rpx;
+			font-weight: 600;
+			border-radius: 64rpx;
+			color: #ffffff;
+			text-align: center;
+			line-height:64rpx ;
+			background-color: #D8336D;
 		}
 	}
 	

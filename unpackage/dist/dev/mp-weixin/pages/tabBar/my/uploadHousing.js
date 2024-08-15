@@ -37,5 +37,5 @@ const _sfc_main = {
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-dd60ae10"], ["__file", "D:/WTT/job/shestays-uniapp/pages/tabBar/my/uploadHousing.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-dd60ae10"], ["__file", "D:/wtt/prictice/shestays-uniapp/pages/tabBar/my/uploadHousing.vue"]]);
 wx.createPage(MiniProgramPage);

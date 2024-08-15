@@ -1,6 +1,12 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
+const common_api_common = require("../../common/api/common.js");
+require("../../common/js/request.js");
+require("../../common/config/index.js");
+require("../../common/js/cache.js");
+require("../../store/index.js");
+require("../../common/js/util.js");
 const _sfc_main = {
   __name: "login",
   setup(__props) {
@@ -11,7 +17,6 @@ const _sfc_main = {
       });
     };
     const wxLogin = () => {
-<<<<<<< HEAD
       common_vendor.index.getUserProfile({
         desc: "个人中心展示昵称、头像",
         success: function(infoRes) {
@@ -41,21 +46,22 @@ const _sfc_main = {
         "onlyAuthorize": true,
         // 微信登录仅请求授权认证
         success(event) {
-          console.log("获取登录code返回：", event);
-          common_vendor.index.showToast({
-            title: "获取登录code成功",
-            icon: "none"
-          });
+          console.log("登录成功", event);
+          userAuthorFun(e.detail, event.code);
         },
         fail(err) {
           console.log("登录失败", err);
-=======
-      common_vendor.index.getUserInfo({
-        provider: "weixin",
-        success: function(infoRes) {
-          console.log("用户昵称为：", infoRes);
->>>>>>> c1596c72d753386a492b4d6e3b3fb4808dd9867a
         }
+      });
+    };
+    const userAuthorFun = (param, loginCode) => {
+      common_api_common.userAuthor({
+        encryptedData: param.encryptedData,
+        iv: param.iv,
+        code: loginCode
+      }).then((res) => {
+      }).catch((err) => {
+        console.log("登录失败");
       });
     };
     common_vendor.onLoad(() => {
@@ -76,5 +82,5 @@ const _sfc_main = {
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-e4e4508d"], ["__file", "D:/WTT/job/shestays-uniapp/pages/login/login.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-e4e4508d"], ["__file", "D:/wtt/prictice/shestays-uniapp/pages/login/login.vue"]]);
 wx.createPage(MiniProgramPage);

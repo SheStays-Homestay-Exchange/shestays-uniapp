@@ -20,10 +20,10 @@ function request(options = {}) {
     common_vendor.index.request({
       ...options,
       success: async (result2) => {
-        if (result2.data.code === 200) {
+        if (result2.data.code == 200) {
           return res(result2.data);
         } else {
-          if (result2.data.code === 401) {
+          if (result2.data.code == 401) {
             const confirmText = token ? "登录已过期，请重新登录！" : "该页面需要登录后才能查看，请登录！";
             clearCache();
             console.log(store_index.store.state.user.isLoginTimeout, "--------======-----------------store.state.user.isLoginTimeout");
@@ -59,6 +59,12 @@ function get(url, data = {}, options = {}) {
   options.method = "GET";
   return request(options);
 }
+function post(url, data = {}, options = {}) {
+  options.url = requestUrl + url;
+  options.data = data;
+  options.method = "POST";
+  return request(options);
+}
 function clearCache() {
   common_js_cache.cache.remove("token");
   common_js_cache.cache.remove("userInfo");
@@ -66,3 +72,4 @@ function clearCache() {
   store_index.store.commit("set_token", "");
 }
 exports.get = get;
+exports.post = post;

@@ -38,10 +38,10 @@ function request(options = {}) {
 				//   msg('出错了，请稍后再试！')
 				//   return rej(result.data)
 				// }
-				if (result.data.code === 200) {
+				if (result.data.code == 200) {
 					return res(result.data)
 				} else {
-					if (result.data.code === 401) {
+					if (result.data.code == 401) {
 						const confirmText = token ? '登录已过期，请重新登录！' : '该页面需要登录后才能查看，请登录！'
 						clearCache()
 						console.log(store.state.user.isLoginTimeout, '--------======-----------------store.state.user.isLoginTimeout')

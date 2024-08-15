@@ -80,19 +80,19 @@
   font-size: 28rpx;
   font-weight: 400;
 }
-.home-index-body .book-card .content-body.data-v-036b8cf8 {
+.home-index-body .content-body.data-v-036b8cf8 {
   display: flex;
   align-items: flex-end;
 }
-.home-index-body .book-card .content-body .left.data-v-036b8cf8 {
+.home-index-body .content-body .left.data-v-036b8cf8 {
   flex: 1;
   overflow: hidden;
 }
-.home-index-body .book-card .content-body .left .remark.data-v-036b8cf8 {
+.home-index-body .content-body .left .remark.data-v-036b8cf8 {
   font-weight: 400;
   font-size: 28rpx;
 }
-.home-index-body .book-card .content-body .left .fold.data-v-036b8cf8 {
+.home-index-body .content-body .left .fold.data-v-036b8cf8 {
   font-weight: 400;
   color: #909193;
   font-size: 20rpx;
@@ -101,11 +101,11 @@
   align-items: center;
   margin-right: 6rpx;
 }
-.home-index-body .book-card .content-body .left .flod-icon.data-v-036b8cf8 {
+.home-index-body .content-body .left .flod-icon.data-v-036b8cf8 {
   width: 28rpx;
   height: 28rpx;
 }
-.home-index-body .book-card .content-body .left .wrap1.data-v-036b8cf8 {
+.home-index-body .content-body .left .wrap1.data-v-036b8cf8 {
   white-space: nowrap;
   /* 保持文本在一行显示 */
   overflow: hidden;
@@ -113,7 +113,7 @@
   text-overflow: ellipsis;
   /* 显示省略号 */
 }
-.home-index-body .book-card .content-body .contact-button.data-v-036b8cf8 {
+.home-index-body .content-body .contact-button.data-v-036b8cf8 {
   width: 168rpx;
   height: 64rpx;
   font-size: 28rpx;

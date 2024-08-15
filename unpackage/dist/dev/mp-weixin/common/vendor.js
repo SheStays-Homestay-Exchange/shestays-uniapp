@@ -6,14 +6,13 @@ const _export_sfc = (sfc, props) => {
   }
   return target;
 };
-/**
-* @vue/shared v3.4.21
-* (c) 2018-present Yuxi (Evan) You and Vue contributors
-* @license MIT
-**/
 function makeMap(str, expectsLowerCase) {
-  const set2 = new Set(str.split(","));
-  return expectsLowerCase ? (val) => set2.has(val.toLowerCase()) : (val) => set2.has(val);
+  const map = /* @__PURE__ */ Object.create(null);
+  const list = str.split(",");
+  for (let i = 0; i < list.length; i++) {
+    map[list[i]] = true;
+  }
+  return expectsLowerCase ? (val) => !!map[val.toLowerCase()] : (val) => !!map[val];
 }
 const EMPTY_OBJ = Object.freeze({});
 const EMPTY_ARR = Object.freeze([]);
@@ -30,17 +29,17 @@ const remove = (arr, el) => {
     arr.splice(i, 1);
   }
 };
-const hasOwnProperty$1 = Object.prototype.hasOwnProperty;
-const hasOwn = (val, key) => hasOwnProperty$1.call(val, key);
+const hasOwnProperty$2 = Object.prototype.hasOwnProperty;
+const hasOwn$1 = (val, key) => hasOwnProperty$2.call(val, key);
 const isArray = Array.isArray;
 const isMap = (val) => toTypeString(val) === "[object Map]";
 const isSet = (val) => toTypeString(val) === "[object Set]";
 const isFunction = (val) => typeof val === "function";
 const isString = (val) => typeof val === "string";
 const isSymbol = (val) => typeof val === "symbol";
-const isObject$1 = (val) => val !== null && typeof val === "object";
+const isObject$2 = (val) => val !== null && typeof val === "object";
 const isPromise$1 = (val) => {
-  return (isObject$1(val) || isFunction(val)) && isFunction(val.then) && isFunction(val.catch);
+  return (isObject$2(val) || isFunction(val)) && isFunction(val.then) && isFunction(val.catch);
 };
 const objectToString = Object.prototype.toString;
 const toTypeString = (value) => objectToString.call(value);
@@ -95,10 +94,6 @@ const looseToNumber = (val) => {
   const n2 = parseFloat(val);
   return isNaN(n2) ? val : n2;
 };
-let _globalThis;
-const getGlobalThis = () => {
-  return _globalThis || (_globalThis = typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : {});
-};
 function normalizeStyle(value) {
   if (isArray(value)) {
     const res = {};
@@ -112,7 +107,7 @@ function normalizeStyle(value) {
       }
     }
     return res;
-  } else if (isString(value) || isObject$1(value)) {
+  } else if (isString(value) || isObject$2(value)) {
     return value;
   }
 }
@@ -140,7 +135,7 @@ function normalizeClass(value) {
         res += normalized + " ";
       }
     }
-  } else if (isObject$1(value)) {
+  } else if (isObject$2(value)) {
     for (const name in value) {
       if (value[name]) {
         res += name + " ";
@@ -150,7 +145,7 @@ function normalizeClass(value) {
   return res.trim();
 }
 const toDisplayString = (val) => {
-  return isString(val) ? val : val == null ? "" : isArray(val) || isObject$1(val) && (val.toString === objectToString || !isFunction(val.toString)) ? JSON.stringify(val, replacer, 2) : String(val);
+  return isString(val) ? val : val == null ? "" : isArray(val) || isObject$2(val) && (val.toString === objectToString || !isFunction(val.toString)) ? JSON.stringify(val, replacer, 2) : String(val);
 };
 const replacer = (_key, val) => {
   if (val && val.__v_isRef) {
@@ -171,14 +166,14 @@ const replacer = (_key, val) => {
     };
   } else if (isSymbol(val)) {
     return stringifySymbol(val);
-  } else if (isObject$1(val) && !isArray(val) && !isPlainObject(val)) {
+  } else if (isObject$2(val) && !isArray(val) && !isPlainObject(val)) {
     return String(val);
   }
   return val;
 };
 const stringifySymbol = (v, i = "") => {
-  var _a;
-  return isSymbol(v) ? `Symbol(${(_a = v.description) != null ? _a : i})` : v;
+  var _a2;
+  return isSymbol(v) ? `Symbol(${(_a2 = v.description) != null ? _a2 : i})` : v;
 };
 const LINEFEED = "\n";
 const SLOT_DEFAULT_NAME = "d";
@@ -374,9 +369,9 @@ E.prototype = {
     return this;
   },
   once: function(name, callback, ctx) {
-    var self2 = this;
+    var self = this;
     function listener() {
-      self2.off(name, listener);
+      self.off(name, listener);
       callback.apply(ctx, arguments);
     }
     listener._ = callback;
@@ -410,11 +405,96 @@ E.prototype = {
   }
 };
 var E$1 = E;
+const isObject$1 = (val) => val !== null && typeof val === "object";
+const defaultDelimiters = ["{", "}"];
+class BaseFormatter {
+  constructor() {
+    this._caches = /* @__PURE__ */ Object.create(null);
+  }
+  interpolate(message, values, delimiters = defaultDelimiters) {
+    if (!values) {
+      return [message];
+    }
+    let tokens = this._caches[message];
+    if (!tokens) {
+      tokens = parse(message, delimiters);
+      this._caches[message] = tokens;
+    }
+    return compile$1(tokens, values);
+  }
+}
+const RE_TOKEN_LIST_VALUE = /^(?:\d)+/;
+const RE_TOKEN_NAMED_VALUE = /^(?:\w)+/;
+function parse(format, [startDelimiter, endDelimiter]) {
+  const tokens = [];
+  let position = 0;
+  let text = "";
+  while (position < format.length) {
+    let char = format[position++];
+    if (char === startDelimiter) {
+      if (text) {
+        tokens.push({ type: "text", value: text });
+      }
+      text = "";
+      let sub = "";
+      char = format[position++];
+      while (char !== void 0 && char !== endDelimiter) {
+        sub += char;
+        char = format[position++];
+      }
+      const isClosed = char === endDelimiter;
+      const type = RE_TOKEN_LIST_VALUE.test(sub) ? "list" : isClosed && RE_TOKEN_NAMED_VALUE.test(sub) ? "named" : "unknown";
+      tokens.push({ value: sub, type });
+    } else {
+      text += char;
+    }
+  }
+  text && tokens.push({ type: "text", value: text });
+  return tokens;
+}
+function compile$1(tokens, values) {
+  const compiled = [];
+  let index2 = 0;
+  const mode = Array.isArray(values) ? "list" : isObject$1(values) ? "named" : "unknown";
+  if (mode === "unknown") {
+    return compiled;
+  }
+  while (index2 < tokens.length) {
+    const token = tokens[index2];
+    switch (token.type) {
+      case "text":
+        compiled.push(token.value);
+        break;
+      case "list":
+        compiled.push(values[parseInt(token.value, 10)]);
+        break;
+      case "named":
+        if (mode === "named") {
+          compiled.push(values[token.value]);
+        } else {
+          {
+            console.warn(`Type of token '${token.type}' and format of value '${mode}' don't match!`);
+          }
+        }
+        break;
+      case "unknown":
+        {
+          console.warn(`Detect 'unknown' type of token!`);
+        }
+        break;
+    }
+    index2++;
+  }
+  return compiled;
+}
 const LOCALE_ZH_HANS = "zh-Hans";
 const LOCALE_ZH_HANT = "zh-Hant";
 const LOCALE_EN = "en";
 const LOCALE_FR = "fr";
 const LOCALE_ES = "es";
+const hasOwnProperty$1 = Object.prototype.hasOwnProperty;
+const hasOwn = (val, key) => hasOwnProperty$1.call(val, key);
+const defaultFormatter = new BaseFormatter();
 function include(str, parts) {
   return !!parts.find((part) => str.indexOf(part) !== -1);
 }
@@ -454,6 +534,161 @@ function normalizeLocale(locale, messages) {
     return lang;
   }
 }
+class I18n {
+  constructor({ locale, fallbackLocale, messages, watcher, formater }) {
+    this.locale = LOCALE_EN;
+    this.fallbackLocale = LOCALE_EN;
+    this.message = {};
+    this.messages = {};
+    this.watchers = [];
+    if (fallbackLocale) {
+      this.fallbackLocale = fallbackLocale;
+    }
+    this.formater = formater || defaultFormatter;
+    this.messages = messages || {};
+    this.setLocale(locale || LOCALE_EN);
+    if (watcher) {
+      this.watchLocale(watcher);
+    }
+  }
+  setLocale(locale) {
+    const oldLocale = this.locale;
+    this.locale = normalizeLocale(locale, this.messages) || this.fallbackLocale;
+    if (!this.messages[this.locale]) {
+      this.messages[this.locale] = {};
+    }
+    this.message = this.messages[this.locale];
+    if (oldLocale !== this.locale) {
+      this.watchers.forEach((watcher) => {
+        watcher(this.locale, oldLocale);
+      });
+    }
+  }
+  getLocale() {
+    return this.locale;
+  }
+  watchLocale(fn) {
+    const index2 = this.watchers.push(fn) - 1;
+    return () => {
+      this.watchers.splice(index2, 1);
+    };
+  }
+  add(locale, message, override = true) {
+    const curMessages = this.messages[locale];
+    if (curMessages) {
+      if (override) {
+        Object.assign(curMessages, message);
+      } else {
+        Object.keys(message).forEach((key) => {
+          if (!hasOwn(curMessages, key)) {
+            curMessages[key] = message[key];
+          }
+        });
+      }
+    } else {
+      this.messages[locale] = message;
+    }
+  }
+  f(message, values, delimiters) {
+    return this.formater.interpolate(message, values, delimiters).join("");
+  }
+  t(key, locale, values) {
+    let message = this.message;
+    if (typeof locale === "string") {
+      locale = normalizeLocale(locale, this.messages);
+      locale && (message = this.messages[locale]);
+    } else {
+      values = locale;
+    }
+    if (!hasOwn(message, key)) {
+      console.warn(`Cannot translate the value of keypath ${key}. Use the value of keypath as default.`);
+      return key;
+    }
+    return this.formater.interpolate(message[key], values).join("");
+  }
+}
+function watchAppLocale(appVm, i18n) {
+  if (appVm.$watchLocale) {
+    appVm.$watchLocale((newLocale) => {
+      i18n.setLocale(newLocale);
+    });
+  } else {
+    appVm.$watch(() => appVm.$locale, (newLocale) => {
+      i18n.setLocale(newLocale);
+    });
+  }
+}
+function getDefaultLocale() {
+  if (typeof index !== "undefined" && index.getLocale) {
+    return index.getLocale();
+  }
+  if (typeof global !== "undefined" && global.getLocale) {
+    return global.getLocale();
+  }
+  return LOCALE_EN;
+}
+function initVueI18n(locale, messages = {}, fallbackLocale, watcher) {
+  if (typeof locale !== "string") {
+    [locale, messages] = [
+      messages,
+      locale
+    ];
+  }
+  if (typeof locale !== "string") {
+    locale = getDefaultLocale();
+  }
+  if (typeof fallbackLocale !== "string") {
+    fallbackLocale = typeof __uniConfig !== "undefined" && __uniConfig.fallbackLocale || LOCALE_EN;
+  }
+  const i18n = new I18n({
+    locale,
+    fallbackLocale,
+    messages,
+    watcher
+  });
+  let t2 = (key, values) => {
+    if (typeof getApp !== "function") {
+      t2 = function(key2, values2) {
+        return i18n.t(key2, values2);
+      };
+    } else {
+      let isWatchedAppLocale = false;
+      t2 = function(key2, values2) {
+        const appVm = getApp().$vm;
+        if (appVm) {
+          appVm.$locale;
+          if (!isWatchedAppLocale) {
+            isWatchedAppLocale = true;
+            watchAppLocale(appVm, i18n);
+          }
+        }
+        return i18n.t(key2, values2);
+      };
+    }
+    return t2(key, values);
+  };
+  return {
+    i18n,
+    f(message, values, delimiters) {
+      return i18n.f(message, values, delimiters);
+    },
+    t(key, values) {
+      return t2(key, values);
+    },
+    add(locale2, message, override = true) {
+      return i18n.add(locale2, message, override);
+    },
+    watch(fn) {
+      return i18n.watchLocale(fn);
+    },
+    getLocale() {
+      return i18n.getLocale();
+    },
+    setLocale(newLocale) {
+      return i18n.setLocale(newLocale);
+    }
+  };
+}
 function getBaseSystemInfo() {
   return wx.getSystemInfoSync();
 }
@@ -465,7 +700,7 @@ function validateProtocol(name, data, protocol, onFail) {
     onFail = validateProtocolFail;
   }
   for (const key in protocol) {
-    const errMsg = validateProp$1(key, data[key], protocol[key], !hasOwn(data, key));
+    const errMsg = validateProp$1(key, data[key], protocol[key], !hasOwn$1(data, key));
     if (isString(errMsg)) {
       onFail(name, errMsg);
     }
@@ -528,7 +763,7 @@ function assertType$1(value, type) {
       valid = value instanceof type;
     }
   } else if (expectedType === "Object") {
-    valid = isObject$1(value);
+    valid = isObject$2(value);
   } else if (expectedType === "Array") {
     valid = isArray(value);
   } else {
@@ -660,7 +895,7 @@ function wrapperHook(hook, params) {
     return hook(data, params) || data;
   };
 }
-function queue$2(hooks, data, params) {
+function queue$1(hooks, data, params) {
   let promise = false;
   for (let i = 0; i < hooks.length; i++) {
     const hook = hooks[i];
@@ -697,7 +932,7 @@ function wrapperOptions(interceptors2, options = {}) {
     }
     const oldCallback = options[name];
     options[name] = function callbackInterceptor(res) {
-      queue$2(hooks, res, options).then((res2) => {
+      queue$1(hooks, res, options).then((res2) => {
         return isFunction(oldCallback) && oldCallback(res2) || res2;
       });
     };
@@ -739,7 +974,7 @@ function invokeApi(method, api, options, params) {
   const interceptor = getApiInterceptorHooks(method);
   if (interceptor && Object.keys(interceptor).length) {
     if (isArray(interceptor.invoke)) {
-      const res = queue$2(interceptor.invoke, options);
+      const res = queue$1(interceptor.invoke, options);
       return res.then((options2) => {
         return api(wrapperOptions(getApiInterceptorHooks(method), options2), ...params);
       });
@@ -784,7 +1019,7 @@ function formatApiArgs(args, options) {
         return errMsg;
       }
     } else {
-      if (!hasOwn(params, name)) {
+      if (!hasOwn$1(params, name)) {
         params[name] = formatterOrDefaultValue;
       }
     }
@@ -799,8 +1034,7 @@ function invokeSuccess(id, name, res) {
 function invokeFail(id, name, errMsg, errRes = {}) {
   const apiErrMsg = name + ":fail" + (errMsg ? " " + errMsg : "");
   delete errRes.errCode;
-  let res = extend({ errMsg: apiErrMsg }, errRes);
-  return invokeCallback(id, res);
+  return invokeCallback(id, typeof UniError !== "undefined" ? typeof errRes.errCode !== "undefined" ? new UniError(name, errRes.errCode, apiErrMsg) : new UniError(apiErrMsg, errRes) : extend({ errMsg: apiErrMsg }, errRes));
 }
 function beforeInvokeApi(name, args, protocol, options) {
   {
@@ -1158,7 +1392,7 @@ function initWrapper(protocols2) {
         argsOption = argsOption(fromArgs, toArgs) || {};
       }
       for (const key in fromArgs) {
-        if (hasOwn(argsOption, key)) {
+        if (hasOwn$1(argsOption, key)) {
           let keyOption = argsOption[key];
           if (isFunction(keyOption)) {
             keyOption = keyOption(fromArgs[key], fromArgs, toArgs);
@@ -1176,7 +1410,7 @@ function initWrapper(protocols2) {
             toArgs[key] = processCallback(methodName, callback, returnValue);
           }
         } else {
-          if (!keepFromArgs && !hasOwn(toArgs, key)) {
+          if (!keepFromArgs && !hasOwn$1(toArgs, key)) {
             toArgs[key] = fromArgs[key];
           }
         }
@@ -1194,7 +1428,7 @@ function initWrapper(protocols2) {
     return processArgs(methodName, res, returnValue, {}, keepReturnValue);
   }
   return function wrapper(methodName, method) {
-    if (!hasOwn(protocols2, methodName)) {
+    if (!hasOwn$1(protocols2, methodName)) {
       return method;
     }
     const protocol = protocols2[methodName];
@@ -1298,8 +1532,8 @@ function populateParameters(fromRes, toRes) {
     appVersion: "1.0.0",
     appVersionCode: "100",
     appLanguage: getAppLanguage(hostLanguage),
-    uniCompileVersion: "4.15",
-    uniRuntimeVersion: "4.15",
+    uniCompileVersion: "4.08",
+    uniRuntimeVersion: "4.08",
     uniPlatform: "mp-weixin",
     deviceBrand,
     deviceModel: model,
@@ -1488,13 +1722,13 @@ function initUni(api, protocols2, platform = wx) {
   const wrapper = initWrapper(protocols2);
   const UniProxyHandlers = {
     get(target, key) {
-      if (hasOwn(target, key)) {
+      if (hasOwn$1(target, key)) {
         return target[key];
       }
-      if (hasOwn(api, key)) {
+      if (hasOwn$1(api, key)) {
         return promisify(key, api[key]);
       }
-      if (hasOwn(baseApis, key)) {
+      if (hasOwn$1(baseApis, key)) {
         return promisify(key, baseApis[key]);
       }
       return promisify(key, wrapper(key, platform[key]));
@@ -1613,509 +1847,7 @@ var protocols = /* @__PURE__ */ Object.freeze({
 });
 const wx$1 = initWx();
 var index = initUni(shims, protocols, wx$1);
-new Set(
-  /* @__PURE__ */ Object.getOwnPropertyNames(Symbol).filter((key) => key !== "arguments" && key !== "caller").map((key) => Symbol[key]).filter(isSymbol)
-);
-function toRaw$1(observed) {
-  const raw = observed && observed["__v_raw"];
-  return raw ? toRaw$1(raw) : observed;
-}
-function isRef$1(r2) {
-  return !!(r2 && r2.__v_isRef === true);
-}
-/**
-* @vue/runtime-core v3.4.21
-* (c) 2018-present Yuxi (Evan) You and Vue contributors
-* @license MIT
-**/
-const stack$1 = [];
-function pushWarningContext$1(vnode) {
-  stack$1.push(vnode);
-}
-function popWarningContext$1() {
-  stack$1.pop();
-}
-function warn$1$1(msg, ...args) {
-  const instance = stack$1.length ? stack$1[stack$1.length - 1].component : null;
-  const appWarnHandler = instance && instance.appContext.config.warnHandler;
-  const trace = getComponentTrace$1();
-  if (appWarnHandler) {
-    callWithErrorHandling$1(
-      appWarnHandler,
-      instance,
-      11,
-      [
-        msg + args.map((a) => {
-          var _a, _b;
-          return (_b = (_a = a.toString) == null ? void 0 : _a.call(a)) != null ? _b : JSON.stringify(a);
-        }).join(""),
-        instance && instance.proxy,
-        trace.map(
-          ({ vnode }) => `at <${formatComponentName$1(instance, vnode.type)}>`
-        ).join("\n"),
-        trace
-      ]
-    );
-  } else {
-    const warnArgs = [`[Vue warn]: ${msg}`, ...args];
-    if (trace.length && // avoid spamming console during tests
-    true) {
-      warnArgs.push(`
-`, ...formatTrace$1(trace));
-    }
-    console.warn(...warnArgs);
-  }
-}
-function getComponentTrace$1() {
-  let currentVNode = stack$1[stack$1.length - 1];
-  if (!currentVNode) {
-    return [];
-  }
-  const normalizedStack = [];
-  while (currentVNode) {
-    const last = normalizedStack[0];
-    if (last && last.vnode === currentVNode) {
-      last.recurseCount++;
-    } else {
-      normalizedStack.push({
-        vnode: currentVNode,
-        recurseCount: 0
-      });
-    }
-    const parentInstance = currentVNode.component && currentVNode.component.parent;
-    currentVNode = parentInstance && parentInstance.vnode;
-  }
-  return normalizedStack;
-}
-function formatTrace$1(trace) {
-  const logs = [];
-  trace.forEach((entry, i) => {
-    logs.push(...i === 0 ? [] : [`
-`], ...formatTraceEntry$1(entry));
-  });
-  return logs;
-}
-function formatTraceEntry$1({ vnode, recurseCount }) {
-  const postfix = recurseCount > 0 ? `... (${recurseCount} recursive calls)` : ``;
-  const isRoot = vnode.component ? vnode.component.parent == null : false;
-  const open = ` at <${formatComponentName$1(
-    vnode.component,
-    vnode.type,
-    isRoot
-  )}`;
-  const close = `>` + postfix;
-  return vnode.props ? [open, ...formatProps$1(vnode.props), close] : [open + close];
-}
-function formatProps$1(props) {
-  const res = [];
-  const keys = Object.keys(props);
-  keys.slice(0, 3).forEach((key) => {
-    res.push(...formatProp$1(key, props[key]));
-  });
-  if (keys.length > 3) {
-    res.push(` ...`);
-  }
-  return res;
-}
-function formatProp$1(key, value, raw) {
-  if (isString(value)) {
-    value = JSON.stringify(value);
-    return raw ? value : [`${key}=${value}`];
-  } else if (typeof value === "number" || typeof value === "boolean" || value == null) {
-    return raw ? value : [`${key}=${value}`];
-  } else if (isRef$1(value)) {
-    value = formatProp$1(key, toRaw$1(value.value), true);
-    return raw ? value : [`${key}=Ref<`, value, `>`];
-  } else if (isFunction(value)) {
-    return [`${key}=fn${value.name ? `<${value.name}>` : ``}`];
-  } else {
-    value = toRaw$1(value);
-    return raw ? value : [`${key}=`, value];
-  }
-}
-const ErrorTypeStrings$1 = {
-  ["sp"]: "serverPrefetch hook",
-  ["bc"]: "beforeCreate hook",
-  ["c"]: "created hook",
-  ["bm"]: "beforeMount hook",
-  ["m"]: "mounted hook",
-  ["bu"]: "beforeUpdate hook",
-  ["u"]: "updated",
-  ["bum"]: "beforeUnmount hook",
-  ["um"]: "unmounted hook",
-  ["a"]: "activated hook",
-  ["da"]: "deactivated hook",
-  ["ec"]: "errorCaptured hook",
-  ["rtc"]: "renderTracked hook",
-  ["rtg"]: "renderTriggered hook",
-  [0]: "setup function",
-  [1]: "render function",
-  [2]: "watcher getter",
-  [3]: "watcher callback",
-  [4]: "watcher cleanup function",
-  [5]: "native event handler",
-  [6]: "component event handler",
-  [7]: "vnode hook",
-  [8]: "directive hook",
-  [9]: "transition hook",
-  [10]: "app errorHandler",
-  [11]: "app warnHandler",
-  [12]: "ref function",
-  [13]: "async component loader",
-  [14]: "scheduler flush. This is likely a Vue internals bug. Please open an issue at https://github.com/vuejs/core ."
-};
-function callWithErrorHandling$1(fn, instance, type, args) {
-  try {
-    return args ? fn(...args) : fn();
-  } catch (err) {
-    handleError$1(err, instance, type);
-  }
-}
-function handleError$1(err, instance, type, throwInDev = true) {
-  const contextVNode = instance ? instance.vnode : null;
-  if (instance) {
-    let cur = instance.parent;
-    const exposedInstance = instance.proxy;
-    const errorInfo = ErrorTypeStrings$1[type];
-    while (cur) {
-      const errorCapturedHooks = cur.ec;
-      if (errorCapturedHooks) {
-        for (let i = 0; i < errorCapturedHooks.length; i++) {
-          if (errorCapturedHooks[i](err, exposedInstance, errorInfo) === false) {
-            return;
-          }
-        }
-      }
-      cur = cur.parent;
-    }
-    const appErrorHandler = instance.appContext.config.errorHandler;
-    if (appErrorHandler) {
-      callWithErrorHandling$1(
-        appErrorHandler,
-        null,
-        10,
-        [err, exposedInstance, errorInfo]
-      );
-      return;
-    }
-  }
-  logError$1(err, type, contextVNode, throwInDev);
-}
-function logError$1(err, type, contextVNode, throwInDev = true) {
-  {
-    const info = ErrorTypeStrings$1[type];
-    if (contextVNode) {
-      pushWarningContext$1(contextVNode);
-    }
-    warn$1$1(`Unhandled error${info ? ` during execution of ${info}` : ``}`);
-    if (contextVNode) {
-      popWarningContext$1();
-    }
-    if (throwInDev) {
-      throw err;
-    } else {
-      console.error(err);
-    }
-  }
-}
-let isFlushing$1 = false;
-let isFlushPending$1 = false;
-const queue$1 = [];
-let flushIndex$1 = 0;
-const pendingPostFlushCbs$1 = [];
-let activePostFlushCbs$1 = null;
-let postFlushIndex$1 = 0;
-const resolvedPromise$1 = /* @__PURE__ */ Promise.resolve();
-const RECURSION_LIMIT$1 = 100;
-function findInsertionIndex$1(id) {
-  let start = flushIndex$1 + 1;
-  let end = queue$1.length;
-  while (start < end) {
-    const middle = start + end >>> 1;
-    const middleJob = queue$1[middle];
-    const middleJobId = getId$1(middleJob);
-    if (middleJobId < id || middleJobId === id && middleJob.pre) {
-      start = middle + 1;
-    } else {
-      end = middle;
-    }
-  }
-  return start;
-}
-function queueJob$1(job) {
-  if (!queue$1.length || !queue$1.includes(
-    job,
-    isFlushing$1 && job.allowRecurse ? flushIndex$1 + 1 : flushIndex$1
-  )) {
-    if (job.id == null) {
-      queue$1.push(job);
-    } else {
-      queue$1.splice(findInsertionIndex$1(job.id), 0, job);
-    }
-    queueFlush$1();
-  }
-}
-function queueFlush$1() {
-  if (!isFlushing$1 && !isFlushPending$1) {
-    isFlushPending$1 = true;
-    resolvedPromise$1.then(flushJobs$1);
-  }
-}
-function queuePostFlushCb$1(cb) {
-  if (!isArray(cb)) {
-    if (!activePostFlushCbs$1 || !activePostFlushCbs$1.includes(
-      cb,
-      cb.allowRecurse ? postFlushIndex$1 + 1 : postFlushIndex$1
-    )) {
-      pendingPostFlushCbs$1.push(cb);
-    }
-  } else {
-    pendingPostFlushCbs$1.push(...cb);
-  }
-  queueFlush$1();
-}
-function flushPostFlushCbs$1(seen) {
-  if (pendingPostFlushCbs$1.length) {
-    const deduped = [...new Set(pendingPostFlushCbs$1)].sort(
-      (a, b) => getId$1(a) - getId$1(b)
-    );
-    pendingPostFlushCbs$1.length = 0;
-    if (activePostFlushCbs$1) {
-      activePostFlushCbs$1.push(...deduped);
-      return;
-    }
-    activePostFlushCbs$1 = deduped;
-    {
-      seen = seen || /* @__PURE__ */ new Map();
-    }
-    for (postFlushIndex$1 = 0; postFlushIndex$1 < activePostFlushCbs$1.length; postFlushIndex$1++) {
-      if (checkRecursiveUpdates$1(seen, activePostFlushCbs$1[postFlushIndex$1])) {
-        continue;
-      }
-      activePostFlushCbs$1[postFlushIndex$1]();
-    }
-    activePostFlushCbs$1 = null;
-    postFlushIndex$1 = 0;
-  }
-}
-const getId$1 = (job) => job.id == null ? Infinity : job.id;
-const comparator$1 = (a, b) => {
-  const diff2 = getId$1(a) - getId$1(b);
-  if (diff2 === 0) {
-    if (a.pre && !b.pre)
-      return -1;
-    if (b.pre && !a.pre)
-      return 1;
-  }
-  return diff2;
-};
-function flushJobs$1(seen) {
-  isFlushPending$1 = false;
-  isFlushing$1 = true;
-  {
-    seen = seen || /* @__PURE__ */ new Map();
-  }
-  queue$1.sort(comparator$1);
-  const check = (job) => checkRecursiveUpdates$1(seen, job);
-  try {
-    for (flushIndex$1 = 0; flushIndex$1 < queue$1.length; flushIndex$1++) {
-      const job = queue$1[flushIndex$1];
-      if (job && job.active !== false) {
-        if (check(job)) {
-          continue;
-        }
-        callWithErrorHandling$1(job, null, 14);
-      }
-    }
-  } finally {
-    flushIndex$1 = 0;
-    queue$1.length = 0;
-    flushPostFlushCbs$1(seen);
-    isFlushing$1 = false;
-    if (queue$1.length || pendingPostFlushCbs$1.length) {
-      flushJobs$1(seen);
-    }
-  }
-}
-function checkRecursiveUpdates$1(seen, fn) {
-  if (!seen.has(fn)) {
-    seen.set(fn, 1);
-  } else {
-    const count = seen.get(fn);
-    if (count > RECURSION_LIMIT$1) {
-      const instance = fn.ownerInstance;
-      const componentName = instance && getComponentName$1(instance.type);
-      handleError$1(
-        `Maximum recursive updates exceeded${componentName ? ` in component <${componentName}>` : ``}. This means you have a reactive effect that is mutating its own dependencies and thus recursively triggering itself. Possible sources include component template, render function, updated hook or watcher source function.`,
-        null,
-        10
-      );
-      return true;
-    } else {
-      seen.set(fn, count + 1);
-    }
-  }
-}
-const hmrDirtyComponents = /* @__PURE__ */ new Set();
-{
-  getGlobalThis().__VUE_HMR_RUNTIME__ = {
-    createRecord: tryWrap(createRecord),
-    rerender: tryWrap(rerender),
-    reload: tryWrap(reload)
-  };
-}
-const map = /* @__PURE__ */ new Map();
-function createRecord(id, initialDef) {
-  if (map.has(id)) {
-    return false;
-  }
-  map.set(id, {
-    initialDef: normalizeClassComponent(initialDef),
-    instances: /* @__PURE__ */ new Set()
-  });
-  return true;
-}
-function normalizeClassComponent(component) {
-  return isClassComponent$1(component) ? component.__vccOpts : component;
-}
-function rerender(id, newRender) {
-  const record = map.get(id);
-  if (!record) {
-    return;
-  }
-  record.initialDef.render = newRender;
-  [...record.instances].forEach((instance) => {
-    if (newRender) {
-      instance.render = newRender;
-      normalizeClassComponent(instance.type).render = newRender;
-    }
-    instance.renderCache = [];
-    instance.effect.dirty = true;
-    instance.update();
-  });
-}
-function reload(id, newComp) {
-  const record = map.get(id);
-  if (!record)
-    return;
-  newComp = normalizeClassComponent(newComp);
-  updateComponentDef(record.initialDef, newComp);
-  const instances = [...record.instances];
-  for (const instance of instances) {
-    const oldComp = normalizeClassComponent(instance.type);
-    if (!hmrDirtyComponents.has(oldComp)) {
-      if (oldComp !== record.initialDef) {
-        updateComponentDef(oldComp, newComp);
-      }
-      hmrDirtyComponents.add(oldComp);
-    }
-    instance.appContext.propsCache.delete(instance.type);
-    instance.appContext.emitsCache.delete(instance.type);
-    instance.appContext.optionsCache.delete(instance.type);
-    if (instance.ceReload) {
-      hmrDirtyComponents.add(oldComp);
-      instance.ceReload(newComp.styles);
-      hmrDirtyComponents.delete(oldComp);
-    } else if (instance.parent) {
-      instance.parent.effect.dirty = true;
-      queueJob$1(instance.parent.update);
-    } else if (instance.appContext.reload) {
-      instance.appContext.reload();
-    } else if (typeof window !== "undefined") {
-      window.location.reload();
-    } else {
-      console.warn(
-        "[HMR] Root or manually mounted instance modified. Full reload required."
-      );
-    }
-  }
-  queuePostFlushCb$1(() => {
-    for (const instance of instances) {
-      hmrDirtyComponents.delete(
-        normalizeClassComponent(instance.type)
-      );
-    }
-  });
-}
-function updateComponentDef(oldComp, newComp) {
-  extend(oldComp, newComp);
-  for (const key in oldComp) {
-    if (key !== "__file" && !(key in newComp)) {
-      delete oldComp[key];
-    }
-  }
-}
-function tryWrap(fn) {
-  return (id, arg) => {
-    try {
-      return fn(id, arg);
-    } catch (e2) {
-      console.error(e2);
-      console.warn(
-        `[HMR] Something went wrong during Vue component hot-reload. Full reload required.`
-      );
-    }
-  };
-}
-{
-  const g = getGlobalThis();
-  const registerGlobalSetter = (key, setter) => {
-    let setters;
-    if (!(setters = g[key]))
-      setters = g[key] = [];
-    setters.push(setter);
-    return (v) => {
-      if (setters.length > 1)
-        setters.forEach((set2) => set2(v));
-      else
-        setters[0](v);
-    };
-  };
-  registerGlobalSetter(
-    `__VUE_INSTANCE_SETTERS__`,
-    (v) => v
-  );
-  registerGlobalSetter(
-    `__VUE_SSR_SETTERS__`,
-    (v) => v
-  );
-}
-const classifyRE$1 = /(?:^|[-_])(\w)/g;
-const classify$1 = (str) => str.replace(classifyRE$1, (c2) => c2.toUpperCase()).replace(/[-_]/g, "");
-function getComponentName$1(Component2, includeInferred = true) {
-  return isFunction(Component2) ? Component2.displayName || Component2.name : Component2.name || includeInferred && Component2.__name;
-}
-function formatComponentName$1(instance, Component2, isRoot = false) {
-  let name = getComponentName$1(Component2);
-  if (!name && Component2.__file) {
-    const match = Component2.__file.match(/([^/\\]+)\.\w+$/);
-    if (match) {
-      name = match[1];
-    }
-  }
-  if (!name && instance && instance.parent) {
-    const inferFromRegistry = (registry) => {
-      for (const key in registry) {
-        if (registry[key] === Component2) {
-          return key;
-        }
-      }
-    };
-    name = inferFromRegistry(
-      instance.components || instance.parent.type.components
-    ) || inferFromRegistry(instance.appContext.components);
-  }
-  return name ? classify$1(name) : isRoot ? `App` : `Anonymous`;
-}
-function isClassComponent$1(value) {
-  return isFunction(value) && "__vccOpts" in value;
-}
-/**
-* @dcloudio/uni-mp-vue v3.4.21
-* (c) 2018-present Yuxi (Evan) You and Vue contributors
-* @license MIT
-**/
-function warn$2(msg, ...args) {
+function warn$1(msg, ...args) {
   console.warn(`[Vue warn] ${msg}`, ...args);
 }
 let activeEffectScope;
@@ -2127,9 +1859,7 @@ class EffectScope {
     this.cleanups = [];
     this.parent = activeEffectScope;
     if (!detached && activeEffectScope) {
-      this.index = (activeEffectScope.scopes || (activeEffectScope.scopes = [])).push(
-        this
-      ) - 1;
+      this.index = (activeEffectScope.scopes || (activeEffectScope.scopes = [])).push(this) - 1;
     }
   }
   get active() {
@@ -2145,7 +1875,7 @@ class EffectScope {
         activeEffectScope = currentEffectScope;
       }
     } else {
-      warn$2(`cannot run an inactive effect scope.`);
+      warn$1(`cannot run an inactive effect scope.`);
     }
   }
   /**
@@ -2191,108 +1921,120 @@ class EffectScope {
 function effectScope(detached) {
   return new EffectScope(detached);
 }
-function recordEffectScope(effect2, scope = activeEffectScope) {
+function recordEffectScope(effect, scope = activeEffectScope) {
   if (scope && scope.active) {
-    scope.effects.push(effect2);
+    scope.effects.push(effect);
   }
 }
 function getCurrentScope() {
   return activeEffectScope;
 }
+const createDep = (effects) => {
+  const dep = new Set(effects);
+  dep.w = 0;
+  dep.n = 0;
+  return dep;
+};
+const wasTracked = (dep) => (dep.w & trackOpBit) > 0;
+const newTracked = (dep) => (dep.n & trackOpBit) > 0;
+const initDepMarkers = ({ deps }) => {
+  if (deps.length) {
+    for (let i = 0; i < deps.length; i++) {
+      deps[i].w |= trackOpBit;
+    }
+  }
+};
+const finalizeDepMarkers = (effect) => {
+  const { deps } = effect;
+  if (deps.length) {
+    let ptr = 0;
+    for (let i = 0; i < deps.length; i++) {
+      const dep = deps[i];
+      if (wasTracked(dep) && !newTracked(dep)) {
+        dep.delete(effect);
+      } else {
+        deps[ptr++] = dep;
+      }
+      dep.w &= ~trackOpBit;
+      dep.n &= ~trackOpBit;
+    }
+    deps.length = ptr;
+  }
+};
+const targetMap = /* @__PURE__ */ new WeakMap();
+let effectTrackDepth = 0;
+let trackOpBit = 1;
+const maxMarkerBits = 30;
 let activeEffect;
-class ReactiveEffect2 {
-  constructor(fn, trigger2, scheduler, scope) {
+const ITERATE_KEY = Symbol("iterate");
+const MAP_KEY_ITERATE_KEY = Symbol("Map key iterate");
+class ReactiveEffect {
+  constructor(fn, scheduler = null, scope) {
     this.fn = fn;
-    this.trigger = trigger2;
     this.scheduler = scheduler;
     this.active = true;
     this.deps = [];
-    this._dirtyLevel = 4;
-    this._trackId = 0;
-    this._runnings = 0;
-    this._shouldSchedule = false;
-    this._depsLength = 0;
+    this.parent = void 0;
     recordEffectScope(this, scope);
   }
-  get dirty() {
-    if (this._dirtyLevel === 2 || this._dirtyLevel === 3) {
-      this._dirtyLevel = 1;
-      pauseTracking();
-      for (let i = 0; i < this._depsLength; i++) {
-        const dep = this.deps[i];
-        if (dep.computed) {
-          triggerComputed(dep.computed);
-          if (this._dirtyLevel >= 4) {
-            break;
-          }
-        }
-      }
-      if (this._dirtyLevel === 1) {
-        this._dirtyLevel = 0;
-      }
-      resetTracking();
-    }
-    return this._dirtyLevel >= 4;
-  }
-  set dirty(v) {
-    this._dirtyLevel = v ? 4 : 0;
-  }
   run() {
-    this._dirtyLevel = 0;
     if (!this.active) {
       return this.fn();
     }
+    let parent = activeEffect;
     let lastShouldTrack = shouldTrack;
-    let lastEffect = activeEffect;
+    while (parent) {
+      if (parent === this) {
+        return;
+      }
+      parent = parent.parent;
+    }
     try {
-      shouldTrack = true;
+      this.parent = activeEffect;
       activeEffect = this;
-      this._runnings++;
-      preCleanupEffect(this);
+      shouldTrack = true;
+      trackOpBit = 1 << ++effectTrackDepth;
+      if (effectTrackDepth <= maxMarkerBits) {
+        initDepMarkers(this);
+      } else {
+        cleanupEffect(this);
+      }
       return this.fn();
     } finally {
-      postCleanupEffect(this);
-      this._runnings--;
-      activeEffect = lastEffect;
+      if (effectTrackDepth <= maxMarkerBits) {
+        finalizeDepMarkers(this);
+      }
+      trackOpBit = 1 << --effectTrackDepth;
+      activeEffect = this.parent;
       shouldTrack = lastShouldTrack;
+      this.parent = void 0;
+      if (this.deferStop) {
+        this.stop();
+      }
     }
   }
   stop() {
-    var _a;
-    if (this.active) {
-      preCleanupEffect(this);
-      postCleanupEffect(this);
-      (_a = this.onStop) == null ? void 0 : _a.call(this);
+    if (activeEffect === this) {
+      this.deferStop = true;
+    } else if (this.active) {
+      cleanupEffect(this);
+      if (this.onStop) {
+        this.onStop();
+      }
       this.active = false;
     }
   }
 }
-function triggerComputed(computed2) {
-  return computed2.value;
-}
-function preCleanupEffect(effect2) {
-  effect2._trackId++;
-  effect2._depsLength = 0;
-}
-function postCleanupEffect(effect2) {
-  if (effect2.deps.length > effect2._depsLength) {
-    for (let i = effect2._depsLength; i < effect2.deps.length; i++) {
-      cleanupDepEffect(effect2.deps[i], effect2);
+function cleanupEffect(effect) {
+  const { deps } = effect;
+  if (deps.length) {
+    for (let i = 0; i < deps.length; i++) {
+      deps[i].delete(effect);
     }
-    effect2.deps.length = effect2._depsLength;
-  }
-}
-function cleanupDepEffect(dep, effect2) {
-  const trackId = dep.get(effect2);
-  if (trackId !== void 0 && effect2._trackId !== trackId) {
-    dep.delete(effect2);
-    if (dep.size === 0) {
-      dep.cleanup();
-    }
+    deps.length = 0;
   }
 }
 let shouldTrack = true;
-let pauseScheduleStack = 0;
 const trackStack = [];
 function pauseTracking() {
   trackStack.push(shouldTrack);
@@ -2302,67 +2044,6 @@ function resetTracking() {
   const last = trackStack.pop();
   shouldTrack = last === void 0 ? true : last;
 }
-function pauseScheduling() {
-  pauseScheduleStack++;
-}
-function resetScheduling() {
-  pauseScheduleStack--;
-  while (!pauseScheduleStack && queueEffectSchedulers.length) {
-    queueEffectSchedulers.shift()();
-  }
-}
-function trackEffect(effect2, dep, debuggerEventExtraInfo) {
-  var _a;
-  if (dep.get(effect2) !== effect2._trackId) {
-    dep.set(effect2, effect2._trackId);
-    const oldDep = effect2.deps[effect2._depsLength];
-    if (oldDep !== dep) {
-      if (oldDep) {
-        cleanupDepEffect(oldDep, effect2);
-      }
-      effect2.deps[effect2._depsLength++] = dep;
-    } else {
-      effect2._depsLength++;
-    }
-    {
-      (_a = effect2.onTrack) == null ? void 0 : _a.call(effect2, extend({ effect: effect2 }, debuggerEventExtraInfo));
-    }
-  }
-}
-const queueEffectSchedulers = [];
-function triggerEffects(dep, dirtyLevel, debuggerEventExtraInfo) {
-  var _a;
-  pauseScheduling();
-  for (const effect2 of dep.keys()) {
-    let tracking;
-    if (effect2._dirtyLevel < dirtyLevel && (tracking != null ? tracking : tracking = dep.get(effect2) === effect2._trackId)) {
-      effect2._shouldSchedule || (effect2._shouldSchedule = effect2._dirtyLevel === 0);
-      effect2._dirtyLevel = dirtyLevel;
-    }
-    if (effect2._shouldSchedule && (tracking != null ? tracking : tracking = dep.get(effect2) === effect2._trackId)) {
-      {
-        (_a = effect2.onTrigger) == null ? void 0 : _a.call(effect2, extend({ effect: effect2 }, debuggerEventExtraInfo));
-      }
-      effect2.trigger();
-      if ((!effect2._runnings || effect2.allowRecurse) && effect2._dirtyLevel !== 2) {
-        effect2._shouldSchedule = false;
-        if (effect2.scheduler) {
-          queueEffectSchedulers.push(effect2.scheduler);
-        }
-      }
-    }
-  }
-  resetScheduling();
-}
-const createDep = (cleanup, computed2) => {
-  const dep = /* @__PURE__ */ new Map();
-  dep.cleanup = cleanup;
-  dep.computed = computed2;
-  return dep;
-};
-const targetMap = /* @__PURE__ */ new WeakMap();
-const ITERATE_KEY = Symbol("iterate");
-const MAP_KEY_ITERATE_KEY = Symbol("Map key iterate");
 function track(target, type, key) {
   if (shouldTrack && activeEffect) {
     let depsMap = targetMap.get(target);
@@ -2371,17 +2052,28 @@ function track(target, type, key) {
     }
     let dep = depsMap.get(key);
     if (!dep) {
-      depsMap.set(key, dep = createDep(() => depsMap.delete(key)));
+      depsMap.set(key, dep = createDep());
     }
-    trackEffect(
-      activeEffect,
-      dep,
-      {
-        target,
-        type,
-        key
-      }
-    );
+    const eventInfo = { effect: activeEffect, target, type, key };
+    trackEffects(dep, eventInfo);
+  }
+}
+function trackEffects(dep, debuggerEventExtraInfo) {
+  let shouldTrack2 = false;
+  if (effectTrackDepth <= maxMarkerBits) {
+    if (!newTracked(dep)) {
+      dep.n |= trackOpBit;
+      shouldTrack2 = !wasTracked(dep);
+    }
+  } else {
+    shouldTrack2 = !dep.has(activeEffect);
+  }
+  if (shouldTrack2) {
+    dep.add(activeEffect);
+    activeEffect.deps.push(dep);
+    if (activeEffect.onTrack) {
+      activeEffect.onTrack(Object.assign({ effect: activeEffect }, debuggerEventExtraInfo));
+    }
   }
 }
 function trigger(target, type, key, newValue, oldValue, oldTarget) {
@@ -2395,7 +2087,7 @@ function trigger(target, type, key, newValue, oldValue, oldTarget) {
   } else if (key === "length" && isArray(target)) {
     const newLength = Number(newValue);
     depsMap.forEach((dep, key2) => {
-      if (key2 === "length" || !isSymbol(key2) && key2 >= newLength) {
+      if (key2 === "length" || key2 >= newLength) {
         deps.push(dep);
       }
     });
@@ -2429,29 +2121,58 @@ function trigger(target, type, key, newValue, oldValue, oldTarget) {
         break;
     }
   }
-  pauseScheduling();
-  for (const dep of deps) {
-    if (dep) {
-      triggerEffects(
-        dep,
-        4,
-        {
-          target,
-          type,
-          key,
-          newValue,
-          oldValue,
-          oldTarget
-        }
-      );
+  const eventInfo = { target, type, key, newValue, oldValue, oldTarget };
+  if (deps.length === 1) {
+    if (deps[0]) {
+      {
+        triggerEffects(deps[0], eventInfo);
+      }
+    }
+  } else {
+    const effects = [];
+    for (const dep of deps) {
+      if (dep) {
+        effects.push(...dep);
+      }
+    }
+    {
+      triggerEffects(createDep(effects), eventInfo);
     }
   }
-  resetScheduling();
+}
+function triggerEffects(dep, debuggerEventExtraInfo) {
+  const effects = isArray(dep) ? dep : [...dep];
+  for (const effect of effects) {
+    if (effect.computed) {
+      triggerEffect(effect, debuggerEventExtraInfo);
+    }
+  }
+  for (const effect of effects) {
+    if (!effect.computed) {
+      triggerEffect(effect, debuggerEventExtraInfo);
+    }
+  }
+}
+function triggerEffect(effect, debuggerEventExtraInfo) {
+  if (effect !== activeEffect || effect.allowRecurse) {
+    if (effect.onTrigger) {
+      effect.onTrigger(extend({ effect }, debuggerEventExtraInfo));
+    }
+    if (effect.scheduler) {
+      effect.scheduler();
+    } else {
+      effect.run();
+    }
+  }
 }
 const isNonTrackableKeys = /* @__PURE__ */ makeMap(`__proto__,__v_isRef,__isVue`);
 const builtInSymbols = new Set(
   /* @__PURE__ */ Object.getOwnPropertyNames(Symbol).filter((key) => key !== "arguments" && key !== "caller").map((key) => Symbol[key]).filter(isSymbol)
 );
+const get$1 = /* @__PURE__ */ createGetter();
+const shallowGet = /* @__PURE__ */ createGetter(false, true);
+const readonlyGet = /* @__PURE__ */ createGetter(true);
+const shallowReadonlyGet = /* @__PURE__ */ createGetter(true, true);
 const arrayInstrumentations = /* @__PURE__ */ createArrayInstrumentations();
 function createArrayInstrumentations() {
   const instrumentations = {};
@@ -2472,9 +2193,7 @@ function createArrayInstrumentations() {
   ["push", "pop", "shift", "unshift", "splice"].forEach((key) => {
     instrumentations[key] = function(...args) {
       pauseTracking();
-      pauseScheduling();
       const res = toRaw(this)[key].apply(this, args);
-      resetScheduling();
       resetTracking();
       return res;
     };
@@ -2486,30 +2205,20 @@ function hasOwnProperty(key) {
   track(obj, "has", key);
   return obj.hasOwnProperty(key);
 }
-class BaseReactiveHandler2 {
-  constructor(_isReadonly = false, _isShallow = false) {
-    this._isReadonly = _isReadonly;
-    this._isShallow = _isShallow;
-  }
-  get(target, key, receiver) {
-    const isReadonly2 = this._isReadonly, isShallow2 = this._isShallow;
+function createGetter(isReadonly2 = false, shallow = false) {
+  return function get3(target, key, receiver) {
     if (key === "__v_isReactive") {
       return !isReadonly2;
     } else if (key === "__v_isReadonly") {
       return isReadonly2;
     } else if (key === "__v_isShallow") {
-      return isShallow2;
-    } else if (key === "__v_raw") {
-      if (receiver === (isReadonly2 ? isShallow2 ? shallowReadonlyMap : readonlyMap : isShallow2 ? shallowReactiveMap : reactiveMap).get(target) || // receiver is not the reactive proxy, but has the same prototype
-      // this means the reciever is a user proxy of the reactive proxy
-      Object.getPrototypeOf(target) === Object.getPrototypeOf(receiver)) {
-        return target;
-      }
-      return;
+      return shallow;
+    } else if (key === "__v_raw" && receiver === (isReadonly2 ? shallow ? shallowReadonlyMap : readonlyMap : shallow ? shallowReactiveMap : reactiveMap).get(target)) {
+      return target;
     }
     const targetIsArray = isArray(target);
     if (!isReadonly2) {
-      if (targetIsArray && hasOwn(arrayInstrumentations, key)) {
+      if (targetIsArray && hasOwn$1(arrayInstrumentations, key)) {
         return Reflect.get(arrayInstrumentations, key, receiver);
       }
       if (key === "hasOwnProperty") {
@@ -2523,40 +2232,37 @@ class BaseReactiveHandler2 {
     if (!isReadonly2) {
       track(target, "get", key);
     }
-    if (isShallow2) {
+    if (shallow) {
       return res;
     }
     if (isRef(res)) {
       return targetIsArray && isIntegerKey(key) ? res : res.value;
     }
-    if (isObject$1(res)) {
+    if (isObject$2(res)) {
       return isReadonly2 ? readonly(res) : reactive(res);
     }
     return res;
-  }
+  };
 }
-class MutableReactiveHandler2 extends BaseReactiveHandler2 {
-  constructor(isShallow2 = false) {
-    super(false, isShallow2);
-  }
-  set(target, key, value, receiver) {
+const set$1 = /* @__PURE__ */ createSetter();
+const shallowSet = /* @__PURE__ */ createSetter(true);
+function createSetter(shallow = false) {
+  return function set2(target, key, value, receiver) {
     let oldValue = target[key];
-    if (!this._isShallow) {
-      const isOldValueReadonly = isReadonly(oldValue);
+    if (isReadonly(oldValue) && isRef(oldValue) && !isRef(value)) {
+      return false;
+    }
+    if (!shallow) {
       if (!isShallow(value) && !isReadonly(value)) {
         oldValue = toRaw(oldValue);
         value = toRaw(value);
       }
       if (!isArray(target) && isRef(oldValue) && !isRef(value)) {
-        if (isOldValueReadonly) {
-          return false;
-        } else {
-          oldValue.value = value;
-          return true;
-        }
+        oldValue.value = value;
+        return true;
       }
     }
-    const hadKey = isArray(target) && isIntegerKey(key) ? Number(key) < target.length : hasOwn(target, key);
+    const hadKey = isArray(target) && isIntegerKey(key) ? Number(key) < target.length : hasOwn$1(target, key);
     const result = Reflect.set(target, key, value, receiver);
     if (target === toRaw(receiver)) {
       if (!hadKey) {
@@ -2566,69 +2272,68 @@ class MutableReactiveHandler2 extends BaseReactiveHandler2 {
       }
     }
     return result;
-  }
-  deleteProperty(target, key) {
-    const hadKey = hasOwn(target, key);
-    const oldValue = target[key];
-    const result = Reflect.deleteProperty(target, key);
-    if (result && hadKey) {
-      trigger(target, "delete", key, void 0, oldValue);
-    }
-    return result;
-  }
-  has(target, key) {
-    const result = Reflect.has(target, key);
-    if (!isSymbol(key) || !builtInSymbols.has(key)) {
-      track(target, "has", key);
-    }
-    return result;
-  }
-  ownKeys(target) {
-    track(
-      target,
-      "iterate",
-      isArray(target) ? "length" : ITERATE_KEY
-    );
-    return Reflect.ownKeys(target);
-  }
+  };
 }
-class ReadonlyReactiveHandler2 extends BaseReactiveHandler2 {
-  constructor(isShallow2 = false) {
-    super(true, isShallow2);
+function deleteProperty(target, key) {
+  const hadKey = hasOwn$1(target, key);
+  const oldValue = target[key];
+  const result = Reflect.deleteProperty(target, key);
+  if (result && hadKey) {
+    trigger(target, "delete", key, void 0, oldValue);
   }
+  return result;
+}
+function has$1(target, key) {
+  const result = Reflect.has(target, key);
+  if (!isSymbol(key) || !builtInSymbols.has(key)) {
+    track(target, "has", key);
+  }
+  return result;
+}
+function ownKeys(target) {
+  track(target, "iterate", isArray(target) ? "length" : ITERATE_KEY);
+  return Reflect.ownKeys(target);
+}
+const mutableHandlers = {
+  get: get$1,
+  set: set$1,
+  deleteProperty,
+  has: has$1,
+  ownKeys
+};
+const readonlyHandlers = {
+  get: readonlyGet,
   set(target, key) {
     {
-      warn$2(
-        `Set operation on key "${String(key)}" failed: target is readonly.`,
-        target
-      );
+      warn$1(`Set operation on key "${String(key)}" failed: target is readonly.`, target);
     }
     return true;
-  }
+  },
   deleteProperty(target, key) {
     {
-      warn$2(
-        `Delete operation on key "${String(key)}" failed: target is readonly.`,
-        target
-      );
+      warn$1(`Delete operation on key "${String(key)}" failed: target is readonly.`, target);
     }
     return true;
   }
-}
-const mutableHandlers = /* @__PURE__ */ new MutableReactiveHandler2();
-const readonlyHandlers = /* @__PURE__ */ new ReadonlyReactiveHandler2();
-const shallowReactiveHandlers = /* @__PURE__ */ new MutableReactiveHandler2(
-  true
-);
-const shallowReadonlyHandlers = /* @__PURE__ */ new ReadonlyReactiveHandler2(true);
+};
+const shallowReactiveHandlers = /* @__PURE__ */ extend({}, mutableHandlers, {
+  get: shallowGet,
+  set: shallowSet
+});
+const shallowReadonlyHandlers = /* @__PURE__ */ extend({}, readonlyHandlers, {
+  get: shallowReadonlyGet
+});
 const toShallow = (value) => value;
 const getProto = (v) => Reflect.getPrototypeOf(v);
 function get(target, key, isReadonly2 = false, isShallow2 = false) {
-  target = target["__v_raw"];
+  target = target[
+    "__v_raw"
+    /* ReactiveFlags.RAW */
+  ];
   const rawTarget = toRaw(target);
   const rawKey = toRaw(key);
   if (!isReadonly2) {
-    if (hasChanged(key, rawKey)) {
+    if (key !== rawKey) {
       track(rawTarget, "get", key);
     }
     track(rawTarget, "get", rawKey);
@@ -2644,11 +2349,14 @@ function get(target, key, isReadonly2 = false, isShallow2 = false) {
   }
 }
 function has(key, isReadonly2 = false) {
-  const target = this["__v_raw"];
+  const target = this[
+    "__v_raw"
+    /* ReactiveFlags.RAW */
+  ];
   const rawTarget = toRaw(target);
   const rawKey = toRaw(key);
   if (!isReadonly2) {
-    if (hasChanged(key, rawKey)) {
+    if (key !== rawKey) {
       track(rawTarget, "has", key);
     }
     track(rawTarget, "has", rawKey);
@@ -2656,7 +2364,10 @@ function has(key, isReadonly2 = false) {
   return key === rawKey ? target.has(key) : target.has(key) || target.has(rawKey);
 }
 function size(target, isReadonly2 = false) {
-  target = target["__v_raw"];
+  target = target[
+    "__v_raw"
+    /* ReactiveFlags.RAW */
+  ];
   !isReadonly2 && track(toRaw(target), "iterate", ITERATE_KEY);
   return Reflect.get(target, "size", target);
 }
@@ -2671,10 +2382,10 @@ function add(value) {
   }
   return this;
 }
-function set$1(key, value) {
+function set$2(key, value) {
   value = toRaw(value);
   const target = toRaw(this);
-  const { has: has2, get: get22 } = getProto(target);
+  const { has: has2, get: get3 } = getProto(target);
   let hadKey = has2.call(target, key);
   if (!hadKey) {
     key = toRaw(key);
@@ -2682,7 +2393,7 @@ function set$1(key, value) {
   } else {
     checkIdentityKeys(target, has2, key);
   }
-  const oldValue = get22.call(target, key);
+  const oldValue = get3.call(target, key);
   target.set(key, value);
   if (!hadKey) {
     trigger(target, "add", key, value);
@@ -2693,7 +2404,7 @@ function set$1(key, value) {
 }
 function deleteEntry(key) {
   const target = toRaw(this);
-  const { has: has2, get: get22 } = getProto(target);
+  const { has: has2, get: get3 } = getProto(target);
   let hadKey = has2.call(target, key);
   if (!hadKey) {
     key = toRaw(key);
@@ -2701,7 +2412,7 @@ function deleteEntry(key) {
   } else {
     checkIdentityKeys(target, has2, key);
   }
-  const oldValue = get22 ? get22.call(target, key) : void 0;
+  const oldValue = get3 ? get3.call(target, key) : void 0;
   const result = target.delete(key);
   if (hadKey) {
     trigger(target, "delete", key, void 0, oldValue);
@@ -2721,7 +2432,10 @@ function clear() {
 function createForEach(isReadonly2, isShallow2) {
   return function forEach(callback, thisArg) {
     const observed = this;
-    const target = observed["__v_raw"];
+    const target = observed[
+      "__v_raw"
+      /* ReactiveFlags.RAW */
+    ];
     const rawTarget = toRaw(target);
     const wrap = isShallow2 ? toShallow : isReadonly2 ? toReadonly : toReactive;
     !isReadonly2 && track(rawTarget, "iterate", ITERATE_KEY);
@@ -2732,18 +2446,17 @@ function createForEach(isReadonly2, isShallow2) {
 }
 function createIterableMethod(method, isReadonly2, isShallow2) {
   return function(...args) {
-    const target = this["__v_raw"];
+    const target = this[
+      "__v_raw"
+      /* ReactiveFlags.RAW */
+    ];
     const rawTarget = toRaw(target);
     const targetIsMap = isMap(rawTarget);
     const isPair = method === "entries" || method === Symbol.iterator && targetIsMap;
     const isKeyOnly = method === "keys" && targetIsMap;
     const innerIterator = target[method](...args);
     const wrap = isShallow2 ? toShallow : isReadonly2 ? toReadonly : toReactive;
-    !isReadonly2 && track(
-      rawTarget,
-      "iterate",
-      isKeyOnly ? MAP_KEY_ITERATE_KEY : ITERATE_KEY
-    );
+    !isReadonly2 && track(rawTarget, "iterate", isKeyOnly ? MAP_KEY_ITERATE_KEY : ITERATE_KEY);
     return {
       // iterator protocol
       next() {
@@ -2764,12 +2477,9 @@ function createReadonlyMethod(type) {
   return function(...args) {
     {
       const key = args[0] ? `on key "${args[0]}" ` : ``;
-      warn$2(
-        `${capitalize(type)} operation ${key}failed: target is readonly.`,
-        toRaw(this)
-      );
+      console.warn(`${capitalize(type)} operation ${key}failed: target is readonly.`, toRaw(this));
     }
-    return type === "delete" ? false : type === "clear" ? void 0 : this;
+    return type === "delete" ? false : this;
   };
 }
 function createInstrumentations() {
@@ -2782,7 +2492,7 @@ function createInstrumentations() {
     },
     has,
     add,
-    set: set$1,
+    set: set$2,
     delete: deleteEntry,
     clear,
     forEach: createForEach(false, false)
@@ -2796,7 +2506,7 @@ function createInstrumentations() {
     },
     has,
     add,
-    set: set$1,
+    set: set$2,
     delete: deleteEntry,
     clear,
     forEach: createForEach(false, true)
@@ -2811,10 +2521,22 @@ function createInstrumentations() {
     has(key) {
       return has.call(this, key, true);
     },
-    add: createReadonlyMethod("add"),
-    set: createReadonlyMethod("set"),
-    delete: createReadonlyMethod("delete"),
-    clear: createReadonlyMethod("clear"),
+    add: createReadonlyMethod(
+      "add"
+      /* TriggerOpTypes.ADD */
+    ),
+    set: createReadonlyMethod(
+      "set"
+      /* TriggerOpTypes.SET */
+    ),
+    delete: createReadonlyMethod(
+      "delete"
+      /* TriggerOpTypes.DELETE */
+    ),
+    clear: createReadonlyMethod(
+      "clear"
+      /* TriggerOpTypes.CLEAR */
+    ),
     forEach: createForEach(true, false)
   };
   const shallowReadonlyInstrumentations2 = {
@@ -2827,27 +2549,30 @@ function createInstrumentations() {
     has(key) {
       return has.call(this, key, true);
     },
-    add: createReadonlyMethod("add"),
-    set: createReadonlyMethod("set"),
-    delete: createReadonlyMethod("delete"),
-    clear: createReadonlyMethod("clear"),
+    add: createReadonlyMethod(
+      "add"
+      /* TriggerOpTypes.ADD */
+    ),
+    set: createReadonlyMethod(
+      "set"
+      /* TriggerOpTypes.SET */
+    ),
+    delete: createReadonlyMethod(
+      "delete"
+      /* TriggerOpTypes.DELETE */
+    ),
+    clear: createReadonlyMethod(
+      "clear"
+      /* TriggerOpTypes.CLEAR */
+    ),
     forEach: createForEach(true, true)
   };
-  const iteratorMethods = [
-    "keys",
-    "values",
-    "entries",
-    Symbol.iterator
-  ];
+  const iteratorMethods = ["keys", "values", "entries", Symbol.iterator];
   iteratorMethods.forEach((method) => {
     mutableInstrumentations2[method] = createIterableMethod(method, false, false);
     readonlyInstrumentations2[method] = createIterableMethod(method, true, false);
     shallowInstrumentations2[method] = createIterableMethod(method, false, true);
-    shallowReadonlyInstrumentations2[method] = createIterableMethod(
-      method,
-      true,
-      true
-    );
+    shallowReadonlyInstrumentations2[method] = createIterableMethod(method, true, true);
   });
   return [
     mutableInstrumentations2,
@@ -2856,12 +2581,7 @@ function createInstrumentations() {
     shallowReadonlyInstrumentations2
   ];
 }
-const [
-  mutableInstrumentations,
-  readonlyInstrumentations,
-  shallowInstrumentations,
-  shallowReadonlyInstrumentations
-] = /* @__PURE__ */ createInstrumentations();
+const [mutableInstrumentations, readonlyInstrumentations, shallowInstrumentations, shallowReadonlyInstrumentations] = /* @__PURE__ */ createInstrumentations();
 function createInstrumentationGetter(isReadonly2, shallow) {
   const instrumentations = shallow ? isReadonly2 ? shallowReadonlyInstrumentations : shallowInstrumentations : isReadonly2 ? readonlyInstrumentations : mutableInstrumentations;
   return (target, key, receiver) => {
@@ -2872,11 +2592,7 @@ function createInstrumentationGetter(isReadonly2, shallow) {
     } else if (key === "__v_raw") {
       return target;
     }
-    return Reflect.get(
-      hasOwn(instrumentations, key) && key in target ? instrumentations : target,
-      key,
-      receiver
-    );
+    return Reflect.get(hasOwn$1(instrumentations, key) && key in target ? instrumentations : target, key, receiver);
   };
 }
 const mutableCollectionHandlers = {
@@ -2895,9 +2611,7 @@ function checkIdentityKeys(target, has2, key) {
   const rawKey = toRaw(key);
   if (rawKey !== key && has2.call(target, rawKey)) {
     const type = toRawType(target);
-    warn$2(
-      `Reactive ${type} contains both the raw and reactive versions of the same object${type === `Map` ? ` as keys` : ``}, which can lead to inconsistencies. Avoid differentiating between the raw and reactive versions of an object and only use the reactive version if possible.`
-    );
+    console.warn(`Reactive ${type} contains both the raw and reactive versions of the same object${type === `Map` ? ` as keys` : ``}, which can lead to inconsistencies. Avoid differentiating between the raw and reactive versions of an object and only use the reactive version if possible.`);
   }
 }
 const reactiveMap = /* @__PURE__ */ new WeakMap();
@@ -2919,55 +2633,40 @@ function targetTypeMap(rawType) {
   }
 }
 function getTargetType(value) {
-  return value["__v_skip"] || !Object.isExtensible(value) ? 0 : targetTypeMap(toRawType(value));
+  return value[
+    "__v_skip"
+    /* ReactiveFlags.SKIP */
+  ] || !Object.isExtensible(value) ? 0 : targetTypeMap(toRawType(value));
 }
 function reactive(target) {
   if (isReadonly(target)) {
     return target;
   }
-  return createReactiveObject(
-    target,
-    false,
-    mutableHandlers,
-    mutableCollectionHandlers,
-    reactiveMap
-  );
+  return createReactiveObject(target, false, mutableHandlers, mutableCollectionHandlers, reactiveMap);
 }
 function shallowReactive(target) {
-  return createReactiveObject(
-    target,
-    false,
-    shallowReactiveHandlers,
-    shallowCollectionHandlers,
-    shallowReactiveMap
-  );
+  return createReactiveObject(target, false, shallowReactiveHandlers, shallowCollectionHandlers, shallowReactiveMap);
 }
 function readonly(target) {
-  return createReactiveObject(
-    target,
-    true,
-    readonlyHandlers,
-    readonlyCollectionHandlers,
-    readonlyMap
-  );
+  return createReactiveObject(target, true, readonlyHandlers, readonlyCollectionHandlers, readonlyMap);
 }
 function shallowReadonly(target) {
-  return createReactiveObject(
-    target,
-    true,
-    shallowReadonlyHandlers,
-    shallowReadonlyCollectionHandlers,
-    shallowReadonlyMap
-  );
+  return createReactiveObject(target, true, shallowReadonlyHandlers, shallowReadonlyCollectionHandlers, shallowReadonlyMap);
 }
 function createReactiveObject(target, isReadonly2, baseHandlers, collectionHandlers, proxyMap) {
-  if (!isObject$1(target)) {
+  if (!isObject$2(target)) {
     {
-      warn$2(`value cannot be made reactive: ${String(target)}`);
+      console.warn(`value cannot be made reactive: ${String(target)}`);
     }
     return target;
   }
-  if (target["__v_raw"] && !(isReadonly2 && target["__v_isReactive"])) {
+  if (target[
+    "__v_raw"
+    /* ReactiveFlags.RAW */
+  ] && !(isReadonly2 && target[
+    "__v_isReactive"
+    /* ReactiveFlags.IS_REACTIVE */
+  ])) {
     return target;
   }
   const existingProxy = proxyMap.get(target);
@@ -2978,143 +2677,78 @@ function createReactiveObject(target, isReadonly2, baseHandlers, collectionHandl
   if (targetType === 0) {
     return target;
   }
-  const proxy = new Proxy(
-    target,
-    targetType === 2 ? collectionHandlers : baseHandlers
-  );
+  const proxy = new Proxy(target, targetType === 2 ? collectionHandlers : baseHandlers);
   proxyMap.set(target, proxy);
   return proxy;
 }
 function isReactive(value) {
   if (isReadonly(value)) {
-    return isReactive(value["__v_raw"]);
+    return isReactive(value[
+      "__v_raw"
+      /* ReactiveFlags.RAW */
+    ]);
   }
-  return !!(value && value["__v_isReactive"]);
+  return !!(value && value[
+    "__v_isReactive"
+    /* ReactiveFlags.IS_REACTIVE */
+  ]);
 }
 function isReadonly(value) {
-  return !!(value && value["__v_isReadonly"]);
+  return !!(value && value[
+    "__v_isReadonly"
+    /* ReactiveFlags.IS_READONLY */
+  ]);
 }
 function isShallow(value) {
-  return !!(value && value["__v_isShallow"]);
+  return !!(value && value[
+    "__v_isShallow"
+    /* ReactiveFlags.IS_SHALLOW */
+  ]);
 }
 function isProxy(value) {
   return isReactive(value) || isReadonly(value);
 }
 function toRaw(observed) {
-  const raw = observed && observed["__v_raw"];
+  const raw = observed && observed[
+    "__v_raw"
+    /* ReactiveFlags.RAW */
+  ];
   return raw ? toRaw(raw) : observed;
 }
 function markRaw(value) {
-  if (Object.isExtensible(value)) {
-    def(value, "__v_skip", true);
-  }
+  def(value, "__v_skip", true);
   return value;
 }
-const toReactive = (value) => isObject$1(value) ? reactive(value) : value;
-const toReadonly = (value) => isObject$1(value) ? readonly(value) : value;
-const COMPUTED_SIDE_EFFECT_WARN = `Computed is still dirty after getter evaluation, likely because a computed is mutating its own dependency in its getter. State mutations in computed getters should be avoided.  Check the docs for more details: https://vuejs.org/guide/essentials/computed.html#getters-should-be-side-effect-free`;
-class ComputedRefImpl {
-  constructor(getter, _setter, isReadonly2, isSSR) {
-    this.getter = getter;
-    this._setter = _setter;
-    this.dep = void 0;
-    this.__v_isRef = true;
-    this["__v_isReadonly"] = false;
-    this.effect = new ReactiveEffect2(
-      () => getter(this._value),
-      () => triggerRefValue(
-        this,
-        this.effect._dirtyLevel === 2 ? 2 : 3
-      )
-    );
-    this.effect.computed = this;
-    this.effect.active = this._cacheable = !isSSR;
-    this["__v_isReadonly"] = isReadonly2;
-  }
-  get value() {
-    const self2 = toRaw(this);
-    if ((!self2._cacheable || self2.effect.dirty) && hasChanged(self2._value, self2._value = self2.effect.run())) {
-      triggerRefValue(self2, 4);
-    }
-    trackRefValue(self2);
-    if (self2.effect._dirtyLevel >= 2) {
-      if (this._warnRecursive) {
-        warn$2(COMPUTED_SIDE_EFFECT_WARN, `
-
-getter: `, this.getter);
-      }
-      triggerRefValue(self2, 2);
-    }
-    return self2._value;
-  }
-  set value(newValue) {
-    this._setter(newValue);
-  }
-  // #region polyfill _dirty for backward compatibility third party code for Vue <= 3.3.x
-  get _dirty() {
-    return this.effect.dirty;
-  }
-  set _dirty(v) {
-    this.effect.dirty = v;
-  }
-  // #endregion
-}
-function computed$1(getterOrOptions, debugOptions, isSSR = false) {
-  let getter;
-  let setter;
-  const onlyGetter = isFunction(getterOrOptions);
-  if (onlyGetter) {
-    getter = getterOrOptions;
-    setter = () => {
-      warn$2("Write operation failed: computed value is readonly");
-    };
-  } else {
-    getter = getterOrOptions.get;
-    setter = getterOrOptions.set;
-  }
-  const cRef = new ComputedRefImpl(getter, setter, onlyGetter || !setter, isSSR);
-  if (debugOptions && !isSSR) {
-    cRef.effect.onTrack = debugOptions.onTrack;
-    cRef.effect.onTrigger = debugOptions.onTrigger;
-  }
-  return cRef;
-}
+const toReactive = (value) => isObject$2(value) ? reactive(value) : value;
+const toReadonly = (value) => isObject$2(value) ? readonly(value) : value;
 function trackRefValue(ref2) {
-  var _a;
   if (shouldTrack && activeEffect) {
     ref2 = toRaw(ref2);
-    trackEffect(
-      activeEffect,
-      (_a = ref2.dep) != null ? _a : ref2.dep = createDep(
-        () => ref2.dep = void 0,
-        ref2 instanceof ComputedRefImpl ? ref2 : void 0
-      ),
-      {
+    {
+      trackEffects(ref2.dep || (ref2.dep = createDep()), {
         target: ref2,
         type: "get",
         key: "value"
-      }
-    );
+      });
+    }
   }
 }
-function triggerRefValue(ref2, dirtyLevel = 4, newVal) {
+function triggerRefValue(ref2, newVal) {
   ref2 = toRaw(ref2);
   const dep = ref2.dep;
   if (dep) {
-    triggerEffects(
-      dep,
-      dirtyLevel,
-      {
+    {
+      triggerEffects(dep, {
         target: ref2,
         type: "set",
         key: "value",
         newValue: newVal
-      }
-    );
+      });
+    }
   }
 }
-function isRef(r2) {
-  return !!(r2 && r2.__v_isRef === true);
+function isRef(r) {
+  return !!(r && r.__v_isRef === true);
 }
 function ref(value) {
   return createRef(value, false);
@@ -3143,7 +2777,7 @@ class RefImpl {
     if (hasChanged(newVal, this._rawValue)) {
       this._rawValue = newVal;
       this._value = useDirectValue ? newVal : toReactive(newVal);
-      triggerRefValue(this, 4, newVal);
+      triggerRefValue(this, newVal);
     }
   }
 }
@@ -3165,6 +2799,61 @@ const shallowUnwrapHandlers = {
 function proxyRefs(objectWithRefs) {
   return isReactive(objectWithRefs) ? objectWithRefs : new Proxy(objectWithRefs, shallowUnwrapHandlers);
 }
+var _a;
+class ComputedRefImpl {
+  constructor(getter, _setter, isReadonly2, isSSR) {
+    this._setter = _setter;
+    this.dep = void 0;
+    this.__v_isRef = true;
+    this[_a] = false;
+    this._dirty = true;
+    this.effect = new ReactiveEffect(getter, () => {
+      if (!this._dirty) {
+        this._dirty = true;
+        triggerRefValue(this);
+      }
+    });
+    this.effect.computed = this;
+    this.effect.active = this._cacheable = !isSSR;
+    this[
+      "__v_isReadonly"
+      /* ReactiveFlags.IS_READONLY */
+    ] = isReadonly2;
+  }
+  get value() {
+    const self = toRaw(this);
+    trackRefValue(self);
+    if (self._dirty || !self._cacheable) {
+      self._dirty = false;
+      self._value = self.effect.run();
+    }
+    return self._value;
+  }
+  set value(newValue) {
+    this._setter(newValue);
+  }
+}
+_a = "__v_isReadonly";
+function computed$1(getterOrOptions, debugOptions, isSSR = false) {
+  let getter;
+  let setter;
+  const onlyGetter = isFunction(getterOrOptions);
+  if (onlyGetter) {
+    getter = getterOrOptions;
+    setter = () => {
+      console.warn("Write operation failed: computed value is readonly");
+    };
+  } else {
+    getter = getterOrOptions.get;
+    setter = getterOrOptions.set;
+  }
+  const cRef = new ComputedRefImpl(getter, setter, onlyGetter || !setter, isSSR);
+  if (debugOptions && !isSSR) {
+    cRef.effect.onTrack = debugOptions.onTrack;
+    cRef.effect.onTrigger = debugOptions.onTrigger;
+  }
+  return cRef;
+}
 const stack = [];
 function pushWarningContext(vnode) {
   stack.push(vnode);
@@ -3172,28 +2861,18 @@ function pushWarningContext(vnode) {
 function popWarningContext() {
   stack.pop();
 }
-function warn$1(msg, ...args) {
+function warn(msg, ...args) {
   pauseTracking();
   const instance = stack.length ? stack[stack.length - 1].component : null;
   const appWarnHandler = instance && instance.appContext.config.warnHandler;
   const trace = getComponentTrace();
   if (appWarnHandler) {
-    callWithErrorHandling(
-      appWarnHandler,
-      instance,
-      11,
-      [
-        msg + args.map((a) => {
-          var _a, _b;
-          return (_b = (_a = a.toString) == null ? void 0 : _a.call(a)) != null ? _b : JSON.stringify(a);
-        }).join(""),
-        instance && instance.proxy,
-        trace.map(
-          ({ vnode }) => `at <${formatComponentName(instance, vnode.type)}>`
-        ).join("\n"),
-        trace
-      ]
-    );
+    callWithErrorHandling(appWarnHandler, instance, 11, [
+      msg + args.join(""),
+      instance && instance.proxy,
+      trace.map(({ vnode }) => `at <${formatComponentName(instance, vnode.type)}>`).join("\n"),
+      trace
+    ]);
   } else {
     const warnArgs = [`[Vue warn]: ${msg}`, ...args];
     if (trace.length && // avoid spamming console during tests
@@ -3237,11 +2916,7 @@ function formatTrace(trace) {
 function formatTraceEntry({ vnode, recurseCount }) {
   const postfix = recurseCount > 0 ? `... (${recurseCount} recursive calls)` : ``;
   const isRoot = vnode.component ? vnode.component.parent == null : false;
-  const open = ` at <${formatComponentName(
-    vnode.component,
-    vnode.type,
-    isRoot
-  )}`;
+  const open = ` at <${formatComponentName(vnode.component, vnode.type, isRoot)}`;
   const close = `>` + postfix;
   return vnode.props ? [open, ...formatProps(vnode.props), close] : [open + close];
 }
@@ -3273,42 +2948,131 @@ function formatProp(key, value, raw) {
   }
 }
 const ErrorTypeStrings = {
-  ["sp"]: "serverPrefetch hook",
-  ["bc"]: "beforeCreate hook",
-  ["c"]: "created hook",
-  ["bm"]: "beforeMount hook",
-  ["m"]: "mounted hook",
-  ["bu"]: "beforeUpdate hook",
-  ["u"]: "updated",
-  ["bum"]: "beforeUnmount hook",
-  ["um"]: "unmounted hook",
-  ["a"]: "activated hook",
-  ["da"]: "deactivated hook",
-  ["ec"]: "errorCaptured hook",
-  ["rtc"]: "renderTracked hook",
-  ["rtg"]: "renderTriggered hook",
-  [0]: "setup function",
-  [1]: "render function",
-  [2]: "watcher getter",
-  [3]: "watcher callback",
-  [4]: "watcher cleanup function",
-  [5]: "native event handler",
-  [6]: "component event handler",
-  [7]: "vnode hook",
-  [8]: "directive hook",
-  [9]: "transition hook",
-  [10]: "app errorHandler",
-  [11]: "app warnHandler",
-  [12]: "ref function",
-  [13]: "async component loader",
-  [14]: "scheduler flush. This is likely a Vue internals bug. Please open an issue at https://github.com/vuejs/core ."
+  [
+    "sp"
+    /* LifecycleHooks.SERVER_PREFETCH */
+  ]: "serverPrefetch hook",
+  [
+    "bc"
+    /* LifecycleHooks.BEFORE_CREATE */
+  ]: "beforeCreate hook",
+  [
+    "c"
+    /* LifecycleHooks.CREATED */
+  ]: "created hook",
+  [
+    "bm"
+    /* LifecycleHooks.BEFORE_MOUNT */
+  ]: "beforeMount hook",
+  [
+    "m"
+    /* LifecycleHooks.MOUNTED */
+  ]: "mounted hook",
+  [
+    "bu"
+    /* LifecycleHooks.BEFORE_UPDATE */
+  ]: "beforeUpdate hook",
+  [
+    "u"
+    /* LifecycleHooks.UPDATED */
+  ]: "updated",
+  [
+    "bum"
+    /* LifecycleHooks.BEFORE_UNMOUNT */
+  ]: "beforeUnmount hook",
+  [
+    "um"
+    /* LifecycleHooks.UNMOUNTED */
+  ]: "unmounted hook",
+  [
+    "a"
+    /* LifecycleHooks.ACTIVATED */
+  ]: "activated hook",
+  [
+    "da"
+    /* LifecycleHooks.DEACTIVATED */
+  ]: "deactivated hook",
+  [
+    "ec"
+    /* LifecycleHooks.ERROR_CAPTURED */
+  ]: "errorCaptured hook",
+  [
+    "rtc"
+    /* LifecycleHooks.RENDER_TRACKED */
+  ]: "renderTracked hook",
+  [
+    "rtg"
+    /* LifecycleHooks.RENDER_TRIGGERED */
+  ]: "renderTriggered hook",
+  [
+    0
+    /* ErrorCodes.SETUP_FUNCTION */
+  ]: "setup function",
+  [
+    1
+    /* ErrorCodes.RENDER_FUNCTION */
+  ]: "render function",
+  [
+    2
+    /* ErrorCodes.WATCH_GETTER */
+  ]: "watcher getter",
+  [
+    3
+    /* ErrorCodes.WATCH_CALLBACK */
+  ]: "watcher callback",
+  [
+    4
+    /* ErrorCodes.WATCH_CLEANUP */
+  ]: "watcher cleanup function",
+  [
+    5
+    /* ErrorCodes.NATIVE_EVENT_HANDLER */
+  ]: "native event handler",
+  [
+    6
+    /* ErrorCodes.COMPONENT_EVENT_HANDLER */
+  ]: "component event handler",
+  [
+    7
+    /* ErrorCodes.VNODE_HOOK */
+  ]: "vnode hook",
+  [
+    8
+    /* ErrorCodes.DIRECTIVE_HOOK */
+  ]: "directive hook",
+  [
+    9
+    /* ErrorCodes.TRANSITION_HOOK */
+  ]: "transition hook",
+  [
+    10
+    /* ErrorCodes.APP_ERROR_HANDLER */
+  ]: "app errorHandler",
+  [
+    11
+    /* ErrorCodes.APP_WARN_HANDLER */
+  ]: "app warnHandler",
+  [
+    12
+    /* ErrorCodes.FUNCTION_REF */
+  ]: "ref function",
+  [
+    13
+    /* ErrorCodes.ASYNC_COMPONENT_LOADER */
+  ]: "async component loader",
+  [
+    14
+    /* ErrorCodes.SCHEDULER */
+  ]: "scheduler flush. This is likely a Vue internals bug. Please open an issue at https://new-issue.vuejs.org/?repo=vuejs/core"
 };
 function callWithErrorHandling(fn, instance, type, args) {
+  let res;
   try {
-    return args ? fn(...args) : fn();
+    res = args ? fn(...args) : fn();
   } catch (err) {
     handleError(err, instance, type);
   }
+  return res;
 }
 function callWithAsyncErrorHandling(fn, instance, type, args) {
   if (isFunction(fn)) {
@@ -3345,12 +3109,7 @@ function handleError(err, instance, type, throwInDev = true) {
     }
     const appErrorHandler = instance.appContext.config.errorHandler;
     if (appErrorHandler) {
-      callWithErrorHandling(
-        appErrorHandler,
-        null,
-        10,
-        [err, exposedInstance, errorInfo]
-      );
+      callWithErrorHandling(appErrorHandler, null, 10, [err, exposedInstance, errorInfo]);
       return;
     }
   }
@@ -3362,7 +3121,7 @@ function logError(err, type, contextVNode, throwInDev = true) {
     if (contextVNode) {
       pushWarningContext(contextVNode);
     }
-    warn$1(`Unhandled error${info ? ` during execution of ${info}` : ``}`);
+    warn(`Unhandled error${info ? ` during execution of ${info}` : ``}`);
     if (contextVNode) {
       popWarningContext();
     }
@@ -3392,21 +3151,13 @@ function findInsertionIndex(id) {
   let end = queue.length;
   while (start < end) {
     const middle = start + end >>> 1;
-    const middleJob = queue[middle];
-    const middleJobId = getId(middleJob);
-    if (middleJobId < id || middleJobId === id && middleJob.pre) {
-      start = middle + 1;
-    } else {
-      end = middle;
-    }
+    const middleJobId = getId(queue[middle]);
+    middleJobId < id ? start = middle + 1 : end = middle;
   }
   return start;
 }
 function queueJob(job) {
-  if (!queue.length || !queue.includes(
-    job,
-    isFlushing && job.allowRecurse ? flushIndex + 1 : flushIndex
-  )) {
+  if (!queue.length || !queue.includes(job, isFlushing && job.allowRecurse ? flushIndex + 1 : flushIndex)) {
     if (job.id == null) {
       queue.push(job);
     } else {
@@ -3432,10 +3183,7 @@ function invalidateJob(job) {
 }
 function queuePostFlushCb(cb) {
   if (!isArray(cb)) {
-    if (!activePostFlushCbs || !activePostFlushCbs.includes(
-      cb,
-      cb.allowRecurse ? postFlushIndex + 1 : postFlushIndex
-    )) {
+    if (!activePostFlushCbs || !activePostFlushCbs.includes(cb, cb.allowRecurse ? postFlushIndex + 1 : postFlushIndex)) {
       pendingPostFlushCbs.push(cb);
     }
   } else {
@@ -3443,16 +3191,13 @@ function queuePostFlushCb(cb) {
   }
   queueFlush();
 }
-function flushPreFlushCbs(instance, seen, i = isFlushing ? flushIndex + 1 : 0) {
+function flushPreFlushCbs(seen, i = isFlushing ? flushIndex + 1 : 0) {
   {
     seen = seen || /* @__PURE__ */ new Map();
   }
   for (; i < queue.length; i++) {
     const cb = queue[i];
     if (cb && cb.pre) {
-      if (instance && cb.id !== instance.uid) {
-        continue;
-      }
       if (checkRecursiveUpdates(seen, cb)) {
         continue;
       }
@@ -3464,9 +3209,7 @@ function flushPreFlushCbs(instance, seen, i = isFlushing ? flushIndex + 1 : 0) {
 }
 function flushPostFlushCbs(seen) {
   if (pendingPostFlushCbs.length) {
-    const deduped = [...new Set(pendingPostFlushCbs)].sort(
-      (a, b) => getId(a) - getId(b)
-    );
+    const deduped = [...new Set(pendingPostFlushCbs)];
     pendingPostFlushCbs.length = 0;
     if (activePostFlushCbs) {
       activePostFlushCbs.push(...deduped);
@@ -3476,6 +3219,7 @@ function flushPostFlushCbs(seen) {
     {
       seen = seen || /* @__PURE__ */ new Map();
     }
+    activePostFlushCbs.sort((a, b) => getId(a) - getId(b));
     for (postFlushIndex = 0; postFlushIndex < activePostFlushCbs.length; postFlushIndex++) {
       if (checkRecursiveUpdates(seen, activePostFlushCbs[postFlushIndex])) {
         continue;
@@ -3512,7 +3256,12 @@ function flushJobs(seen) {
         if (check(job)) {
           continue;
         }
-        callWithErrorHandling(job, null, 14);
+        callWithErrorHandling(
+          job,
+          null,
+          14
+          /* ErrorCodes.SCHEDULER */
+        );
       }
     }
   } finally {
@@ -3534,11 +3283,7 @@ function checkRecursiveUpdates(seen, fn) {
     if (count > RECURSION_LIMIT) {
       const instance = fn.ownerInstance;
       const componentName = instance && getComponentName(instance.type);
-      handleError(
-        `Maximum recursive updates exceeded${componentName ? ` in component <${componentName}>` : ``}. This means you have a reactive effect that is mutating its own dependencies and thus recursively triggering itself. Possible sources include component template, render function, updated hook or watcher source function.`,
-        null,
-        10
-      );
+      warn(`Maximum recursive updates exceeded${componentName ? ` in component <${componentName}>` : ``}. This means you have a reactive effect that is mutating its own dependencies and thus recursively triggering itself. Possible sources include component template, render function, updated hook or watcher source function.`);
       return true;
     } else {
       seen.set(fn, count + 1);
@@ -3556,7 +3301,7 @@ function emit$1(event, ...args) {
   }
 }
 function setDevtoolsHook(hook, target) {
-  var _a, _b;
+  var _a2, _b;
   devtools = hook;
   if (devtools) {
     devtools.enabled = true;
@@ -3567,8 +3312,10 @@ function setDevtoolsHook(hook, target) {
     // browser environment to avoid the timer handle stalling test runner exit
     // (#4815)
     typeof window !== "undefined" && // some envs mock window but not fully
+    // eslint-disable-next-line no-restricted-globals
     window.HTMLElement && // also exclude jsdom
-    !((_b = (_a = window.navigator) == null ? void 0 : _a.userAgent) == null ? void 0 : _b.includes("jsdom"))
+    // eslint-disable-next-line no-restricted-globals
+    !((_b = (_a2 = window.navigator) === null || _a2 === void 0 ? void 0 : _a2.userAgent) === null || _b === void 0 ? void 0 : _b.includes("jsdom"))
   ) {
     const replay = target.__VUE_DEVTOOLS_HOOK_REPLAY__ = target.__VUE_DEVTOOLS_HOOK_REPLAY__ || [];
     replay.push((newHook) => {
@@ -3596,15 +3343,15 @@ function devtoolsInitApp(app, version2) {
 }
 const devtoolsComponentAdded = /* @__PURE__ */ createDevtoolsComponentHook(
   "component:added"
-  /* COMPONENT_ADDED */
+  /* DevtoolsHooks.COMPONENT_ADDED */
 );
 const devtoolsComponentUpdated = /* @__PURE__ */ createDevtoolsComponentHook(
   "component:updated"
-  /* COMPONENT_UPDATED */
+  /* DevtoolsHooks.COMPONENT_UPDATED */
 );
 const _devtoolsComponentRemoved = /* @__PURE__ */ createDevtoolsComponentHook(
   "component:removed"
-  /* COMPONENT_REMOVED */
+  /* DevtoolsHooks.COMPONENT_REMOVED */
 );
 const devtoolsComponentRemoved = (component) => {
   if (devtools && typeof devtools.cleanupBuffer === "function" && // remove the component if it wasn't buffered
@@ -3612,8 +3359,6 @@ const devtoolsComponentRemoved = (component) => {
     _devtoolsComponentRemoved(component);
   }
 };
-/*! #__NO_SIDE_EFFECTS__ */
-// @__NO_SIDE_EFFECTS__
 function createDevtoolsComponentHook(hook) {
   return (component) => {
     emit$1(
@@ -3629,11 +3374,11 @@ function createDevtoolsComponentHook(hook) {
 }
 const devtoolsPerfStart = /* @__PURE__ */ createDevtoolsPerformanceHook(
   "perf:start"
-  /* PERFORMANCE_START */
+  /* DevtoolsHooks.PERFORMANCE_START */
 );
 const devtoolsPerfEnd = /* @__PURE__ */ createDevtoolsPerformanceHook(
   "perf:end"
-  /* PERFORMANCE_END */
+  /* DevtoolsHooks.PERFORMANCE_END */
 );
 function createDevtoolsPerformanceHook(hook) {
   return (component, type, time) => {
@@ -3641,38 +3386,25 @@ function createDevtoolsPerformanceHook(hook) {
   };
 }
 function devtoolsComponentEmit(component, event, params) {
-  emit$1(
-    "component:emit",
-    component.appContext.app,
-    component,
-    event,
-    params
-  );
+  emit$1("component:emit", component.appContext.app, component, event, params);
 }
 function emit(instance, event, ...rawArgs) {
   if (instance.isUnmounted)
     return;
   const props = instance.vnode.props || EMPTY_OBJ;
   {
-    const {
-      emitsOptions,
-      propsOptions: [propsOptions]
-    } = instance;
+    const { emitsOptions, propsOptions: [propsOptions] } = instance;
     if (emitsOptions) {
       if (!(event in emitsOptions) && true) {
         if (!propsOptions || !(toHandlerKey(event) in propsOptions)) {
-          warn$1(
-            `Component emitted event "${event}" but it is neither declared in the emits option nor as an "${toHandlerKey(event)}" prop.`
-          );
+          warn(`Component emitted event "${event}" but it is neither declared in the emits option nor as an "${toHandlerKey(event)}" prop.`);
         }
       } else {
         const validator = emitsOptions[event];
         if (isFunction(validator)) {
           const isValid = validator(...rawArgs);
           if (!isValid) {
-            warn$1(
-              `Invalid event arguments: event validation failed for event "${event}".`
-            );
+            warn(`Invalid event arguments: event validation failed for event "${event}".`);
           }
         }
       }
@@ -3697,14 +3429,7 @@ function emit(instance, event, ...rawArgs) {
   {
     const lowerCaseEvent = event.toLowerCase();
     if (lowerCaseEvent !== event && props[toHandlerKey(lowerCaseEvent)]) {
-      warn$1(
-        `Event "${lowerCaseEvent}" is emitted in component ${formatComponentName(
-          instance,
-          instance.type
-        )} but the handler is registered for "${event}". Note that HTML attributes are case-insensitive and you cannot use v-on to listen to camelCase events when using in-DOM templates. You should probably use "${hyphenate(
-          event
-        )}" instead of "${event}".`
-      );
+      warn(`Event "${lowerCaseEvent}" is emitted in component ${formatComponentName(instance, instance.type)} but the handler is registered for "${event}". Note that HTML attributes are case-insensitive and you cannot use v-on to listen to camelCase events when using in-DOM templates. You should probably use "${hyphenate(event)}" instead of "${event}".`);
     }
   }
   let handlerName;
@@ -3714,12 +3439,7 @@ function emit(instance, event, ...rawArgs) {
     handler = props[handlerName = toHandlerKey(hyphenate(event))];
   }
   if (handler) {
-    callWithAsyncErrorHandling(
-      handler,
-      instance,
-      6,
-      args
-    );
+    callWithAsyncErrorHandling(handler, instance, 6, args);
   }
   const onceHandler = props[handlerName + `Once`];
   if (onceHandler) {
@@ -3729,12 +3449,7 @@ function emit(instance, event, ...rawArgs) {
       return;
     }
     instance.emitted[handlerName] = true;
-    callWithAsyncErrorHandling(
-      onceHandler,
-      instance,
-      6,
-      args
-    );
+    callWithAsyncErrorHandling(onceHandler, instance, 6, args);
   }
 }
 function normalizeEmitsOptions(comp, appContext, asMixin = false) {
@@ -3765,7 +3480,7 @@ function normalizeEmitsOptions(comp, appContext, asMixin = false) {
     }
   }
   if (!raw && !hasExtends) {
-    if (isObject$1(comp)) {
+    if (isObject$2(comp)) {
       cache.set(comp, null);
     }
     return null;
@@ -3775,7 +3490,7 @@ function normalizeEmitsOptions(comp, appContext, asMixin = false) {
   } else {
     extend(normalized, raw);
   }
-  if (isObject$1(comp)) {
+  if (isObject$2(comp)) {
     cache.set(comp, normalized);
   }
   return normalized;
@@ -3785,7 +3500,7 @@ function isEmitListener(options, key) {
     return false;
   }
   key = key.slice(2).replace(/Once$/, "");
-  return hasOwn(options, key[0].toLowerCase() + key.slice(1)) || hasOwn(options, hyphenate(key)) || hasOwn(options, key);
+  return hasOwn$1(options, key[0].toLowerCase() + key.slice(1)) || hasOwn$1(options, hyphenate(key)) || hasOwn$1(options, key);
 }
 let currentRenderingInstance = null;
 function setCurrentRenderingInstance(instance) {
@@ -3794,422 +3509,10 @@ function setCurrentRenderingInstance(instance) {
   instance && instance.type.__scopeId || null;
   return prev;
 }
-const COMPONENTS = "components";
-function resolveComponent(name, maybeSelfReference) {
-  return resolveAsset(COMPONENTS, name, true, maybeSelfReference) || name;
-}
-function resolveAsset(type, name, warnMissing = true, maybeSelfReference = false) {
-  const instance = currentRenderingInstance || currentInstance;
-  if (instance) {
-    const Component2 = instance.type;
-    if (type === COMPONENTS) {
-      const selfName = getComponentName(
-        Component2,
-        false
-      );
-      if (selfName && (selfName === name || selfName === camelize(name) || selfName === capitalize(camelize(name)))) {
-        return Component2;
-      }
-    }
-    const res = (
-      // local registration
-      // check instance[type] first which is resolved for options API
-      resolve(instance[type] || Component2[type], name) || // global registration
-      resolve(instance.appContext[type], name)
-    );
-    if (!res && maybeSelfReference) {
-      return Component2;
-    }
-    if (warnMissing && !res) {
-      const extra = type === COMPONENTS ? `
-If this is a native custom element, make sure to exclude it from component resolution via compilerOptions.isCustomElement.` : ``;
-      warn$1(`Failed to resolve ${type.slice(0, -1)}: ${name}${extra}`);
-    }
-    return res;
-  } else {
-    warn$1(
-      `resolve${capitalize(type.slice(0, -1))} can only be used in render() or setup().`
-    );
-  }
-}
-function resolve(registry, name) {
-  return registry && (registry[name] || registry[camelize(name)] || registry[capitalize(camelize(name))]);
-}
-const INITIAL_WATCHER_VALUE = {};
-function watch(source, cb, options) {
-  if (!isFunction(cb)) {
-    warn$1(
-      `\`watch(fn, options?)\` signature has been moved to a separate API. Use \`watchEffect(fn, options?)\` instead. \`watch\` now only supports \`watch(source, cb, options?) signature.`
-    );
-  }
-  return doWatch(source, cb, options);
-}
-function doWatch(source, cb, {
-  immediate,
-  deep,
-  flush,
-  once: once2,
-  onTrack,
-  onTrigger
-} = EMPTY_OBJ) {
-  if (cb && once2) {
-    const _cb = cb;
-    cb = (...args) => {
-      _cb(...args);
-      unwatch();
-    };
-  }
-  if (deep !== void 0 && typeof deep === "number") {
-    warn$1(
-      `watch() "deep" option with number value will be used as watch depth in future versions. Please use a boolean instead to avoid potential breakage.`
-    );
-  }
-  if (!cb) {
-    if (immediate !== void 0) {
-      warn$1(
-        `watch() "immediate" option is only respected when using the watch(source, callback, options?) signature.`
-      );
-    }
-    if (deep !== void 0) {
-      warn$1(
-        `watch() "deep" option is only respected when using the watch(source, callback, options?) signature.`
-      );
-    }
-    if (once2 !== void 0) {
-      warn$1(
-        `watch() "once" option is only respected when using the watch(source, callback, options?) signature.`
-      );
-    }
-  }
-  const warnInvalidSource = (s2) => {
-    warn$1(
-      `Invalid watch source: `,
-      s2,
-      `A watch source can only be a getter/effect function, a ref, a reactive object, or an array of these types.`
-    );
-  };
-  const instance = currentInstance;
-  const reactiveGetter = (source2) => deep === true ? source2 : (
-    // for deep: false, only traverse root-level properties
-    traverse(source2, deep === false ? 1 : void 0)
-  );
-  let getter;
-  let forceTrigger = false;
-  let isMultiSource = false;
-  if (isRef(source)) {
-    getter = () => source.value;
-    forceTrigger = isShallow(source);
-  } else if (isReactive(source)) {
-    getter = () => reactiveGetter(source);
-    forceTrigger = true;
-  } else if (isArray(source)) {
-    isMultiSource = true;
-    forceTrigger = source.some((s2) => isReactive(s2) || isShallow(s2));
-    getter = () => source.map((s2) => {
-      if (isRef(s2)) {
-        return s2.value;
-      } else if (isReactive(s2)) {
-        return reactiveGetter(s2);
-      } else if (isFunction(s2)) {
-        return callWithErrorHandling(s2, instance, 2);
-      } else {
-        warnInvalidSource(s2);
-      }
-    });
-  } else if (isFunction(source)) {
-    if (cb) {
-      getter = () => callWithErrorHandling(source, instance, 2);
-    } else {
-      getter = () => {
-        if (cleanup) {
-          cleanup();
-        }
-        return callWithAsyncErrorHandling(
-          source,
-          instance,
-          3,
-          [onCleanup]
-        );
-      };
-    }
-  } else {
-    getter = NOOP;
-    warnInvalidSource(source);
-  }
-  if (cb && deep) {
-    const baseGetter = getter;
-    getter = () => traverse(baseGetter());
-  }
-  let cleanup;
-  let onCleanup = (fn) => {
-    cleanup = effect2.onStop = () => {
-      callWithErrorHandling(fn, instance, 4);
-      cleanup = effect2.onStop = void 0;
-    };
-  };
-  let oldValue = isMultiSource ? new Array(source.length).fill(INITIAL_WATCHER_VALUE) : INITIAL_WATCHER_VALUE;
-  const job = () => {
-    if (!effect2.active || !effect2.dirty) {
-      return;
-    }
-    if (cb) {
-      const newValue = effect2.run();
-      if (deep || forceTrigger || (isMultiSource ? newValue.some((v, i) => hasChanged(v, oldValue[i])) : hasChanged(newValue, oldValue)) || false) {
-        if (cleanup) {
-          cleanup();
-        }
-        callWithAsyncErrorHandling(cb, instance, 3, [
-          newValue,
-          // pass undefined as the old value when it's changed for the first time
-          oldValue === INITIAL_WATCHER_VALUE ? void 0 : isMultiSource && oldValue[0] === INITIAL_WATCHER_VALUE ? [] : oldValue,
-          onCleanup
-        ]);
-        oldValue = newValue;
-      }
-    } else {
-      effect2.run();
-    }
-  };
-  job.allowRecurse = !!cb;
-  let scheduler;
-  if (flush === "sync") {
-    scheduler = job;
-  } else if (flush === "post") {
-    scheduler = () => queuePostRenderEffect$1(job, instance && instance.suspense);
-  } else {
-    job.pre = true;
-    if (instance)
-      job.id = instance.uid;
-    scheduler = () => queueJob(job);
-  }
-  const effect2 = new ReactiveEffect2(getter, NOOP, scheduler);
-  const scope = getCurrentScope();
-  const unwatch = () => {
-    effect2.stop();
-    if (scope) {
-      remove(scope.effects, effect2);
-    }
-  };
-  {
-    effect2.onTrack = onTrack;
-    effect2.onTrigger = onTrigger;
-  }
-  if (cb) {
-    if (immediate) {
-      job();
-    } else {
-      oldValue = effect2.run();
-    }
-  } else if (flush === "post") {
-    queuePostRenderEffect$1(
-      effect2.run.bind(effect2),
-      instance && instance.suspense
-    );
-  } else {
-    effect2.run();
-  }
-  return unwatch;
-}
-function instanceWatch(source, value, options) {
-  const publicThis = this.proxy;
-  const getter = isString(source) ? source.includes(".") ? createPathGetter(publicThis, source) : () => publicThis[source] : source.bind(publicThis, publicThis);
-  let cb;
-  if (isFunction(value)) {
-    cb = value;
-  } else {
-    cb = value.handler;
-    options = value;
-  }
-  const reset = setCurrentInstance(this);
-  const res = doWatch(getter, cb.bind(publicThis), options);
-  reset();
-  return res;
-}
-function createPathGetter(ctx, path) {
-  const segments = path.split(".");
-  return () => {
-    let cur = ctx;
-    for (let i = 0; i < segments.length && cur; i++) {
-      cur = cur[segments[i]];
-    }
-    return cur;
-  };
-}
-function traverse(value, depth, currentDepth = 0, seen) {
-  if (!isObject$1(value) || value["__v_skip"]) {
-    return value;
-  }
-  if (depth && depth > 0) {
-    if (currentDepth >= depth) {
-      return value;
-    }
-    currentDepth++;
-  }
-  seen = seen || /* @__PURE__ */ new Set();
-  if (seen.has(value)) {
-    return value;
-  }
-  seen.add(value);
-  if (isRef(value)) {
-    traverse(value.value, depth, currentDepth, seen);
-  } else if (isArray(value)) {
-    for (let i = 0; i < value.length; i++) {
-      traverse(value[i], depth, currentDepth, seen);
-    }
-  } else if (isSet(value) || isMap(value)) {
-    value.forEach((v) => {
-      traverse(v, depth, currentDepth, seen);
-    });
-  } else if (isPlainObject(value)) {
-    for (const key in value) {
-      traverse(value[key], depth, currentDepth, seen);
-    }
-  }
-  return value;
-}
-function validateDirectiveName(name) {
-  if (isBuiltInDirective(name)) {
-    warn$1("Do not use built-in directive ids as custom directive id: " + name);
-  }
-}
-function createAppContext() {
-  return {
-    app: null,
-    config: {
-      isNativeTag: NO,
-      performance: false,
-      globalProperties: {},
-      optionMergeStrategies: {},
-      errorHandler: void 0,
-      warnHandler: void 0,
-      compilerOptions: {}
-    },
-    mixins: [],
-    components: {},
-    directives: {},
-    provides: /* @__PURE__ */ Object.create(null),
-    optionsCache: /* @__PURE__ */ new WeakMap(),
-    propsCache: /* @__PURE__ */ new WeakMap(),
-    emitsCache: /* @__PURE__ */ new WeakMap()
-  };
-}
-let uid$1 = 0;
-function createAppAPI(render, hydrate) {
-  return function createApp2(rootComponent, rootProps = null) {
-    if (!isFunction(rootComponent)) {
-      rootComponent = extend({}, rootComponent);
-    }
-    if (rootProps != null && !isObject$1(rootProps)) {
-      warn$1(`root props passed to app.mount() must be an object.`);
-      rootProps = null;
-    }
-    const context = createAppContext();
-    const installedPlugins = /* @__PURE__ */ new WeakSet();
-    const app = context.app = {
-      _uid: uid$1++,
-      _component: rootComponent,
-      _props: rootProps,
-      _container: null,
-      _context: context,
-      _instance: null,
-      version,
-      get config() {
-        return context.config;
-      },
-      set config(v) {
-        {
-          warn$1(
-            `app.config cannot be replaced. Modify individual options instead.`
-          );
-        }
-      },
-      use(plugin2, ...options) {
-        if (installedPlugins.has(plugin2)) {
-          warn$1(`Plugin has already been applied to target app.`);
-        } else if (plugin2 && isFunction(plugin2.install)) {
-          installedPlugins.add(plugin2);
-          plugin2.install(app, ...options);
-        } else if (isFunction(plugin2)) {
-          installedPlugins.add(plugin2);
-          plugin2(app, ...options);
-        } else {
-          warn$1(
-            `A plugin must either be a function or an object with an "install" function.`
-          );
-        }
-        return app;
-      },
-      mixin(mixin) {
-        {
-          if (!context.mixins.includes(mixin)) {
-            context.mixins.push(mixin);
-          } else {
-            warn$1(
-              "Mixin has already been applied to target app" + (mixin.name ? `: ${mixin.name}` : "")
-            );
-          }
-        }
-        return app;
-      },
-      component(name, component) {
-        {
-          validateComponentName(name, context.config);
-        }
-        if (!component) {
-          return context.components[name];
-        }
-        if (context.components[name]) {
-          warn$1(`Component "${name}" has already been registered in target app.`);
-        }
-        context.components[name] = component;
-        return app;
-      },
-      directive(name, directive) {
-        {
-          validateDirectiveName(name);
-        }
-        if (!directive) {
-          return context.directives[name];
-        }
-        if (context.directives[name]) {
-          warn$1(`Directive "${name}" has already been registered in target app.`);
-        }
-        context.directives[name] = directive;
-        return app;
-      },
-      // fixed by xxxxxx
-      mount() {
-      },
-      // fixed by xxxxxx
-      unmount() {
-      },
-      provide(key, value) {
-        if (key in context.provides) {
-          warn$1(
-            `App already provides property with key "${String(key)}". It will be overwritten with the new value.`
-          );
-        }
-        context.provides[key] = value;
-        return app;
-      },
-      runWithContext(fn) {
-        const lastApp = currentApp;
-        currentApp = app;
-        try {
-          return fn();
-        } finally {
-          currentApp = lastApp;
-        }
-      }
-    };
-    return app;
-  };
-}
-let currentApp = null;
 function provide(key, value) {
   if (!currentInstance) {
     {
-      warn$1(`provide() can only be used inside setup().`);
+      warn(`provide() can only be used inside setup().`);
     }
   } else {
     let provides = currentInstance.provides;
@@ -4225,18 +3528,222 @@ function provide(key, value) {
 }
 function inject(key, defaultValue, treatDefaultAsFactory = false) {
   const instance = currentInstance || currentRenderingInstance;
-  if (instance || currentApp) {
-    const provides = instance ? instance.parent == null ? instance.vnode.appContext && instance.vnode.appContext.provides : instance.parent.provides : currentApp._context.provides;
+  if (instance) {
+    const provides = instance.parent == null ? instance.vnode.appContext && instance.vnode.appContext.provides : instance.parent.provides;
     if (provides && key in provides) {
       return provides[key];
     } else if (arguments.length > 1) {
-      return treatDefaultAsFactory && isFunction(defaultValue) ? defaultValue.call(instance && instance.proxy) : defaultValue;
+      return treatDefaultAsFactory && isFunction(defaultValue) ? defaultValue.call(instance.proxy) : defaultValue;
     } else {
-      warn$1(`injection "${String(key)}" not found.`);
+      warn(`injection "${String(key)}" not found.`);
     }
   } else {
-    warn$1(`inject() can only be used inside setup() or functional components.`);
+    warn(`inject() can only be used inside setup() or functional components.`);
   }
+}
+const INITIAL_WATCHER_VALUE = {};
+function watch(source, cb, options) {
+  if (!isFunction(cb)) {
+    warn(`\`watch(fn, options?)\` signature has been moved to a separate API. Use \`watchEffect(fn, options?)\` instead. \`watch\` now only supports \`watch(source, cb, options?) signature.`);
+  }
+  return doWatch(source, cb, options);
+}
+function doWatch(source, cb, { immediate, deep, flush, onTrack, onTrigger } = EMPTY_OBJ) {
+  if (!cb) {
+    if (immediate !== void 0) {
+      warn(`watch() "immediate" option is only respected when using the watch(source, callback, options?) signature.`);
+    }
+    if (deep !== void 0) {
+      warn(`watch() "deep" option is only respected when using the watch(source, callback, options?) signature.`);
+    }
+  }
+  const warnInvalidSource = (s2) => {
+    warn(`Invalid watch source: `, s2, `A watch source can only be a getter/effect function, a ref, a reactive object, or an array of these types.`);
+  };
+  const instance = getCurrentScope() === (currentInstance === null || currentInstance === void 0 ? void 0 : currentInstance.scope) ? currentInstance : null;
+  let getter;
+  let forceTrigger = false;
+  let isMultiSource = false;
+  if (isRef(source)) {
+    getter = () => source.value;
+    forceTrigger = isShallow(source);
+  } else if (isReactive(source)) {
+    getter = () => source;
+    deep = true;
+  } else if (isArray(source)) {
+    isMultiSource = true;
+    forceTrigger = source.some((s2) => isReactive(s2) || isShallow(s2));
+    getter = () => source.map((s2) => {
+      if (isRef(s2)) {
+        return s2.value;
+      } else if (isReactive(s2)) {
+        return traverse(s2);
+      } else if (isFunction(s2)) {
+        return callWithErrorHandling(
+          s2,
+          instance,
+          2
+          /* ErrorCodes.WATCH_GETTER */
+        );
+      } else {
+        warnInvalidSource(s2);
+      }
+    });
+  } else if (isFunction(source)) {
+    if (cb) {
+      getter = () => callWithErrorHandling(
+        source,
+        instance,
+        2
+        /* ErrorCodes.WATCH_GETTER */
+      );
+    } else {
+      getter = () => {
+        if (instance && instance.isUnmounted) {
+          return;
+        }
+        if (cleanup) {
+          cleanup();
+        }
+        return callWithAsyncErrorHandling(source, instance, 3, [onCleanup]);
+      };
+    }
+  } else {
+    getter = NOOP;
+    warnInvalidSource(source);
+  }
+  if (cb && deep) {
+    const baseGetter = getter;
+    getter = () => traverse(baseGetter());
+  }
+  let cleanup;
+  let onCleanup = (fn) => {
+    cleanup = effect.onStop = () => {
+      callWithErrorHandling(
+        fn,
+        instance,
+        4
+        /* ErrorCodes.WATCH_CLEANUP */
+      );
+    };
+  };
+  let oldValue = isMultiSource ? new Array(source.length).fill(INITIAL_WATCHER_VALUE) : INITIAL_WATCHER_VALUE;
+  const job = () => {
+    if (!effect.active) {
+      return;
+    }
+    if (cb) {
+      const newValue = effect.run();
+      if (deep || forceTrigger || (isMultiSource ? newValue.some((v, i) => hasChanged(v, oldValue[i])) : hasChanged(newValue, oldValue)) || false) {
+        if (cleanup) {
+          cleanup();
+        }
+        callWithAsyncErrorHandling(cb, instance, 3, [
+          newValue,
+          // pass undefined as the old value when it's changed for the first time
+          oldValue === INITIAL_WATCHER_VALUE ? void 0 : isMultiSource && oldValue[0] === INITIAL_WATCHER_VALUE ? [] : oldValue,
+          onCleanup
+        ]);
+        oldValue = newValue;
+      }
+    } else {
+      effect.run();
+    }
+  };
+  job.allowRecurse = !!cb;
+  let scheduler;
+  if (flush === "sync") {
+    scheduler = job;
+  } else if (flush === "post") {
+    scheduler = () => queuePostRenderEffect$1(job, instance && instance.suspense);
+  } else {
+    job.pre = true;
+    if (instance)
+      job.id = instance.uid;
+    scheduler = () => queueJob(job);
+  }
+  const effect = new ReactiveEffect(getter, scheduler);
+  {
+    effect.onTrack = onTrack;
+    effect.onTrigger = onTrigger;
+  }
+  if (cb) {
+    if (immediate) {
+      job();
+    } else {
+      oldValue = effect.run();
+    }
+  } else if (flush === "post") {
+    queuePostRenderEffect$1(effect.run.bind(effect), instance && instance.suspense);
+  } else {
+    effect.run();
+  }
+  const unwatch = () => {
+    effect.stop();
+    if (instance && instance.scope) {
+      remove(instance.scope.effects, effect);
+    }
+  };
+  return unwatch;
+}
+function instanceWatch(source, value, options) {
+  const publicThis = this.proxy;
+  const getter = isString(source) ? source.includes(".") ? createPathGetter(publicThis, source) : () => publicThis[source] : source.bind(publicThis, publicThis);
+  let cb;
+  if (isFunction(value)) {
+    cb = value;
+  } else {
+    cb = value.handler;
+    options = value;
+  }
+  const cur = currentInstance;
+  setCurrentInstance(this);
+  const res = doWatch(getter, cb.bind(publicThis), options);
+  if (cur) {
+    setCurrentInstance(cur);
+  } else {
+    unsetCurrentInstance();
+  }
+  return res;
+}
+function createPathGetter(ctx, path) {
+  const segments = path.split(".");
+  return () => {
+    let cur = ctx;
+    for (let i = 0; i < segments.length && cur; i++) {
+      cur = cur[segments[i]];
+    }
+    return cur;
+  };
+}
+function traverse(value, seen) {
+  if (!isObject$2(value) || value[
+    "__v_skip"
+    /* ReactiveFlags.SKIP */
+  ]) {
+    return value;
+  }
+  seen = seen || /* @__PURE__ */ new Set();
+  if (seen.has(value)) {
+    return value;
+  }
+  seen.add(value);
+  if (isRef(value)) {
+    traverse(value.value, seen);
+  } else if (isArray(value)) {
+    for (let i = 0; i < value.length; i++) {
+      traverse(value[i], seen);
+    }
+  } else if (isSet(value) || isMap(value)) {
+    value.forEach((v) => {
+      traverse(v, seen);
+    });
+  } else if (isPlainObject(value)) {
+    for (const key in value) {
+      traverse(value[key], seen);
+    }
+  }
+  return value;
 }
 const isKeepAlive = (vnode) => vnode.type.__isKeepAlive;
 function onActivated(hook, target) {
@@ -4290,9 +3797,9 @@ function injectHook(type, hook, target = currentInstance, prepend = false) {
         return;
       }
       pauseTracking();
-      const reset = setCurrentInstance(target);
+      setCurrentInstance(target);
       const res = callWithAsyncErrorHandling(hook, target, type, args);
-      reset();
+      unsetCurrentInstance();
       resetTracking();
       return res;
     });
@@ -4303,33 +3810,97 @@ function injectHook(type, hook, target = currentInstance, prepend = false) {
     }
     return wrappedHook;
   } else {
-    const apiName = toHandlerKey(
-      (ErrorTypeStrings[type] || type.replace(/^on/, "")).replace(/ hook$/, "")
-    );
-    warn$1(
-      `${apiName} is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup().`
-    );
+    const apiName = toHandlerKey((ErrorTypeStrings[type] || type.replace(/^on/, "")).replace(/ hook$/, ""));
+    warn(`${apiName} is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup().`);
   }
 }
 const createHook$1 = (lifecycle) => (hook, target = currentInstance) => (
   // post-create lifecycle registrations are noops during SSR (except for serverPrefetch)
   (!isInSSRComponentSetup || lifecycle === "sp") && injectHook(lifecycle, (...args) => hook(...args), target)
 );
-const onBeforeMount = createHook$1("bm");
-const onMounted = createHook$1("m");
-const onBeforeUpdate = createHook$1("bu");
-const onUpdated = createHook$1("u");
-const onBeforeUnmount = createHook$1("bum");
-const onUnmounted = createHook$1("um");
-const onServerPrefetch = createHook$1("sp");
+const onBeforeMount = createHook$1(
+  "bm"
+  /* LifecycleHooks.BEFORE_MOUNT */
+);
+const onMounted = createHook$1(
+  "m"
+  /* LifecycleHooks.MOUNTED */
+);
+const onBeforeUpdate = createHook$1(
+  "bu"
+  /* LifecycleHooks.BEFORE_UPDATE */
+);
+const onUpdated = createHook$1(
+  "u"
+  /* LifecycleHooks.UPDATED */
+);
+const onBeforeUnmount = createHook$1(
+  "bum"
+  /* LifecycleHooks.BEFORE_UNMOUNT */
+);
+const onUnmounted = createHook$1(
+  "um"
+  /* LifecycleHooks.UNMOUNTED */
+);
+const onServerPrefetch = createHook$1(
+  "sp"
+  /* LifecycleHooks.SERVER_PREFETCH */
+);
 const onRenderTriggered = createHook$1(
   "rtg"
+  /* LifecycleHooks.RENDER_TRIGGERED */
 );
 const onRenderTracked = createHook$1(
   "rtc"
+  /* LifecycleHooks.RENDER_TRACKED */
 );
 function onErrorCaptured(hook, target = currentInstance) {
   injectHook("ec", hook, target);
+}
+function validateDirectiveName(name) {
+  if (isBuiltInDirective(name)) {
+    warn("Do not use built-in directive ids as custom directive id: " + name);
+  }
+}
+const COMPONENTS = "components";
+function resolveComponent(name, maybeSelfReference) {
+  return resolveAsset(COMPONENTS, name, true, maybeSelfReference) || name;
+}
+function resolveAsset(type, name, warnMissing = true, maybeSelfReference = false) {
+  const instance = currentRenderingInstance || currentInstance;
+  if (instance) {
+    const Component2 = instance.type;
+    if (type === COMPONENTS) {
+      const selfName = getComponentName(
+        Component2,
+        false
+        /* do not include inferred name to avoid breaking existing code */
+      );
+      if (selfName && (selfName === name || selfName === camelize(name) || selfName === capitalize(camelize(name)))) {
+        return Component2;
+      }
+    }
+    const res = (
+      // local registration
+      // check instance[type] first which is resolved for options API
+      resolve(instance[type] || Component2[type], name) || // global registration
+      resolve(instance.appContext[type], name)
+    );
+    if (!res && maybeSelfReference) {
+      return Component2;
+    }
+    if (warnMissing && !res) {
+      const extra = type === COMPONENTS ? `
+If this is a native custom element, make sure to exclude it from component resolution via compilerOptions.isCustomElement.` : ``;
+      warn(`Failed to resolve ${type.slice(0, -1)}: ${name}${extra}`);
+    }
+    return res;
+  } else {
+    warn(`resolve${capitalize(type.slice(0, -1))} can only be used in render() or setup().`);
+  }
+}
+function resolve(registry, name) {
+  return registry && (registry[name] || registry[camelize(name)] || registry[capitalize(camelize(name))]);
 }
 const getPublicInstance = (i) => {
   if (!i)
@@ -4355,16 +3926,13 @@ const publicPropertiesMap = (
     $root: (i) => getPublicInstance(i.root),
     $emit: (i) => i.emit,
     $options: (i) => resolveMergedOptions(i),
-    $forceUpdate: (i) => i.f || (i.f = () => {
-      i.effect.dirty = true;
-      queueJob(i.update);
-    }),
+    $forceUpdate: (i) => i.f || (i.f = () => queueJob(i.update)),
     // $nextTick: i => i.n || (i.n = nextTick.bind(i.proxy!)),// fixed by xxxxxx
     $watch: (i) => instanceWatch.bind(i)
   })
 );
 const isReservedPrefix = (key) => key === "_" || key === "$";
-const hasSetupBinding = (state, key) => state !== EMPTY_OBJ && !state.__isScriptSetup && hasOwn(state, key);
+const hasSetupBinding = (state, key) => state !== EMPTY_OBJ && !state.__isScriptSetup && hasOwn$1(state, key);
 const PublicInstanceProxyHandlers = {
   get({ _: instance }, key) {
     const { ctx, setupState, data, props, accessCache, type, appContext } = instance;
@@ -4388,17 +3956,17 @@ const PublicInstanceProxyHandlers = {
       } else if (hasSetupBinding(setupState, key)) {
         accessCache[key] = 1;
         return setupState[key];
-      } else if (data !== EMPTY_OBJ && hasOwn(data, key)) {
+      } else if (data !== EMPTY_OBJ && hasOwn$1(data, key)) {
         accessCache[key] = 2;
         return data[key];
       } else if (
         // only cache other properties when instance has declared (thus stable)
         // props
-        (normalizedProps = instance.propsOptions[0]) && hasOwn(normalizedProps, key)
+        (normalizedProps = instance.propsOptions[0]) && hasOwn$1(normalizedProps, key)
       ) {
         accessCache[key] = 3;
         return props[key];
-      } else if (ctx !== EMPTY_OBJ && hasOwn(ctx, key)) {
+      } else if (ctx !== EMPTY_OBJ && hasOwn$1(ctx, key)) {
         accessCache[key] = 4;
         return ctx[key];
       } else if (shouldCacheAccess) {
@@ -4410,8 +3978,6 @@ const PublicInstanceProxyHandlers = {
     if (publicGetter) {
       if (key === "$attrs") {
         track(instance, "get", key);
-      } else if (key === "$slots") {
-        track(instance, "get", key);
       }
       return publicGetter(instance);
     } else if (
@@ -4419,12 +3985,12 @@ const PublicInstanceProxyHandlers = {
       (cssModule = type.__cssModules) && (cssModule = cssModule[key])
     ) {
       return cssModule;
-    } else if (ctx !== EMPTY_OBJ && hasOwn(ctx, key)) {
+    } else if (ctx !== EMPTY_OBJ && hasOwn$1(ctx, key)) {
       accessCache[key] = 4;
       return ctx[key];
     } else if (
       // global properties
-      globalProperties = appContext.config.globalProperties, hasOwn(globalProperties, key)
+      globalProperties = appContext.config.globalProperties, hasOwn$1(globalProperties, key)
     ) {
       {
         return globalProperties[key];
@@ -4432,16 +3998,10 @@ const PublicInstanceProxyHandlers = {
     } else if (currentRenderingInstance && (!isString(key) || // #1091 avoid internal isRef/isVNode checks on component instance leading
     // to infinite warning loop
     key.indexOf("__v") !== 0)) {
-      if (data !== EMPTY_OBJ && isReservedPrefix(key[0]) && hasOwn(data, key)) {
-        warn$1(
-          `Property ${JSON.stringify(
-            key
-          )} must be accessed via $data because it starts with a reserved character ("$" or "_") and is not proxied on the render context.`
-        );
+      if (data !== EMPTY_OBJ && isReservedPrefix(key[0]) && hasOwn$1(data, key)) {
+        warn(`Property ${JSON.stringify(key)} must be accessed via $data because it starts with a reserved character ("$" or "_") and is not proxied on the render context.`);
       } else if (instance === currentRenderingInstance) {
-        warn$1(
-          `Property ${JSON.stringify(key)} was accessed during render but is not defined on instance.`
-        );
+        warn(`Property ${JSON.stringify(key)} was accessed during render but is not defined on instance.`);
       }
     }
   },
@@ -4450,20 +4010,18 @@ const PublicInstanceProxyHandlers = {
     if (hasSetupBinding(setupState, key)) {
       setupState[key] = value;
       return true;
-    } else if (setupState.__isScriptSetup && hasOwn(setupState, key)) {
-      warn$1(`Cannot mutate <script setup> binding "${key}" from Options API.`);
+    } else if (setupState.__isScriptSetup && hasOwn$1(setupState, key)) {
+      warn(`Cannot mutate <script setup> binding "${key}" from Options API.`);
       return false;
-    } else if (data !== EMPTY_OBJ && hasOwn(data, key)) {
+    } else if (data !== EMPTY_OBJ && hasOwn$1(data, key)) {
       data[key] = value;
       return true;
-    } else if (hasOwn(instance.props, key)) {
-      warn$1(`Attempting to mutate prop "${key}". Props are readonly.`);
+    } else if (hasOwn$1(instance.props, key)) {
+      warn(`Attempting to mutate prop "${key}". Props are readonly.`);
       return false;
     }
     if (key[0] === "$" && key.slice(1) in instance) {
-      warn$1(
-        `Attempting to mutate public property "${key}". Properties starting with $ are reserved and readonly.`
-      );
+      warn(`Attempting to mutate public property "${key}". Properties starting with $ are reserved and readonly.`);
       return false;
     } else {
       if (key in instance.appContext.config.globalProperties) {
@@ -4478,16 +4036,14 @@ const PublicInstanceProxyHandlers = {
     }
     return true;
   },
-  has({
-    _: { data, setupState, accessCache, ctx, appContext, propsOptions }
-  }, key) {
+  has({ _: { data, setupState, accessCache, ctx, appContext, propsOptions } }, key) {
     let normalizedProps;
-    return !!accessCache[key] || data !== EMPTY_OBJ && hasOwn(data, key) || hasSetupBinding(setupState, key) || (normalizedProps = propsOptions[0]) && hasOwn(normalizedProps, key) || hasOwn(ctx, key) || hasOwn(publicPropertiesMap, key) || hasOwn(appContext.config.globalProperties, key);
+    return !!accessCache[key] || data !== EMPTY_OBJ && hasOwn$1(data, key) || hasSetupBinding(setupState, key) || (normalizedProps = propsOptions[0]) && hasOwn$1(normalizedProps, key) || hasOwn$1(ctx, key) || hasOwn$1(publicPropertiesMap, key) || hasOwn$1(appContext.config.globalProperties, key);
   },
   defineProperty(target, key, descriptor) {
     if (descriptor.get != null) {
       target._.accessCache[key] = 0;
-    } else if (hasOwn(descriptor, "value")) {
+    } else if (hasOwn$1(descriptor, "value")) {
       this.set(target, key, descriptor.value, null);
     }
     return Reflect.defineProperty(target, key, descriptor);
@@ -4495,9 +4051,7 @@ const PublicInstanceProxyHandlers = {
 };
 {
   PublicInstanceProxyHandlers.ownKeys = (target) => {
-    warn$1(
-      `Avoid app logic that relies on enumerating keys on a component instance. The keys will be empty in production mode to avoid performance overhead.`
-    );
+    warn(`Avoid app logic that relies on enumerating keys on a component instance. The keys will be empty in production mode to avoid performance overhead.`);
     return Reflect.ownKeys(target);
   };
 }
@@ -4521,10 +4075,7 @@ function createDevRenderContext(instance) {
   return target;
 }
 function exposePropsOnRenderContext(instance) {
-  const {
-    ctx,
-    propsOptions: [propsOptions]
-  } = instance;
+  const { ctx, propsOptions: [propsOptions] } = instance;
   if (propsOptions) {
     Object.keys(propsOptions).forEach((key) => {
       Object.defineProperty(ctx, key, {
@@ -4541,11 +4092,7 @@ function exposeSetupStateOnRenderContext(instance) {
   Object.keys(toRaw(setupState)).forEach((key) => {
     if (!setupState.__isScriptSetup) {
       if (isReservedPrefix(key[0])) {
-        warn$1(
-          `setup() return property ${JSON.stringify(
-            key
-          )} should not start with "$" or "_" which are reserved prefixes for Vue internals.`
-        );
+        warn(`setup() return property ${JSON.stringify(key)} should not start with "$" or "_" which are reserved prefixes for Vue internals.`);
         return;
       }
       Object.defineProperty(ctx, key, {
@@ -4557,17 +4104,11 @@ function exposeSetupStateOnRenderContext(instance) {
     }
   });
 }
-function normalizePropsOrEmits(props) {
-  return isArray(props) ? props.reduce(
-    (normalized, p2) => (normalized[p2] = null, normalized),
-    {}
-  ) : props;
-}
 function createDuplicateChecker() {
   const cache = /* @__PURE__ */ Object.create(null);
   return (type, key) => {
     if (cache[key]) {
-      warn$1(`${type} property "${key}" is already defined in ${cache[key]}.`);
+      warn(`${type} property "${key}" is already defined in ${cache[key]}.`);
     } else {
       cache[key] = type;
     }
@@ -4580,7 +4121,12 @@ function applyOptions$1(instance) {
   const ctx = instance.ctx;
   shouldCacheAccess = false;
   if (options.beforeCreate) {
-    callHook$1(options.beforeCreate, instance, "bc");
+    callHook$1(
+      options.beforeCreate,
+      instance,
+      "bc"
+      /* LifecycleHooks.BEFORE_CREATE */
+    );
   }
   const {
     // state
@@ -4625,7 +4171,7 @@ function applyOptions$1(instance) {
     }
   }
   if (injectOptions) {
-    resolveInjections(injectOptions, ctx, checkDuplicateProperties);
+    resolveInjections(injectOptions, ctx, checkDuplicateProperties, instance.appContext.config.unwrapInjectedRef);
   }
   if (methods) {
     for (const key in methods) {
@@ -4643,26 +4189,20 @@ function applyOptions$1(instance) {
           checkDuplicateProperties("Methods", key);
         }
       } else {
-        warn$1(
-          `Method "${key}" has type "${typeof methodHandler}" in the component definition. Did you reference the function correctly?`
-        );
+        warn(`Method "${key}" has type "${typeof methodHandler}" in the component definition. Did you reference the function correctly?`);
       }
     }
   }
   if (dataOptions) {
     if (!isFunction(dataOptions)) {
-      warn$1(
-        `The data option must be a function. Plain object usage is no longer supported.`
-      );
+      warn(`The data option must be a function. Plain object usage is no longer supported.`);
     }
     const data = dataOptions.call(publicThis, publicThis);
     if (isPromise$1(data)) {
-      warn$1(
-        `data() returned a Promise - note data() cannot be async; If you intend to perform data fetching before component renders, use async setup() + <Suspense>.`
-      );
+      warn(`data() returned a Promise - note data() cannot be async; If you intend to perform data fetching before component renders, use async setup() + <Suspense>.`);
     }
-    if (!isObject$1(data)) {
-      warn$1(`data() should return an object.`);
+    if (!isObject$2(data)) {
+      warn(`data() should return an object.`);
     } else {
       instance.data = reactive(data);
       {
@@ -4684,24 +4224,22 @@ function applyOptions$1(instance) {
   if (computedOptions) {
     for (const key in computedOptions) {
       const opt = computedOptions[key];
-      const get22 = isFunction(opt) ? opt.bind(publicThis, publicThis) : isFunction(opt.get) ? opt.get.bind(publicThis, publicThis) : NOOP;
-      if (get22 === NOOP) {
-        warn$1(`Computed property "${key}" has no getter.`);
+      const get3 = isFunction(opt) ? opt.bind(publicThis, publicThis) : isFunction(opt.get) ? opt.get.bind(publicThis, publicThis) : NOOP;
+      if (get3 === NOOP) {
+        warn(`Computed property "${key}" has no getter.`);
       }
       const set2 = !isFunction(opt) && isFunction(opt.set) ? opt.set.bind(publicThis) : () => {
-        warn$1(
-          `Write operation failed: computed property "${key}" is readonly.`
-        );
+        warn(`Write operation failed: computed property "${key}" is readonly.`);
       };
-      const c2 = computed({
-        get: get22,
+      const c = computed({
+        get: get3,
         set: set2
       });
       Object.defineProperty(ctx, key, {
         enumerable: true,
         configurable: true,
-        get: () => c2.value,
-        set: (v) => c2.value = v
+        get: () => c.value,
+        set: (v) => c.value = v
       });
       {
         checkDuplicateProperties("Computed", key);
@@ -4723,7 +4261,12 @@ function applyOptions$1(instance) {
   }
   {
     if (created) {
-      callHook$1(created, instance, "c");
+      callHook$1(
+        created,
+        instance,
+        "c"
+        /* LifecycleHooks.CREATED */
+      );
     }
   }
   function registerLifecycleHook(register2, hook) {
@@ -4772,19 +4315,20 @@ function applyOptions$1(instance) {
     instance.ctx.$onApplyOptions(options, instance, publicThis);
   }
 }
-function resolveInjections(injectOptions, ctx, checkDuplicateProperties = NOOP) {
+function resolveInjections(injectOptions, ctx, checkDuplicateProperties = NOOP, unwrapRef = false) {
   if (isArray(injectOptions)) {
     injectOptions = normalizeInject(injectOptions);
   }
   for (const key in injectOptions) {
     const opt = injectOptions[key];
     let injected;
-    if (isObject$1(opt)) {
+    if (isObject$2(opt)) {
       if ("default" in opt) {
         injected = inject(
           opt.from || key,
           opt.default,
           true
+          /* treat default function as factory */
         );
       } else {
         injected = inject(opt.from || key);
@@ -4793,12 +4337,19 @@ function resolveInjections(injectOptions, ctx, checkDuplicateProperties = NOOP) 
       injected = inject(opt);
     }
     if (isRef(injected)) {
-      Object.defineProperty(ctx, key, {
-        enumerable: true,
-        configurable: true,
-        get: () => injected.value,
-        set: (v) => injected.value = v
-      });
+      if (unwrapRef) {
+        Object.defineProperty(ctx, key, {
+          enumerable: true,
+          configurable: true,
+          get: () => injected.value,
+          set: (v) => injected.value = v
+        });
+      } else {
+        {
+          warn(`injected property "${key}" is a ref and will be auto-unwrapped and no longer needs \`.value\` in the next minor release. To opt-in to the new behavior now, set \`app.config.unwrapInjectedRef = true\` (this config is temporary and will not be needed in the future.)`);
+        }
+        ctx[key] = injected;
+      }
     } else {
       ctx[key] = injected;
     }
@@ -4808,11 +4359,7 @@ function resolveInjections(injectOptions, ctx, checkDuplicateProperties = NOOP) 
   }
 }
 function callHook$1(hook, instance, type) {
-  callWithAsyncErrorHandling(
-    isArray(hook) ? hook.map((h2) => h2.bind(instance.proxy)) : hook.bind(instance.proxy),
-    instance,
-    type
-  );
+  callWithAsyncErrorHandling(isArray(hook) ? hook.map((h) => h.bind(instance.proxy)) : hook.bind(instance.proxy), instance, type);
 }
 function createWatcher(raw, ctx, publicThis, key) {
   const getter = key.includes(".") ? createPathGetter(publicThis, key) : () => publicThis[key];
@@ -4821,33 +4368,29 @@ function createWatcher(raw, ctx, publicThis, key) {
     if (isFunction(handler)) {
       watch(getter, handler);
     } else {
-      warn$1(`Invalid watch handler specified by key "${raw}"`, handler);
+      warn(`Invalid watch handler specified by key "${raw}"`, handler);
     }
   } else if (isFunction(raw)) {
     watch(getter, raw.bind(publicThis));
-  } else if (isObject$1(raw)) {
+  } else if (isObject$2(raw)) {
     if (isArray(raw)) {
-      raw.forEach((r2) => createWatcher(r2, ctx, publicThis, key));
+      raw.forEach((r) => createWatcher(r, ctx, publicThis, key));
     } else {
       const handler = isFunction(raw.handler) ? raw.handler.bind(publicThis) : ctx[raw.handler];
       if (isFunction(handler)) {
         watch(getter, handler, raw);
       } else {
-        warn$1(`Invalid watch handler specified by key "${raw.handler}"`, handler);
+        warn(`Invalid watch handler specified by key "${raw.handler}"`, handler);
       }
     }
   } else {
-    warn$1(`Invalid watch option: "${key}"`, raw);
+    warn(`Invalid watch option: "${key}"`, raw);
   }
 }
 function resolveMergedOptions(instance) {
   const base = instance.type;
   const { mixins, extends: extendsOptions } = base;
-  const {
-    mixins: globalMixins,
-    optionsCache: cache,
-    config: { optionMergeStrategies }
-  } = instance.appContext;
+  const { mixins: globalMixins, optionsCache: cache, config: { optionMergeStrategies } } = instance.appContext;
   const cached = cache.get(base);
   let resolved;
   if (cached) {
@@ -4859,13 +4402,11 @@ function resolveMergedOptions(instance) {
   } else {
     resolved = {};
     if (globalMixins.length) {
-      globalMixins.forEach(
-        (m2) => mergeOptions(resolved, m2, optionMergeStrategies, true)
-      );
+      globalMixins.forEach((m) => mergeOptions(resolved, m, optionMergeStrategies, true));
     }
     mergeOptions(resolved, base, optionMergeStrategies);
   }
-  if (isObject$1(base)) {
+  if (isObject$2(base)) {
     cache.set(base, resolved);
   }
   return resolved;
@@ -4876,15 +4417,11 @@ function mergeOptions(to, from, strats, asMixin = false) {
     mergeOptions(to, extendsOptions, strats, true);
   }
   if (mixins) {
-    mixins.forEach(
-      (m2) => mergeOptions(to, m2, strats, true)
-    );
+    mixins.forEach((m) => mergeOptions(to, m, strats, true));
   }
   for (const key in from) {
     if (asMixin && key === "expose") {
-      warn$1(
-        `"expose" option is ignored when declared in mixins or extends. It should only be declared in the base component itself.`
-      );
+      warn(`"expose" option is ignored when declared in mixins or extends. It should only be declared in the base component itself.`);
     } else {
       const strat = internalOptionMergeStrats[key] || strats && strats[key];
       to[key] = strat ? strat(to[key], from[key]) : from[key];
@@ -4894,8 +4431,8 @@ function mergeOptions(to, from, strats, asMixin = false) {
 }
 const internalOptionMergeStrats = {
   data: mergeDataFn,
-  props: mergeEmitsOrPropsOptions,
-  emits: mergeEmitsOrPropsOptions,
+  props: mergeObjectOptions,
+  emits: mergeObjectOptions,
   // objects
   methods: mergeObjectOptions,
   computed: mergeObjectOptions,
@@ -4931,10 +4468,7 @@ function mergeDataFn(to, from) {
     return from;
   }
   return function mergedDataFn() {
-    return extend(
-      isFunction(to) ? to.call(this, this) : to,
-      isFunction(from) ? from.call(this, this) : from
-    );
+    return extend(isFunction(to) ? to.call(this, this) : to, isFunction(from) ? from.call(this, this) : from);
   };
 }
 function mergeInject(to, from) {
@@ -4954,21 +4488,7 @@ function mergeAsArray$1(to, from) {
   return to ? [...new Set([].concat(to, from))] : from;
 }
 function mergeObjectOptions(to, from) {
-  return to ? extend(/* @__PURE__ */ Object.create(null), to, from) : from;
-}
-function mergeEmitsOrPropsOptions(to, from) {
-  if (to) {
-    if (isArray(to) && isArray(from)) {
-      return [.../* @__PURE__ */ new Set([...to, ...from])];
-    }
-    return extend(
-      /* @__PURE__ */ Object.create(null),
-      normalizePropsOrEmits(to),
-      normalizePropsOrEmits(from != null ? from : {})
-    );
-  } else {
-    return from;
-  }
+  return to ? extend(extend(/* @__PURE__ */ Object.create(null), to), from) : from;
 }
 function mergeWatchOptions(to, from) {
   if (!to)
@@ -5013,11 +4533,7 @@ function isInHmrContext(instance) {
   }
 }
 function updateProps(instance, rawProps, rawPrevProps, optimized) {
-  const {
-    props,
-    attrs,
-    vnode: { patchFlag }
-  } = instance;
+  const { props, attrs, vnode: { patchFlag } } = instance;
   const rawCurrentProps = toRaw(props);
   const [options] = instance.propsOptions;
   let hasAttrsChanged = false;
@@ -5036,7 +4552,7 @@ function updateProps(instance, rawProps, rawPrevProps, optimized) {
         }
         const value = rawProps[key];
         if (options) {
-          if (hasOwn(attrs, key)) {
+          if (hasOwn$1(attrs, key)) {
             if (value !== attrs[key]) {
               attrs[key] = value;
               hasAttrsChanged = true;
@@ -5050,6 +4566,7 @@ function updateProps(instance, rawProps, rawPrevProps, optimized) {
               value,
               instance,
               false
+              /* isAbsent */
             );
           }
         } else {
@@ -5067,9 +4584,9 @@ function updateProps(instance, rawProps, rawPrevProps, optimized) {
     let kebabKey;
     for (const key in rawCurrentProps) {
       if (!rawProps || // for camelCase
-      !hasOwn(rawProps, key) && // it's possible the original props was passed in as kebab-case
+      !hasOwn$1(rawProps, key) && // it's possible the original props was passed in as kebab-case
       // and converted to camelCase (#955)
-      ((kebabKey = hyphenate(key)) === key || !hasOwn(rawProps, kebabKey))) {
+      ((kebabKey = hyphenate(key)) === key || !hasOwn$1(rawProps, kebabKey))) {
         if (options) {
           if (rawPrevProps && // for camelCase
           (rawPrevProps[key] !== void 0 || // for kebab-case
@@ -5081,6 +4598,7 @@ function updateProps(instance, rawProps, rawPrevProps, optimized) {
               void 0,
               instance,
               true
+              /* isAbsent */
             );
           }
         } else {
@@ -5090,7 +4608,7 @@ function updateProps(instance, rawProps, rawPrevProps, optimized) {
     }
     if (attrs !== rawCurrentProps) {
       for (const key in attrs) {
-        if (!rawProps || !hasOwn(rawProps, key) && true) {
+        if (!rawProps || !hasOwn$1(rawProps, key) && true) {
           delete attrs[key];
           hasAttrsChanged = true;
         }
@@ -5115,7 +4633,7 @@ function setFullProps(instance, rawProps, props, attrs) {
       }
       const value = rawProps[key];
       let camelKey;
-      if (options && hasOwn(options, camelKey = camelize(key))) {
+      if (options && hasOwn$1(options, camelKey = camelize(key))) {
         if (!needCastKeys || !needCastKeys.includes(camelKey)) {
           props[camelKey] = value;
         } else {
@@ -5134,14 +4652,7 @@ function setFullProps(instance, rawProps, props, attrs) {
     const castValues = rawCastValues || EMPTY_OBJ;
     for (let i = 0; i < needCastKeys.length; i++) {
       const key = needCastKeys[i];
-      props[key] = resolvePropValue(
-        options,
-        rawCurrentProps,
-        key,
-        castValues[key],
-        instance,
-        !hasOwn(castValues, key)
-      );
+      props[key] = resolvePropValue(options, rawCurrentProps, key, castValues[key], instance, !hasOwn$1(castValues, key));
     }
   }
   return hasAttrsChanged;
@@ -5149,20 +4660,17 @@ function setFullProps(instance, rawProps, props, attrs) {
 function resolvePropValue(options, props, key, value, instance, isAbsent) {
   const opt = options[key];
   if (opt != null) {
-    const hasDefault = hasOwn(opt, "default");
+    const hasDefault = hasOwn$1(opt, "default");
     if (hasDefault && value === void 0) {
       const defaultValue = opt.default;
-      if (opt.type !== Function && !opt.skipFactory && isFunction(defaultValue)) {
+      if (opt.type !== Function && isFunction(defaultValue)) {
         const { propsDefaults } = instance;
         if (key in propsDefaults) {
           value = propsDefaults[key];
         } else {
-          const reset = setCurrentInstance(instance);
-          value = propsDefaults[key] = defaultValue.call(
-            null,
-            props
-          );
-          reset();
+          setCurrentInstance(instance);
+          value = propsDefaults[key] = defaultValue.call(null, props);
+          unsetCurrentInstance();
         }
       } else {
         value = defaultValue;
@@ -5170,13 +4678,13 @@ function resolvePropValue(options, props, key, value, instance, isAbsent) {
     }
     if (opt[
       0
-      /* shouldCast */
+      /* BooleanFlags.shouldCast */
     ]) {
       if (isAbsent && !hasDefault) {
         value = false;
       } else if (opt[
         1
-        /* shouldCastTrue */
+        /* BooleanFlags.shouldCastTrue */
       ] && (value === "" || value === hyphenate(key))) {
         value = true;
       }
@@ -5213,7 +4721,7 @@ function normalizePropsOptions(comp, appContext, asMixin = false) {
     }
   }
   if (!raw && !hasExtends) {
-    if (isObject$1(comp)) {
+    if (isObject$2(comp)) {
       cache.set(comp, EMPTY_ARR);
     }
     return EMPTY_ARR;
@@ -5221,7 +4729,7 @@ function normalizePropsOptions(comp, appContext, asMixin = false) {
   if (isArray(raw)) {
     for (let i = 0; i < raw.length; i++) {
       if (!isString(raw[i])) {
-        warn$1(`props must be strings when using array syntax.`, raw[i]);
+        warn(`props must be strings when using array syntax.`, raw[i]);
       }
       const normalizedKey = camelize(raw[i]);
       if (validatePropName(normalizedKey)) {
@@ -5229,26 +4737,26 @@ function normalizePropsOptions(comp, appContext, asMixin = false) {
       }
     }
   } else if (raw) {
-    if (!isObject$1(raw)) {
-      warn$1(`invalid props options`, raw);
+    if (!isObject$2(raw)) {
+      warn(`invalid props options`, raw);
     }
     for (const key in raw) {
       const normalizedKey = camelize(key);
       if (validatePropName(normalizedKey)) {
         const opt = raw[key];
-        const prop = normalized[normalizedKey] = isArray(opt) || isFunction(opt) ? { type: opt } : extend({}, opt);
+        const prop = normalized[normalizedKey] = isArray(opt) || isFunction(opt) ? { type: opt } : Object.assign({}, opt);
         if (prop) {
           const booleanIndex = getTypeIndex(Boolean, prop.type);
           const stringIndex = getTypeIndex(String, prop.type);
           prop[
             0
-            /* shouldCast */
+            /* BooleanFlags.shouldCast */
           ] = booleanIndex > -1;
           prop[
             1
-            /* shouldCastTrue */
+            /* BooleanFlags.shouldCastTrue */
           ] = stringIndex < 0 || booleanIndex < stringIndex;
-          if (booleanIndex > -1 || hasOwn(prop, "default")) {
+          if (booleanIndex > -1 || hasOwn$1(prop, "default")) {
             needCastKeys.push(normalizedKey);
           }
         }
@@ -5256,30 +4764,22 @@ function normalizePropsOptions(comp, appContext, asMixin = false) {
     }
   }
   const res = [normalized, needCastKeys];
-  if (isObject$1(comp)) {
+  if (isObject$2(comp)) {
     cache.set(comp, res);
   }
   return res;
 }
 function validatePropName(key) {
-  if (key[0] !== "$" && !isReservedProp(key)) {
+  if (key[0] !== "$") {
     return true;
   } else {
-    warn$1(`Invalid prop name: "${key}" is a reserved property.`);
+    warn(`Invalid prop name: "${key}" is a reserved property.`);
   }
   return false;
 }
 function getType(ctor) {
-  if (ctor === null) {
-    return "null";
-  }
-  if (typeof ctor === "function") {
-    return ctor.name || "";
-  } else if (typeof ctor === "object") {
-    const name = ctor.constructor && ctor.constructor.name;
-    return name || "";
-  }
-  return "";
+  const match = ctor && ctor.toString().match(/^\s*(function|class) (\w+)/);
+  return match ? match[2] : ctor === null ? "null" : "";
 }
 function isSameType(a, b) {
   return getType(a) === getType(b);
@@ -5299,25 +4799,19 @@ function validateProps(rawProps, props, instance) {
     let opt = options[key];
     if (opt == null)
       continue;
-    validateProp(
-      key,
-      resolvedValues[key],
-      opt,
-      shallowReadonly(resolvedValues),
-      !hasOwn(rawProps, key) && !hasOwn(rawProps, hyphenate(key))
-    );
+    validateProp(key, resolvedValues[key], opt, !hasOwn$1(rawProps, key) && !hasOwn$1(rawProps, hyphenate(key)));
   }
 }
-function validateProp(name, value, prop, props, isAbsent) {
-  const { type, required, validator, skipCheck } = prop;
+function validateProp(name, value, prop, isAbsent) {
+  const { type, required, validator } = prop;
   if (required && isAbsent) {
-    warn$1('Missing required prop: "' + name + '"');
+    warn('Missing required prop: "' + name + '"');
     return;
   }
-  if (value == null && !required) {
+  if (value == null && !prop.required) {
     return;
   }
-  if (type != null && type !== true && !skipCheck) {
+  if (type != null && type !== true) {
     let isValid = false;
     const types = isArray(type) ? type : [type];
     const expectedTypes = [];
@@ -5327,17 +4821,15 @@ function validateProp(name, value, prop, props, isAbsent) {
       isValid = valid;
     }
     if (!isValid) {
-      warn$1(getInvalidTypeMessage(name, value, expectedTypes));
+      warn(getInvalidTypeMessage(name, value, expectedTypes));
       return;
     }
   }
-  if (validator && !validator(value, props)) {
-    warn$1('Invalid prop: custom validator check failed for prop "' + name + '".');
+  if (validator && !validator(value)) {
+    warn('Invalid prop: custom validator check failed for prop "' + name + '".');
   }
 }
-const isSimpleType = /* @__PURE__ */ makeMap(
-  "String,Number,Boolean,Function,Symbol,BigInt"
-);
+const isSimpleType = /* @__PURE__ */ makeMap("String,Number,Boolean,Function,Symbol,BigInt");
 function assertType(value, type) {
   let valid;
   const expectedType = getType(type);
@@ -5348,7 +4840,7 @@ function assertType(value, type) {
       valid = value instanceof type;
     }
   } else if (expectedType === "Object") {
-    valid = isObject$1(value);
+    valid = isObject$2(value);
   } else if (expectedType === "Array") {
     valid = isArray(value);
   } else if (expectedType === "null") {
@@ -5362,9 +4854,6 @@ function assertType(value, type) {
   };
 }
 function getInvalidTypeMessage(name, value, expectedTypes) {
-  if (expectedTypes.length === 0) {
-    return `Prop type [] for prop "${name}" won't match anything. Did you mean to use type Array instead?`;
-  }
   let message = `Invalid prop: type check failed for prop "${name}". Expected ${expectedTypes.map(capitalize).join(" | ")}`;
   const expectedType = expectedTypes[0];
   const receivedType = toRawType(value);
@@ -5395,6 +4884,122 @@ function isExplicable(type) {
 function isBoolean(...args) {
   return args.some((elem) => elem.toLowerCase() === "boolean");
 }
+function createAppContext() {
+  return {
+    app: null,
+    config: {
+      isNativeTag: NO,
+      performance: false,
+      globalProperties: {},
+      optionMergeStrategies: {},
+      errorHandler: void 0,
+      warnHandler: void 0,
+      compilerOptions: {}
+    },
+    mixins: [],
+    components: {},
+    directives: {},
+    provides: /* @__PURE__ */ Object.create(null),
+    optionsCache: /* @__PURE__ */ new WeakMap(),
+    propsCache: /* @__PURE__ */ new WeakMap(),
+    emitsCache: /* @__PURE__ */ new WeakMap()
+  };
+}
+let uid$1 = 0;
+function createAppAPI(render, hydrate) {
+  return function createApp2(rootComponent, rootProps = null) {
+    if (!isFunction(rootComponent)) {
+      rootComponent = Object.assign({}, rootComponent);
+    }
+    if (rootProps != null && !isObject$2(rootProps)) {
+      warn(`root props passed to app.mount() must be an object.`);
+      rootProps = null;
+    }
+    const context = createAppContext();
+    const installedPlugins = /* @__PURE__ */ new Set();
+    const app = context.app = {
+      _uid: uid$1++,
+      _component: rootComponent,
+      _props: rootProps,
+      _container: null,
+      _context: context,
+      _instance: null,
+      version,
+      get config() {
+        return context.config;
+      },
+      set config(v) {
+        {
+          warn(`app.config cannot be replaced. Modify individual options instead.`);
+        }
+      },
+      use(plugin2, ...options) {
+        if (installedPlugins.has(plugin2)) {
+          warn(`Plugin has already been applied to target app.`);
+        } else if (plugin2 && isFunction(plugin2.install)) {
+          installedPlugins.add(plugin2);
+          plugin2.install(app, ...options);
+        } else if (isFunction(plugin2)) {
+          installedPlugins.add(plugin2);
+          plugin2(app, ...options);
+        } else {
+          warn(`A plugin must either be a function or an object with an "install" function.`);
+        }
+        return app;
+      },
+      mixin(mixin) {
+        {
+          if (!context.mixins.includes(mixin)) {
+            context.mixins.push(mixin);
+          } else {
+            warn("Mixin has already been applied to target app" + (mixin.name ? `: ${mixin.name}` : ""));
+          }
+        }
+        return app;
+      },
+      component(name, component) {
+        {
+          validateComponentName(name, context.config);
+        }
+        if (!component) {
+          return context.components[name];
+        }
+        if (context.components[name]) {
+          warn(`Component "${name}" has already been registered in target app.`);
+        }
+        context.components[name] = component;
+        return app;
+      },
+      directive(name, directive) {
+        {
+          validateDirectiveName(name);
+        }
+        if (!directive) {
+          return context.directives[name];
+        }
+        if (context.directives[name]) {
+          warn(`Directive "${name}" has already been registered in target app.`);
+        }
+        context.directives[name] = directive;
+        return app;
+      },
+      // fixed by xxxxxx
+      mount() {
+      },
+      // fixed by xxxxxx
+      unmount() {
+      },
+      provide(key, value) {
+        if (key in context.provides) {
+          warn(`App already provides property with key "${String(key)}". It will be overwritten with the new value.`);
+        }
+        context.provides[key] = value;
+        return app;
+      }
+    };
+    return app;
+  };
+}
 let supported;
 let perf;
 function startMeasure(instance, type) {
@@ -5410,11 +5015,7 @@ function endMeasure(instance, type) {
     const startTag = `vue-${type}-${instance.uid}`;
     const endTag = startTag + `:end`;
     perf.mark(endTag);
-    perf.measure(
-      `<${formatComponentName(instance, instance.type)}> ${type}`,
-      startTag,
-      endTag
-    );
+    perf.measure(`<${formatComponentName(instance, instance.type)}> ${type}`, startTag, endTag);
     perf.clearMarks(startTag);
     perf.clearMarks(endTag);
   }
@@ -5435,10 +5036,10 @@ function isSupported() {
   return supported;
 }
 const queuePostRenderEffect$1 = queuePostFlushCb;
-const Fragment = Symbol.for("v-fgt");
-const Text = Symbol.for("v-txt");
-const Comment = Symbol.for("v-cmt");
-const Static = Symbol.for("v-stc");
+const Fragment = Symbol("Fragment");
+const Text = Symbol("Text");
+const Comment = Symbol("Comment");
+const Static = Symbol("Static");
 function isVNode(value) {
   return value ? value.__v_isVNode === true : false;
 }
@@ -5460,13 +5061,10 @@ function createComponentInstance(vnode, parent, suspense) {
     parent,
     appContext,
     root: null,
-    // to be immediately set
     next: null,
     subTree: null,
-    // will be set synchronously right after creation
     effect: null,
     update: null,
-    // will be set synchronously right after creation
     scope: new EffectScope(
       true
       /* detached */
@@ -5487,7 +5085,6 @@ function createComponentInstance(vnode, parent, suspense) {
     emitsOptions: normalizeEmitsOptions(type, appContext),
     // emit
     emit: null,
-    // to be set immediately
     emitted: null,
     // props default value
     propsDefaults: EMPTY_OBJ,
@@ -5502,8 +5099,6 @@ function createComponentInstance(vnode, parent, suspense) {
     refs: EMPTY_OBJ,
     setupState: EMPTY_OBJ,
     setupContext: null,
-    attrsProxy: null,
-    slotsProxy: null,
     // suspense related
     suspense,
     suspenseId: suspense ? suspense.pendingId : 0,
@@ -5541,35 +5136,19 @@ function createComponentInstance(vnode, parent, suspense) {
 }
 let currentInstance = null;
 const getCurrentInstance = () => currentInstance || currentRenderingInstance;
-let internalSetCurrentInstance;
-let setInSSRSetupState;
-{
-  internalSetCurrentInstance = (i) => {
-    currentInstance = i;
-  };
-  setInSSRSetupState = (v) => {
-    isInSSRComponentSetup = v;
-  };
-}
 const setCurrentInstance = (instance) => {
-  const prev = currentInstance;
-  internalSetCurrentInstance(instance);
+  currentInstance = instance;
   instance.scope.on();
-  return () => {
-    instance.scope.off();
-    internalSetCurrentInstance(prev);
-  };
 };
 const unsetCurrentInstance = () => {
   currentInstance && currentInstance.scope.off();
-  internalSetCurrentInstance(null);
+  currentInstance = null;
 };
 const isBuiltInTag = /* @__PURE__ */ makeMap("slot,component");
-function validateComponentName(name, { isNativeTag }) {
-  if (isBuiltInTag(name) || isNativeTag(name)) {
-    warn$1(
-      "Do not use built-in or reserved HTML elements as component id: " + name
-    );
+function validateComponentName(name, config) {
+  const appIsNativeTag = config.isNativeTag || NO;
+  if (isBuiltInTag(name) || appIsNativeTag(name)) {
+    warn("Do not use built-in or reserved HTML elements as component id: " + name);
   }
 }
 function isStatefulComponent(instance) {
@@ -5577,7 +5156,7 @@ function isStatefulComponent(instance) {
 }
 let isInSSRComponentSetup = false;
 function setupComponent(instance, isSSR = false) {
-  isSSR && setInSSRSetupState(isSSR);
+  isInSSRComponentSetup = isSSR;
   const {
     props
     /*, children*/
@@ -5585,7 +5164,7 @@ function setupComponent(instance, isSSR = false) {
   const isStateful = isStatefulComponent(instance);
   initProps$1(instance, props, isStateful, isSSR);
   const setupResult = isStateful ? setupStatefulComponent(instance, isSSR) : void 0;
-  isSSR && setInSSRSetupState(false);
+  isInSSRComponentSetup = false;
   return setupResult;
 }
 function setupStatefulComponent(instance, isSSR) {
@@ -5607,9 +5186,7 @@ function setupStatefulComponent(instance, isSSR) {
       }
     }
     if (Component2.compilerOptions && isRuntimeOnly()) {
-      warn$1(
-        `"compilerOptions" is only supported when using a build of Vue that includes the runtime compiler. Since you are using a runtime-only build, the options should be passed via your build tool config instead.`
-      );
+      warn(`"compilerOptions" is only supported when using a build of Vue that includes the runtime compiler. Since you are using a runtime-only build, the options should be passed via your build tool config instead.`);
     }
   }
   instance.accessCache = /* @__PURE__ */ Object.create(null);
@@ -5620,25 +5197,15 @@ function setupStatefulComponent(instance, isSSR) {
   const { setup } = Component2;
   if (setup) {
     const setupContext = instance.setupContext = setup.length > 1 ? createSetupContext(instance) : null;
-    const reset = setCurrentInstance(instance);
+    setCurrentInstance(instance);
     pauseTracking();
-    const setupResult = callWithErrorHandling(
-      setup,
-      instance,
-      0,
-      [
-        shallowReadonly(instance.props),
-        setupContext
-      ]
-    );
+    const setupResult = callWithErrorHandling(setup, instance, 0, [shallowReadonly(instance.props), setupContext]);
     resetTracking();
-    reset();
+    unsetCurrentInstance();
     if (isPromise$1(setupResult)) {
       setupResult.then(unsetCurrentInstance, unsetCurrentInstance);
       {
-        warn$1(
-          `setup() returned a Promise, but the version of Vue you are using does not support it yet.`
-        );
+        warn(`setup() returned a Promise, but the version of Vue you are using does not support it yet.`);
       }
     } else {
       handleSetupResult(instance, setupResult, isSSR);
@@ -5652,11 +5219,9 @@ function handleSetupResult(instance, setupResult, isSSR) {
     {
       instance.render = setupResult;
     }
-  } else if (isObject$1(setupResult)) {
+  } else if (isObject$2(setupResult)) {
     if (isVNode(setupResult)) {
-      warn$1(
-        `setup() should not return VNodes directly - return a render function instead.`
-      );
+      warn(`setup() should not return VNodes directly - return a render function instead.`);
     }
     {
       instance.devtoolsRawSetupState = setupResult;
@@ -5666,9 +5231,7 @@ function handleSetupResult(instance, setupResult, isSSR) {
       exposeSetupStateOnRenderContext(instance);
     }
   } else if (setupResult !== void 0) {
-    warn$1(
-      `setup() should return an object. Received: ${setupResult === null ? "null" : typeof setupResult}`
-    );
+    warn(`setup() should return an object. Received: ${setupResult === null ? "null" : typeof setupResult}`);
   }
   finishComponentSetup(instance, isSSR);
 }
@@ -5680,27 +5243,25 @@ function finishComponentSetup(instance, isSSR, skipOptions) {
     instance.render = Component2.render || NOOP;
   }
   {
-    const reset = setCurrentInstance(instance);
+    setCurrentInstance(instance);
     pauseTracking();
-    try {
-      applyOptions$1(instance);
-    } finally {
-      resetTracking();
-      reset();
-    }
+    applyOptions$1(instance);
+    resetTracking();
+    unsetCurrentInstance();
   }
   if (!Component2.render && instance.render === NOOP && !isSSR) {
     if (Component2.template) {
-      warn$1(
+      warn(
         `Component provided template option but runtime compilation is not supported in this build of Vue. Configure your bundler to alias "vue" to "vue/dist/vue.esm-bundler.js".`
+        /* should not happen */
       );
     } else {
-      warn$1(`Component is missing template or render function.`);
+      warn(`Component is missing template or render function.`);
     }
   }
 }
-function getAttrsProxy(instance) {
-  return instance.attrsProxy || (instance.attrsProxy = new Proxy(
+function createAttrsProxy(instance) {
+  return new Proxy(
     instance.attrs,
     {
       get(target, key) {
@@ -5708,29 +5269,21 @@ function getAttrsProxy(instance) {
         return target[key];
       },
       set() {
-        warn$1(`setupContext.attrs is readonly.`);
+        warn(`setupContext.attrs is readonly.`);
         return false;
       },
       deleteProperty() {
-        warn$1(`setupContext.attrs is readonly.`);
+        warn(`setupContext.attrs is readonly.`);
         return false;
       }
     }
-  ));
-}
-function getSlotsProxy(instance) {
-  return instance.slotsProxy || (instance.slotsProxy = new Proxy(instance.slots, {
-    get(target, key) {
-      track(instance, "get", "$slots");
-      return target[key];
-    }
-  }));
+  );
 }
 function createSetupContext(instance) {
   const expose = (exposed) => {
     {
       if (instance.exposed) {
-        warn$1(`expose() should be called only once per setup().`);
+        warn(`expose() should be called only once per setup().`);
       }
       if (exposed != null) {
         let exposedType = typeof exposed;
@@ -5742,21 +5295,20 @@ function createSetupContext(instance) {
           }
         }
         if (exposedType !== "object") {
-          warn$1(
-            `expose() should be passed a plain object, received ${exposedType}.`
-          );
+          warn(`expose() should be passed a plain object, received ${exposedType}.`);
         }
       }
     }
     instance.exposed = exposed || {};
   };
+  let attrs;
   {
     return Object.freeze({
       get attrs() {
-        return getAttrsProxy(instance);
+        return attrs || (attrs = createAttrsProxy(instance));
       },
       get slots() {
-        return getSlotsProxy(instance);
+        return shallowReadonly(instance.slots);
       },
       get emit() {
         return (event, ...args) => instance.emit(event, ...args);
@@ -5781,7 +5333,7 @@ function getExposeProxy(instance) {
   }
 }
 const classifyRE = /(?:^|[-_])(\w)/g;
-const classify = (str) => str.replace(classifyRE, (c2) => c2.toUpperCase()).replace(/[-_]/g, "");
+const classify = (str) => str.replace(classifyRE, (c) => c.toUpperCase()).replace(/[-_]/g, "");
 function getComponentName(Component2, includeInferred = true) {
   return isFunction(Component2) ? Component2.displayName || Component2.name : Component2.name || includeInferred && Component2.__name;
 }
@@ -5801,24 +5353,14 @@ function formatComponentName(instance, Component2, isRoot = false) {
         }
       }
     };
-    name = inferFromRegistry(
-      instance.components || instance.parent.type.components
-    ) || inferFromRegistry(instance.appContext.components);
+    name = inferFromRegistry(instance.components || instance.parent.type.components) || inferFromRegistry(instance.appContext.components);
   }
   return name ? classify(name) : isRoot ? `App` : `Anonymous`;
 }
 const computed = (getterOrOptions, debugOptions) => {
-  const c2 = computed$1(getterOrOptions, debugOptions, isInSSRComponentSetup);
-  {
-    const i = getCurrentInstance();
-    if (i && i.appContext.config.warnRecursiveComputed) {
-      c2._warnRecursive = true;
-    }
-  }
-  return c2;
+  return computed$1(getterOrOptions, debugOptions, isInSSRComponentSetup);
 };
-const version = "3.4.21";
-const warn = warn$1;
+const version = "3.2.47";
 function unwrapper(target) {
   return unref(target);
 }
@@ -5870,52 +5412,26 @@ function _diff(current, pre, path, result) {
         const preType = toTypeString(preValue);
         if (currentType != ARRAYTYPE && currentType != OBJECTTYPE) {
           if (currentValue != preValue) {
-            setResult(
-              result,
-              (path == "" ? "" : path + ".") + key,
-              currentValue
-            );
+            setResult(result, (path == "" ? "" : path + ".") + key, currentValue);
           }
         } else if (currentType == ARRAYTYPE) {
           if (preType != ARRAYTYPE) {
-            setResult(
-              result,
-              (path == "" ? "" : path + ".") + key,
-              currentValue
-            );
+            setResult(result, (path == "" ? "" : path + ".") + key, currentValue);
           } else {
             if (currentValue.length < preValue.length) {
-              setResult(
-                result,
-                (path == "" ? "" : path + ".") + key,
-                currentValue
-              );
+              setResult(result, (path == "" ? "" : path + ".") + key, currentValue);
             } else {
               currentValue.forEach((item, index2) => {
-                _diff(
-                  item,
-                  preValue[index2],
-                  (path == "" ? "" : path + ".") + key + "[" + index2 + "]",
-                  result
-                );
+                _diff(item, preValue[index2], (path == "" ? "" : path + ".") + key + "[" + index2 + "]", result);
               });
             }
           }
         } else if (currentType == OBJECTTYPE) {
           if (preType != OBJECTTYPE || Object.keys(currentValue).length < Object.keys(preValue).length) {
-            setResult(
-              result,
-              (path == "" ? "" : path + ".") + key,
-              currentValue
-            );
+            setResult(result, (path == "" ? "" : path + ".") + key, currentValue);
           } else {
             for (let subKey in currentValue) {
-              _diff(
-                currentValue[subKey],
-                preValue[subKey],
-                (path == "" ? "" : path + ".") + key + "." + subKey,
-                result
-              );
+              _diff(currentValue[subKey], preValue[subKey], (path == "" ? "" : path + ".") + key + "." + subKey, result);
             }
           }
         }
@@ -5969,6 +5485,7 @@ function nextTick(instance, fn) {
         fn.bind(instance.proxy),
         instance,
         14
+        /* ErrorCodes.SCHEDULER */
       );
     } else if (_resolve) {
       _resolve(instance.proxy);
@@ -5997,7 +5514,7 @@ function clone(src, seen) {
       copy = {};
       seen.set(src, copy);
       for (const name in src) {
-        if (hasOwn(src, name)) {
+        if (hasOwn$1(src, name)) {
           copy[name] = clone(src[name], seen);
         }
       }
@@ -6049,11 +5566,7 @@ function initAppConfig(appConfig) {
   };
 }
 function onApplyOptions(options, instance, publicThis) {
-  instance.appContext.config.globalProperties.$applyOptions(
-    options,
-    instance,
-    publicThis
-  );
+  instance.appContext.config.globalProperties.$applyOptions(options, instance, publicThis);
   const computedOptions = options.computed;
   if (computedOptions) {
     const keys = Object.keys(computedOptions);
@@ -6068,11 +5581,7 @@ function onApplyOptions(options, instance, publicThis) {
   delete instance.ctx.$onApplyOptions;
 }
 function setRef$1(instance, isUnmount = false) {
-  const {
-    setupState,
-    $templateRefs,
-    ctx: { $scope, $mpPlatform }
-  } = instance;
+  const { setupState, $templateRefs, ctx: { $scope, $mpPlatform } } = instance;
   if ($mpPlatform === "mp-alipay") {
     return;
   }
@@ -6080,18 +5589,14 @@ function setRef$1(instance, isUnmount = false) {
     return;
   }
   if (isUnmount) {
-    return $templateRefs.forEach(
-      (templateRef) => setTemplateRef(templateRef, null, setupState)
-    );
+    return $templateRefs.forEach((templateRef) => setTemplateRef(templateRef, null, setupState));
   }
   const check = $mpPlatform === "mp-baidu" || $mpPlatform === "mp-toutiao";
   const doSetByRefs = (refs) => {
     const mpComponents = (
       // 字节小程序 selectAllComponents 可能返回 null
       // https://github.com/dcloudio/uni-app/issues/3954
-      ($scope.selectAllComponents(".r") || []).concat(
-        $scope.selectAllComponents(".r-i-f") || []
-      )
+      ($scope.selectAllComponents(".r") || []).concat($scope.selectAllComponents(".r-i-f") || [])
     );
     return refs.filter((templateRef) => {
       const refValue = findComponentPublicInstance(mpComponents, templateRef.i);
@@ -6117,15 +5622,13 @@ function setRef$1(instance, isUnmount = false) {
   }
 }
 function toSkip(value) {
-  if (isObject$1(value)) {
+  if (isObject$2(value)) {
     markRaw(value);
   }
   return value;
 }
 function findComponentPublicInstance(mpComponents, id) {
-  const mpInstance = mpComponents.find(
-    (com) => com && (com.properties || com.props).uI === id
-  );
+  const mpInstance = mpComponents.find((com) => com && (com.properties || com.props).uI === id);
   if (mpInstance) {
     const vm = mpInstance.$vm;
     if (vm) {
@@ -6135,21 +5638,21 @@ function findComponentPublicInstance(mpComponents, id) {
   }
   return null;
 }
-function setTemplateRef({ r: r2, f: f2 }, refValue, setupState) {
-  if (isFunction(r2)) {
-    r2(refValue, {});
+function setTemplateRef({ r, f: f2 }, refValue, setupState) {
+  if (isFunction(r)) {
+    r(refValue, {});
   } else {
-    const _isString = isString(r2);
-    const _isRef = isRef(r2);
+    const _isString = isString(r);
+    const _isRef = isRef(r);
     if (_isString || _isRef) {
       if (f2) {
         if (!_isRef) {
           return;
         }
-        if (!isArray(r2.value)) {
-          r2.value = [];
+        if (!isArray(r.value)) {
+          r.value = [];
         }
-        const existing = r2.value;
+        const existing = r.value;
         if (existing.indexOf(refValue) === -1) {
           existing.push(refValue);
           if (!refValue) {
@@ -6158,22 +5661,28 @@ function setTemplateRef({ r: r2, f: f2 }, refValue, setupState) {
           onBeforeUnmount(() => remove(existing, refValue), refValue.$);
         }
       } else if (_isString) {
-        if (hasOwn(setupState, r2)) {
-          setupState[r2] = refValue;
+        if (hasOwn$1(setupState, r)) {
+          setupState[r] = refValue;
         }
-      } else if (isRef(r2)) {
-        r2.value = refValue;
+      } else if (isRef(r)) {
+        r.value = refValue;
       } else {
-        warnRef(r2);
+        warnRef(r);
       }
     } else {
-      warnRef(r2);
+      warnRef(r);
     }
   }
 }
 function warnRef(ref2) {
   warn("Invalid template ref type:", ref2, `(${typeof ref2})`);
 }
+var MPType;
+(function(MPType2) {
+  MPType2["APP"] = "app";
+  MPType2["PAGE"] = "page";
+  MPType2["COMPONENT"] = "component";
+})(MPType || (MPType = {}));
 const queuePostRenderEffect = queuePostFlushCb;
 function mountComponent(initialVNode, options) {
   const instance = initialVNode.component = createComponentInstance(initialVNode, options.parentComponent, null);
@@ -6220,31 +5729,7 @@ const getFunctionalFallthrough = (attrs) => {
   return res;
 };
 function renderComponentRoot(instance) {
-  const {
-    type: Component2,
-    vnode,
-    proxy,
-    withProxy,
-    props,
-    propsOptions: [propsOptions],
-    slots,
-    attrs,
-    emit: emit2,
-    render,
-    renderCache,
-    data,
-    setupState,
-    ctx,
-    uid: uid2,
-    appContext: {
-      app: {
-        config: {
-          globalProperties: { pruneComponentPropsCache: pruneComponentPropsCache2 }
-        }
-      }
-    },
-    inheritAttrs
-  } = instance;
+  const { type: Component2, vnode, proxy, withProxy, props, propsOptions: [propsOptions], slots, attrs, emit: emit2, render, renderCache, data, setupState, ctx, uid: uid2, appContext: { app: { config: { globalProperties: { pruneComponentPropsCache: pruneComponentPropsCache2 } } } }, inheritAttrs } = instance;
   instance.$templateRefs = [];
   instance.$ei = 0;
   pruneComponentPropsCache2(uid2);
@@ -6255,22 +5740,9 @@ function renderComponentRoot(instance) {
     if (vnode.shapeFlag & 4) {
       fallthroughAttrs(inheritAttrs, props, propsOptions, attrs);
       const proxyToUse = withProxy || proxy;
-      result = render.call(
-        proxyToUse,
-        proxyToUse,
-        renderCache,
-        props,
-        setupState,
-        data,
-        ctx
-      );
+      result = render.call(proxyToUse, proxyToUse, renderCache, props, setupState, data, ctx);
     } else {
-      fallthroughAttrs(
-        inheritAttrs,
-        props,
-        propsOptions,
-        Component2.props ? attrs : getFunctionalFallthrough(attrs)
-      );
+      fallthroughAttrs(inheritAttrs, props, propsOptions, Component2.props ? attrs : getFunctionalFallthrough(attrs));
       const render2 = Component2;
       result = render2.length > 1 ? render2(props, { attrs, slots, emit: emit2 }) : render2(
         props,
@@ -6279,7 +5751,12 @@ function renderComponentRoot(instance) {
       );
     }
   } catch (err) {
-    handleError(err, instance, 1);
+    handleError(
+      err,
+      instance,
+      1
+      /* ErrorCodes.RENDER_FUNCTION */
+    );
     result = false;
   }
   setRef$1(instance);
@@ -6288,9 +5765,7 @@ function renderComponentRoot(instance) {
 }
 function fallthroughAttrs(inheritAttrs, props, propsOptions, fallthroughAttrs2) {
   if (props && fallthroughAttrs2 && inheritAttrs !== false) {
-    const keys = Object.keys(fallthroughAttrs2).filter(
-      (key) => key !== "class" && key !== "style"
-    );
+    const keys = Object.keys(fallthroughAttrs2).filter((key) => key !== "class" && key !== "style");
     if (!keys.length) {
       return;
     }
@@ -6324,10 +5799,7 @@ function componentUpdateScopedSlotsFn() {
     if (typeof oldScopedSlotData === "undefined" || typeof oldScopedSlotData[index2] === "undefined") {
       diffData[diffPath] = data;
     } else {
-      const diffScopedSlotData = diff(
-        data,
-        oldScopedSlotData[index2]
-      );
+      const diffScopedSlotData = diff(data, oldScopedSlotData[index2]);
       Object.keys(diffScopedSlotData).forEach((name) => {
         diffData[diffPath + "." + name] = diffScopedSlotData[name];
       });
@@ -6338,13 +5810,11 @@ function componentUpdateScopedSlotsFn() {
     mpInstance.setData(diffData);
   }
 }
-function toggleRecurse({ effect: effect2, update: update3 }, allowed) {
-  effect2.allowRecurse = update3.allowRecurse = allowed;
+function toggleRecurse({ effect, update: update3 }, allowed) {
+  effect.allowRecurse = update3.allowRecurse = allowed;
 }
 function setupRenderEffect(instance) {
-  const updateScopedSlots = componentUpdateScopedSlotsFn.bind(
-    instance
-  );
+  const updateScopedSlots = componentUpdateScopedSlotsFn.bind(instance);
   instance.$updateScopedSlots = () => nextTick$1(() => queueJob(updateScopedSlots));
   const componentUpdateFn = () => {
     if (!instance.isMounted) {
@@ -6390,23 +5860,18 @@ function setupRenderEffect(instance) {
       }
     }
   };
-  const effect2 = instance.effect = new ReactiveEffect2(
+  const effect = instance.effect = new ReactiveEffect(
     componentUpdateFn,
-    NOOP,
-    () => queueJob(update3),
+    () => queueJob(instance.update),
     instance.scope
     // track it in component's effect scope
   );
-  const update3 = instance.update = () => {
-    if (effect2.dirty) {
-      effect2.run();
-    }
-  };
+  const update3 = instance.update = effect.run.bind(effect);
   update3.id = instance.uid;
   toggleRecurse(instance, true);
   {
-    effect2.onTrack = instance.rtc ? (e2) => invokeArrayFns$1(instance.rtc, e2) : void 0;
-    effect2.onTrigger = instance.rtg ? (e2) => invokeArrayFns$1(instance.rtg, e2) : void 0;
+    effect.onTrack = instance.rtc ? (e2) => invokeArrayFns$1(instance.rtc, e2) : void 0;
+    effect.onTrigger = instance.rtg ? (e2) => invokeArrayFns$1(instance.rtg, e2) : void 0;
     update3.ownerInstance = instance;
   }
   update3();
@@ -6454,29 +5919,26 @@ function createVueApp(rootComponent, rootProps = null) {
   const app = oldCreateApp(rootComponent, rootProps);
   const appContext = app._context;
   initAppConfig(appContext.config);
-  const createVNode2 = (initialVNode) => {
+  const createVNode = (initialVNode) => {
     initialVNode.appContext = appContext;
     initialVNode.shapeFlag = 6;
     return initialVNode;
   };
-  const createComponent2 = function createComponent22(initialVNode, options) {
-    return mountComponent(createVNode2(initialVNode), options);
+  const createComponent2 = function createComponent3(initialVNode, options) {
+    return mountComponent(createVNode(initialVNode), options);
   };
   const destroyComponent = function destroyComponent2(component) {
     return component && unmountComponent(component.$);
   };
   app.mount = function mount() {
     rootComponent.render = NOOP;
-    const instance = mountComponent(
-      createVNode2({ type: rootComponent }),
-      {
-        mpType: "app",
-        mpInstance: null,
-        parentComponent: null,
-        slots: [],
-        props: null
-      }
-    );
+    const instance = mountComponent(createVNode({ type: rootComponent }), {
+      mpType: MPType.APP,
+      mpInstance: null,
+      parentComponent: null,
+      slots: [],
+      props: null
+    });
     app._instance = instance.$;
     {
       devtoolsInitApp(app, version);
@@ -6574,8 +6036,8 @@ if (typeof atob !== "function") {
   realAtob = atob;
 }
 function b64DecodeUnicode(str) {
-  return decodeURIComponent(realAtob(str).split("").map(function(c2) {
-    return "%" + ("00" + c2.charCodeAt(0).toString(16)).slice(-2);
+  return decodeURIComponent(realAtob(str).split("").map(function(c) {
+    return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
   }).join(""));
 }
 function getCurrentUserInfo() {
@@ -6680,7 +6142,7 @@ function getCreateApp() {
 function vOn(value, key) {
   const instance = getCurrentInstance();
   const ctx = instance.ctx;
-  const extraKey = typeof key !== "undefined" && (ctx.$mpPlatform === "mp-weixin" || ctx.$mpPlatform === "mp-qq" || ctx.$mpPlatform === "mp-xhs") && (isString(key) || typeof key === "number") ? "_" + key : "";
+  const extraKey = typeof key !== "undefined" && (ctx.$mpPlatform === "mp-weixin" || ctx.$mpPlatform === "mp-qq") && (isString(key) || typeof key === "number") ? "_" + key : "";
   const name = "e" + instance.$ei++ + extraKey;
   const mpInstance = ctx.$scope;
   if (!value) {
@@ -6739,14 +6201,14 @@ function patchMPEvent(event) {
     event.preventDefault = NOOP;
     event.stopPropagation = NOOP;
     event.stopImmediatePropagation = NOOP;
-    if (!hasOwn(event, "detail")) {
+    if (!hasOwn$1(event, "detail")) {
       event.detail = {};
     }
-    if (hasOwn(event, "markerId")) {
+    if (hasOwn$1(event, "markerId")) {
       event.detail = typeof event.detail === "object" ? event.detail : {};
       event.detail.markerId = event.markerId;
     }
-    if (isPlainObject(event.detail) && hasOwn(event.detail, "checked") && !hasOwn(event.detail, "value")) {
+    if (isPlainObject(event.detail) && hasOwn$1(event.detail, "checked") && !hasOwn$1(event.detail, "value")) {
       event.detail.value = event.detail.checked;
     }
     if (isPlainObject(event.detail)) {
@@ -6782,7 +6244,7 @@ function vFor(source, renderItem) {
     for (let i = 0; i < source; i++) {
       ret[i] = renderItem(i + 1, i, i);
     }
-  } else if (isObject$1(source)) {
+  } else if (isObject$2(source)) {
     if (source[Symbol.iterator]) {
       ret = Array.from(source, (item, i) => renderItem(item, i, i));
     } else {
@@ -6892,7 +6354,7 @@ function initComponentInstance(instance, options) {
 function initMocks(instance, mpInstance, mocks2) {
   const ctx = instance.ctx;
   mocks2.forEach((mock) => {
-    if (hasOwn(mpInstance, mock)) {
+    if (hasOwn$1(mpInstance, mock)) {
       instance[mock] = ctx[mock] = mpInstance[mock];
     }
   });
@@ -6948,7 +6410,7 @@ function findHooks(vueOptions, hooks = /* @__PURE__ */ new Set()) {
   return hooks;
 }
 function initHook(mpOptions, hook, excludes) {
-  if (excludes.indexOf(hook) === -1 && !hasOwn(mpOptions, hook)) {
+  if (excludes.indexOf(hook) === -1 && !hasOwn$1(mpOptions, hook)) {
     mpOptions[hook] = function(args) {
       return this.$vm && this.$vm.$callHook(hook, args);
     };
@@ -6981,7 +6443,7 @@ const findMixinRuntimeHooks = /* @__PURE__ */ once(() => {
       const hooks = Object.keys(MINI_PROGRAM_PAGE_RUNTIME_HOOKS);
       mixins.forEach((mixin) => {
         hooks.forEach((hook) => {
-          if (hasOwn(mixin, hook) && !runtimeHooks.includes(hook)) {
+          if (hasOwn$1(mixin, hook) && !runtimeHooks.includes(hook)) {
             runtimeHooks.push(hook);
           }
         });
@@ -7006,7 +6468,6 @@ function parseApp(instance, parseAppOptions) {
   const appOptions = {
     globalData: instance.$options && instance.$options.globalData || {},
     $vm: instance,
-    // mp-alipay 组件 data 初始化比 onLaunch 早，提前挂载
     onLaunch(options) {
       this.$vm = instance;
       const ctx = internalInstance.ctx;
@@ -7058,13 +6519,13 @@ function initCreateSubpackageApp(parseAppOptions) {
     const globalData = app.globalData;
     if (globalData) {
       Object.keys(appOptions.globalData).forEach((name) => {
-        if (!hasOwn(globalData, name)) {
+        if (!hasOwn$1(globalData, name)) {
           globalData[name] = appOptions.globalData[name];
         }
       });
     }
     Object.keys(appOptions).forEach((name) => {
-      if (!hasOwn(app, name)) {
+      if (!hasOwn$1(app, name)) {
         app[name] = appOptions[name];
       }
     });
@@ -7114,7 +6575,7 @@ function initVueIds(vueIds, mpInstance) {
 const EXTRAS = ["externalClasses"];
 function initExtraOptions(miniProgramComponentOptions, vueOptions) {
   EXTRAS.forEach((name) => {
-    if (hasOwn(vueOptions, name)) {
+    if (hasOwn$1(vueOptions, name)) {
       miniProgramComponentOptions[name] = vueOptions[name];
     }
   });
@@ -7226,7 +6687,7 @@ function initDefaultProps(options, isBehavior = false) {
     };
   }
   if (options.behaviors) {
-    if (options.behaviors.includes("__GLOBAL__://form-field")) {
+    if (options.behaviors.includes("wx://form-field")) {
       if (!options.properties || !options.properties.name) {
         properties.name = {
           type: null,
@@ -7397,7 +6858,7 @@ function initBehaviors(vueOptions) {
   const behaviors = [];
   if (isArray(vueBehaviors)) {
     vueBehaviors.forEach((behavior) => {
-      behaviors.push(behavior.replace("uni://", "__GLOBAL__://"));
+      behaviors.push(behavior.replace("uni://", "wx://"));
       if (behavior === "uni://form-field") {
         if (isArray(vueProps)) {
           vueProps.push("name");
@@ -7421,7 +6882,7 @@ function applyOptions(componentOptions, vueOptions) {
   componentOptions.data = initData();
   componentOptions.behaviors = initBehaviors(vueOptions);
 }
-function parseComponent(vueOptions, { parse, mocks: mocks2, isPage: isPage2, initRelation: initRelation2, handleLink: handleLink2, initLifetimes: initLifetimes2 }) {
+function parseComponent(vueOptions, { parse: parse2, mocks: mocks2, isPage: isPage2, initRelation: initRelation2, handleLink: handleLink2, initLifetimes: initLifetimes2 }) {
   vueOptions = vueOptions.default || vueOptions;
   const options = {
     multipleSlots: true,
@@ -7431,7 +6892,7 @@ function parseComponent(vueOptions, { parse, mocks: mocks2, isPage: isPage2, ini
   };
   if (isArray(vueOptions.mixins)) {
     vueOptions.mixins.forEach((item) => {
-      if (isObject$1(item.options)) {
+      if (isObject$2(item.options)) {
         extend(options, item.options);
       }
     });
@@ -7467,8 +6928,8 @@ function parseComponent(vueOptions, { parse, mocks: mocks2, isPage: isPage2, ini
   {
     initWorkletMethods(mpComponentOptions.methods, vueOptions.methods);
   }
-  if (parse) {
-    parse(mpComponentOptions, { handleLink: handleLink2 });
+  if (parse2) {
+    parse2(mpComponentOptions, { handleLink: handleLink2 });
   }
   return mpComponentOptions;
 }
@@ -7496,7 +6957,7 @@ function $destroyComponent(instance) {
   return $destroyComponentFn(instance);
 }
 function parsePage(vueOptions, parseOptions2) {
-  const { parse, mocks: mocks2, isPage: isPage2, initRelation: initRelation2, handleLink: handleLink2, initLifetimes: initLifetimes2 } = parseOptions2;
+  const { parse: parse2, mocks: mocks2, isPage: isPage2, initRelation: initRelation2, handleLink: handleLink2, initLifetimes: initLifetimes2 } = parseOptions2;
   const miniProgramPageOptions = parseComponent(vueOptions, {
     mocks: mocks2,
     isPage: isPage2,
@@ -7519,7 +6980,7 @@ function parsePage(vueOptions, parseOptions2) {
   }
   initRuntimeHooks(methods, vueOptions.__runtimeHooks);
   initMixinRuntimeHooks(methods);
-  parse && parse(miniProgramPageOptions, { handleLink: handleLink2 });
+  parse2 && parse2(miniProgramPageOptions, { handleLink: handleLink2 });
   return miniProgramPageOptions;
 }
 function initCreatePage(parseOptions2) {
@@ -7590,7 +7051,6 @@ function initLifetimes({ mocks: mocks2, isPage: isPage2, initRelation: initRelat
         mpType: isMiniProgramPage ? "page" : "component",
         mpInstance,
         slots: properties.uS || {},
-        // vueSlots
         parentComponent: relationOptions.parent && relationOptions.parent.$,
         onBeforeSetup(instance, options) {
           initRefs(instance, mpInstance);
@@ -8354,28 +7814,28 @@ var mapMutations = normalizeNamespace(function(namespace, mutations) {
   });
   return res;
 });
-function normalizeMap(map2) {
-  if (!isValidMap(map2)) {
+function normalizeMap(map) {
+  if (!isValidMap(map)) {
     return [];
   }
-  return Array.isArray(map2) ? map2.map(function(key) {
+  return Array.isArray(map) ? map.map(function(key) {
     return { key, val: key };
-  }) : Object.keys(map2).map(function(key) {
-    return { key, val: map2[key] };
+  }) : Object.keys(map).map(function(key) {
+    return { key, val: map[key] };
   });
 }
-function isValidMap(map2) {
-  return Array.isArray(map2) || isObject(map2);
+function isValidMap(map) {
+  return Array.isArray(map) || isObject(map);
 }
 function normalizeNamespace(fn) {
-  return function(namespace, map2) {
+  return function(namespace, map) {
     if (typeof namespace !== "string") {
-      map2 = namespace;
+      map = namespace;
       namespace = "";
     } else if (namespace.charAt(namespace.length - 1) !== "/") {
       namespace += "/";
     }
-    return fn(namespace, map2);
+    return fn(namespace, map);
   };
 }
 function getModuleByNamespace(store, helper, namespace) {
@@ -8385,3963 +7845,27 @@ function getModuleByNamespace(store, helper, namespace) {
   }
   return module2;
 }
-<<<<<<< HEAD
-const pages = [
-  {
-    path: "pages/login/login",
-    style: {
-      navigationBarTitleText: ""
-    }
-  },
-  {
-    path: "pages/tabBar/index/index",
-    style: {
-      navigationBarTitleText: "首页"
-    }
-  },
-  {
-    path: "pages/tabBar/about/about",
-    style: {
-      navigationBarTitleText: "关于SS"
-    }
-  },
-  {
-    path: "pages/tabBar/my/my",
-    style: {
-      navigationBarTitleText: "我的"
-    }
-  },
-  {
-    path: "pages/tabBar/my/myHousing",
-    style: {
-      navigationBarTitleText: "我的房源"
-    }
-  },
-  {
-    path: "pages/tabBar/my/uploadHousing",
-    style: {
-      navigationBarTitleText: "上传房源"
-    }
-  },
-  {
-    path: "pages/public/search/search",
-    style: {
-      navigationBarTitleText: "搜索房源"
-    }
-  },
-  {
-    path: "pages/public/searchAddress/searchAddress",
-    style: {
-      navigationBarTitleText: "选择房源地址"
-    }
-  },
-  {
-    path: "pages/tabBar/my/housingList/housingList",
-    style: {
-      navigationBarTitleText: "待审核房源"
-    }
-  },
-  {
-    path: "pages/tabBar/my/myHome/myHome",
-    style: {
-      navigationBarTitleText: "个人主页"
-    }
-  },
-  {
-    path: "pages/tabBar/my/updateMyInfo/updateMyInfo",
-    style: {
-      navigationBarTitleText: "编辑个人信息"
-    }
-  },
-  {
-    path: "pages/houseDetail/houseDetail",
-    style: {
-      navigationBarTitleText: "房源详情"
-    }
-  },
-  {
-    path: "pages/rules/rules",
-    style: {
-      navigationBarTitleText: "协议"
-    }
-  }
-];
-const subPackages = [];
-const globalStyle = {
-  pageOrientation: "portrait",
-  navigationBarTitleText: "Hello uniapp",
-  navigationBarTextStyle: "black",
-  navigationBarBackgroundColor: "#fff",
-  backgroundColor: "#000",
-  backgroundColorTop: "#F4F5F6",
-  backgroundColorBottom: "#F4F5F6",
-  "mp-360": {
-    navigationStyle: "custom"
-  },
-  h5: {
-    maxWidth: 1190,
-    navigationBarTextStyle: "black",
-    navigationBarBackgroundColor: "#F1F1F1"
-  }
-};
-const tabBar = {
-  color: "#909193",
-  selectedColor: "#D8336D",
-  borderStyle: "black",
-  backgroundColor: "#F8F8F8",
-  list: [
-    {
-      pagePath: "pages/tabBar/index/index",
-      iconPath: "static/search.png",
-      selectedIconPath: "static/search-active.png",
-      text: "发现"
-    },
-    {
-      pagePath: "pages/tabBar/about/about",
-      iconPath: "static/image/logo-icon.png",
-      selectedIconPath: "static/image/logo-icon.png",
-      text: "关于SS"
-    },
-    {
-      pagePath: "pages/tabBar/my/my",
-      iconPath: "static/home.png",
-      selectedIconPath: "static/home-active.png",
-      text: "我的"
-    }
-  ]
-};
-const e = {
-  pages,
-  subPackages,
-  globalStyle,
-  tabBar
-};
-function t(e2) {
-  return e2 && e2.__esModule && Object.prototype.hasOwnProperty.call(e2, "default") ? e2.default : e2;
-}
-function n(e2, t2, n2) {
-  return e2(n2 = { path: t2, exports: {}, require: function(e3, t3) {
-    return function() {
-      throw new Error("Dynamic requires are not currently supported by @rollup/plugin-commonjs");
-    }(null == t3 && n2.path);
-  } }, n2.exports), n2.exports;
-}
-var s = n(function(e2, t2) {
-  var n2;
-  e2.exports = (n2 = n2 || function(e3, t3) {
-    var n3 = Object.create || function() {
-      function e4() {
-      }
-      return function(t4) {
-        var n4;
-        return e4.prototype = t4, n4 = new e4(), e4.prototype = null, n4;
-      };
-    }(), s2 = {}, r2 = s2.lib = {}, i2 = r2.Base = { extend: function(e4) {
-      var t4 = n3(this);
-      return e4 && t4.mixIn(e4), t4.hasOwnProperty("init") && this.init !== t4.init || (t4.init = function() {
-        t4.$super.init.apply(this, arguments);
-      }), t4.init.prototype = t4, t4.$super = this, t4;
-    }, create: function() {
-      var e4 = this.extend();
-      return e4.init.apply(e4, arguments), e4;
-    }, init: function() {
-    }, mixIn: function(e4) {
-      for (var t4 in e4)
-        e4.hasOwnProperty(t4) && (this[t4] = e4[t4]);
-      e4.hasOwnProperty("toString") && (this.toString = e4.toString);
-    }, clone: function() {
-      return this.init.prototype.extend(this);
-    } }, o2 = r2.WordArray = i2.extend({ init: function(e4, n4) {
-      e4 = this.words = e4 || [], this.sigBytes = n4 != t3 ? n4 : 4 * e4.length;
-    }, toString: function(e4) {
-      return (e4 || c2).stringify(this);
-    }, concat: function(e4) {
-      var t4 = this.words, n4 = e4.words, s3 = this.sigBytes, r3 = e4.sigBytes;
-      if (this.clamp(), s3 % 4)
-        for (var i3 = 0; i3 < r3; i3++) {
-          var o3 = n4[i3 >>> 2] >>> 24 - i3 % 4 * 8 & 255;
-          t4[s3 + i3 >>> 2] |= o3 << 24 - (s3 + i3) % 4 * 8;
-        }
-      else
-        for (i3 = 0; i3 < r3; i3 += 4)
-          t4[s3 + i3 >>> 2] = n4[i3 >>> 2];
-      return this.sigBytes += r3, this;
-    }, clamp: function() {
-      var t4 = this.words, n4 = this.sigBytes;
-      t4[n4 >>> 2] &= 4294967295 << 32 - n4 % 4 * 8, t4.length = e3.ceil(n4 / 4);
-    }, clone: function() {
-      var e4 = i2.clone.call(this);
-      return e4.words = this.words.slice(0), e4;
-    }, random: function(t4) {
-      for (var n4, s3 = [], r3 = function(t5) {
-        t5 = t5;
-        var n5 = 987654321, s4 = 4294967295;
-        return function() {
-          var r4 = ((n5 = 36969 * (65535 & n5) + (n5 >> 16) & s4) << 16) + (t5 = 18e3 * (65535 & t5) + (t5 >> 16) & s4) & s4;
-          return r4 /= 4294967296, (r4 += 0.5) * (e3.random() > 0.5 ? 1 : -1);
-        };
-      }, i3 = 0; i3 < t4; i3 += 4) {
-        var a3 = r3(4294967296 * (n4 || e3.random()));
-        n4 = 987654071 * a3(), s3.push(4294967296 * a3() | 0);
-      }
-      return new o2.init(s3, t4);
-    } }), a2 = s2.enc = {}, c2 = a2.Hex = { stringify: function(e4) {
-      for (var t4 = e4.words, n4 = e4.sigBytes, s3 = [], r3 = 0; r3 < n4; r3++) {
-        var i3 = t4[r3 >>> 2] >>> 24 - r3 % 4 * 8 & 255;
-        s3.push((i3 >>> 4).toString(16)), s3.push((15 & i3).toString(16));
-      }
-      return s3.join("");
-    }, parse: function(e4) {
-      for (var t4 = e4.length, n4 = [], s3 = 0; s3 < t4; s3 += 2)
-        n4[s3 >>> 3] |= parseInt(e4.substr(s3, 2), 16) << 24 - s3 % 8 * 4;
-      return new o2.init(n4, t4 / 2);
-    } }, u2 = a2.Latin1 = { stringify: function(e4) {
-      for (var t4 = e4.words, n4 = e4.sigBytes, s3 = [], r3 = 0; r3 < n4; r3++) {
-        var i3 = t4[r3 >>> 2] >>> 24 - r3 % 4 * 8 & 255;
-        s3.push(String.fromCharCode(i3));
-      }
-      return s3.join("");
-    }, parse: function(e4) {
-      for (var t4 = e4.length, n4 = [], s3 = 0; s3 < t4; s3++)
-        n4[s3 >>> 2] |= (255 & e4.charCodeAt(s3)) << 24 - s3 % 4 * 8;
-      return new o2.init(n4, t4);
-    } }, h2 = a2.Utf8 = { stringify: function(e4) {
-      try {
-        return decodeURIComponent(escape(u2.stringify(e4)));
-      } catch (e5) {
-        throw new Error("Malformed UTF-8 data");
-      }
-    }, parse: function(e4) {
-      return u2.parse(unescape(encodeURIComponent(e4)));
-    } }, l2 = r2.BufferedBlockAlgorithm = i2.extend({ reset: function() {
-      this._data = new o2.init(), this._nDataBytes = 0;
-    }, _append: function(e4) {
-      "string" == typeof e4 && (e4 = h2.parse(e4)), this._data.concat(e4), this._nDataBytes += e4.sigBytes;
-    }, _process: function(t4) {
-      var n4 = this._data, s3 = n4.words, r3 = n4.sigBytes, i3 = this.blockSize, a3 = r3 / (4 * i3), c3 = (a3 = t4 ? e3.ceil(a3) : e3.max((0 | a3) - this._minBufferSize, 0)) * i3, u3 = e3.min(4 * c3, r3);
-      if (c3) {
-        for (var h3 = 0; h3 < c3; h3 += i3)
-          this._doProcessBlock(s3, h3);
-        var l3 = s3.splice(0, c3);
-        n4.sigBytes -= u3;
-      }
-      return new o2.init(l3, u3);
-    }, clone: function() {
-      var e4 = i2.clone.call(this);
-      return e4._data = this._data.clone(), e4;
-    }, _minBufferSize: 0 });
-    r2.Hasher = l2.extend({ cfg: i2.extend(), init: function(e4) {
-      this.cfg = this.cfg.extend(e4), this.reset();
-    }, reset: function() {
-      l2.reset.call(this), this._doReset();
-    }, update: function(e4) {
-      return this._append(e4), this._process(), this;
-    }, finalize: function(e4) {
-      return e4 && this._append(e4), this._doFinalize();
-    }, blockSize: 16, _createHelper: function(e4) {
-      return function(t4, n4) {
-        return new e4.init(n4).finalize(t4);
-      };
-    }, _createHmacHelper: function(e4) {
-      return function(t4, n4) {
-        return new d2.HMAC.init(e4, n4).finalize(t4);
-      };
-    } });
-    var d2 = s2.algo = {};
-    return s2;
-  }(Math), n2);
-}), r = s, i = (n(function(e2, t2) {
-  var n2;
-  e2.exports = (n2 = r, function(e3) {
-    var t3 = n2, s2 = t3.lib, r2 = s2.WordArray, i2 = s2.Hasher, o2 = t3.algo, a2 = [];
-    !function() {
-      for (var t4 = 0; t4 < 64; t4++)
-        a2[t4] = 4294967296 * e3.abs(e3.sin(t4 + 1)) | 0;
-    }();
-    var c2 = o2.MD5 = i2.extend({ _doReset: function() {
-      this._hash = new r2.init([1732584193, 4023233417, 2562383102, 271733878]);
-    }, _doProcessBlock: function(e4, t4) {
-      for (var n3 = 0; n3 < 16; n3++) {
-        var s3 = t4 + n3, r3 = e4[s3];
-        e4[s3] = 16711935 & (r3 << 8 | r3 >>> 24) | 4278255360 & (r3 << 24 | r3 >>> 8);
-      }
-      var i3 = this._hash.words, o3 = e4[t4 + 0], c3 = e4[t4 + 1], p2 = e4[t4 + 2], f2 = e4[t4 + 3], g2 = e4[t4 + 4], m2 = e4[t4 + 5], y2 = e4[t4 + 6], _2 = e4[t4 + 7], w2 = e4[t4 + 8], v2 = e4[t4 + 9], I2 = e4[t4 + 10], S2 = e4[t4 + 11], b2 = e4[t4 + 12], k = e4[t4 + 13], A2 = e4[t4 + 14], P2 = e4[t4 + 15], T2 = i3[0], C2 = i3[1], x = i3[2], O2 = i3[3];
-      T2 = u2(T2, C2, x, O2, o3, 7, a2[0]), O2 = u2(O2, T2, C2, x, c3, 12, a2[1]), x = u2(x, O2, T2, C2, p2, 17, a2[2]), C2 = u2(C2, x, O2, T2, f2, 22, a2[3]), T2 = u2(T2, C2, x, O2, g2, 7, a2[4]), O2 = u2(O2, T2, C2, x, m2, 12, a2[5]), x = u2(x, O2, T2, C2, y2, 17, a2[6]), C2 = u2(C2, x, O2, T2, _2, 22, a2[7]), T2 = u2(T2, C2, x, O2, w2, 7, a2[8]), O2 = u2(O2, T2, C2, x, v2, 12, a2[9]), x = u2(x, O2, T2, C2, I2, 17, a2[10]), C2 = u2(C2, x, O2, T2, S2, 22, a2[11]), T2 = u2(T2, C2, x, O2, b2, 7, a2[12]), O2 = u2(O2, T2, C2, x, k, 12, a2[13]), x = u2(x, O2, T2, C2, A2, 17, a2[14]), T2 = h2(T2, C2 = u2(C2, x, O2, T2, P2, 22, a2[15]), x, O2, c3, 5, a2[16]), O2 = h2(O2, T2, C2, x, y2, 9, a2[17]), x = h2(x, O2, T2, C2, S2, 14, a2[18]), C2 = h2(C2, x, O2, T2, o3, 20, a2[19]), T2 = h2(T2, C2, x, O2, m2, 5, a2[20]), O2 = h2(O2, T2, C2, x, I2, 9, a2[21]), x = h2(x, O2, T2, C2, P2, 14, a2[22]), C2 = h2(C2, x, O2, T2, g2, 20, a2[23]), T2 = h2(T2, C2, x, O2, v2, 5, a2[24]), O2 = h2(O2, T2, C2, x, A2, 9, a2[25]), x = h2(x, O2, T2, C2, f2, 14, a2[26]), C2 = h2(C2, x, O2, T2, w2, 20, a2[27]), T2 = h2(T2, C2, x, O2, k, 5, a2[28]), O2 = h2(O2, T2, C2, x, p2, 9, a2[29]), x = h2(x, O2, T2, C2, _2, 14, a2[30]), T2 = l2(T2, C2 = h2(C2, x, O2, T2, b2, 20, a2[31]), x, O2, m2, 4, a2[32]), O2 = l2(O2, T2, C2, x, w2, 11, a2[33]), x = l2(x, O2, T2, C2, S2, 16, a2[34]), C2 = l2(C2, x, O2, T2, A2, 23, a2[35]), T2 = l2(T2, C2, x, O2, c3, 4, a2[36]), O2 = l2(O2, T2, C2, x, g2, 11, a2[37]), x = l2(x, O2, T2, C2, _2, 16, a2[38]), C2 = l2(C2, x, O2, T2, I2, 23, a2[39]), T2 = l2(T2, C2, x, O2, k, 4, a2[40]), O2 = l2(O2, T2, C2, x, o3, 11, a2[41]), x = l2(x, O2, T2, C2, f2, 16, a2[42]), C2 = l2(C2, x, O2, T2, y2, 23, a2[43]), T2 = l2(T2, C2, x, O2, v2, 4, a2[44]), O2 = l2(O2, T2, C2, x, b2, 11, a2[45]), x = l2(x, O2, T2, C2, P2, 16, a2[46]), T2 = d2(T2, C2 = l2(C2, x, O2, T2, p2, 23, a2[47]), x, O2, o3, 6, a2[48]), O2 = d2(O2, T2, C2, x, _2, 10, a2[49]), x = d2(x, O2, T2, C2, A2, 15, a2[50]), C2 = d2(C2, x, O2, T2, m2, 21, a2[51]), T2 = d2(T2, C2, x, O2, b2, 6, a2[52]), O2 = d2(O2, T2, C2, x, f2, 10, a2[53]), x = d2(x, O2, T2, C2, I2, 15, a2[54]), C2 = d2(C2, x, O2, T2, c3, 21, a2[55]), T2 = d2(T2, C2, x, O2, w2, 6, a2[56]), O2 = d2(O2, T2, C2, x, P2, 10, a2[57]), x = d2(x, O2, T2, C2, y2, 15, a2[58]), C2 = d2(C2, x, O2, T2, k, 21, a2[59]), T2 = d2(T2, C2, x, O2, g2, 6, a2[60]), O2 = d2(O2, T2, C2, x, S2, 10, a2[61]), x = d2(x, O2, T2, C2, p2, 15, a2[62]), C2 = d2(C2, x, O2, T2, v2, 21, a2[63]), i3[0] = i3[0] + T2 | 0, i3[1] = i3[1] + C2 | 0, i3[2] = i3[2] + x | 0, i3[3] = i3[3] + O2 | 0;
-    }, _doFinalize: function() {
-      var t4 = this._data, n3 = t4.words, s3 = 8 * this._nDataBytes, r3 = 8 * t4.sigBytes;
-      n3[r3 >>> 5] |= 128 << 24 - r3 % 32;
-      var i3 = e3.floor(s3 / 4294967296), o3 = s3;
-      n3[15 + (r3 + 64 >>> 9 << 4)] = 16711935 & (i3 << 8 | i3 >>> 24) | 4278255360 & (i3 << 24 | i3 >>> 8), n3[14 + (r3 + 64 >>> 9 << 4)] = 16711935 & (o3 << 8 | o3 >>> 24) | 4278255360 & (o3 << 24 | o3 >>> 8), t4.sigBytes = 4 * (n3.length + 1), this._process();
-      for (var a3 = this._hash, c3 = a3.words, u3 = 0; u3 < 4; u3++) {
-        var h3 = c3[u3];
-        c3[u3] = 16711935 & (h3 << 8 | h3 >>> 24) | 4278255360 & (h3 << 24 | h3 >>> 8);
-      }
-      return a3;
-    }, clone: function() {
-      var e4 = i2.clone.call(this);
-      return e4._hash = this._hash.clone(), e4;
-    } });
-    function u2(e4, t4, n3, s3, r3, i3, o3) {
-      var a3 = e4 + (t4 & n3 | ~t4 & s3) + r3 + o3;
-      return (a3 << i3 | a3 >>> 32 - i3) + t4;
-    }
-    function h2(e4, t4, n3, s3, r3, i3, o3) {
-      var a3 = e4 + (t4 & s3 | n3 & ~s3) + r3 + o3;
-      return (a3 << i3 | a3 >>> 32 - i3) + t4;
-    }
-    function l2(e4, t4, n3, s3, r3, i3, o3) {
-      var a3 = e4 + (t4 ^ n3 ^ s3) + r3 + o3;
-      return (a3 << i3 | a3 >>> 32 - i3) + t4;
-    }
-    function d2(e4, t4, n3, s3, r3, i3, o3) {
-      var a3 = e4 + (n3 ^ (t4 | ~s3)) + r3 + o3;
-      return (a3 << i3 | a3 >>> 32 - i3) + t4;
-    }
-    t3.MD5 = i2._createHelper(c2), t3.HmacMD5 = i2._createHmacHelper(c2);
-  }(Math), n2.MD5);
-}), n(function(e2, t2) {
-  var n2;
-  e2.exports = (n2 = r, void function() {
-    var e3 = n2, t3 = e3.lib.Base, s2 = e3.enc.Utf8;
-    e3.algo.HMAC = t3.extend({ init: function(e4, t4) {
-      e4 = this._hasher = new e4.init(), "string" == typeof t4 && (t4 = s2.parse(t4));
-      var n3 = e4.blockSize, r2 = 4 * n3;
-      t4.sigBytes > r2 && (t4 = e4.finalize(t4)), t4.clamp();
-      for (var i2 = this._oKey = t4.clone(), o2 = this._iKey = t4.clone(), a2 = i2.words, c2 = o2.words, u2 = 0; u2 < n3; u2++)
-        a2[u2] ^= 1549556828, c2[u2] ^= 909522486;
-      i2.sigBytes = o2.sigBytes = r2, this.reset();
-    }, reset: function() {
-      var e4 = this._hasher;
-      e4.reset(), e4.update(this._iKey);
-    }, update: function(e4) {
-      return this._hasher.update(e4), this;
-    }, finalize: function(e4) {
-      var t4 = this._hasher, n3 = t4.finalize(e4);
-      return t4.reset(), t4.finalize(this._oKey.clone().concat(n3));
-    } });
-  }());
-}), n(function(e2, t2) {
-  e2.exports = r.HmacMD5;
-})), o = n(function(e2, t2) {
-  e2.exports = r.enc.Utf8;
-}), a = n(function(e2, t2) {
-  var n2;
-  e2.exports = (n2 = r, function() {
-    var e3 = n2, t3 = e3.lib.WordArray;
-    function s2(e4, n3, s3) {
-      for (var r2 = [], i2 = 0, o2 = 0; o2 < n3; o2++)
-        if (o2 % 4) {
-          var a2 = s3[e4.charCodeAt(o2 - 1)] << o2 % 4 * 2, c2 = s3[e4.charCodeAt(o2)] >>> 6 - o2 % 4 * 2;
-          r2[i2 >>> 2] |= (a2 | c2) << 24 - i2 % 4 * 8, i2++;
-        }
-      return t3.create(r2, i2);
-    }
-    e3.enc.Base64 = { stringify: function(e4) {
-      var t4 = e4.words, n3 = e4.sigBytes, s3 = this._map;
-      e4.clamp();
-      for (var r2 = [], i2 = 0; i2 < n3; i2 += 3)
-        for (var o2 = (t4[i2 >>> 2] >>> 24 - i2 % 4 * 8 & 255) << 16 | (t4[i2 + 1 >>> 2] >>> 24 - (i2 + 1) % 4 * 8 & 255) << 8 | t4[i2 + 2 >>> 2] >>> 24 - (i2 + 2) % 4 * 8 & 255, a2 = 0; a2 < 4 && i2 + 0.75 * a2 < n3; a2++)
-          r2.push(s3.charAt(o2 >>> 6 * (3 - a2) & 63));
-      var c2 = s3.charAt(64);
-      if (c2)
-        for (; r2.length % 4; )
-          r2.push(c2);
-      return r2.join("");
-    }, parse: function(e4) {
-      var t4 = e4.length, n3 = this._map, r2 = this._reverseMap;
-      if (!r2) {
-        r2 = this._reverseMap = [];
-        for (var i2 = 0; i2 < n3.length; i2++)
-          r2[n3.charCodeAt(i2)] = i2;
-      }
-      var o2 = n3.charAt(64);
-      if (o2) {
-        var a2 = e4.indexOf(o2);
-        -1 !== a2 && (t4 = a2);
-      }
-      return s2(e4, t4, r2);
-    }, _map: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=" };
-  }(), n2.enc.Base64);
-});
-const c = "FUNCTION", u = "OBJECT", h = "CLIENT_DB", l = "pending", d = "fulfilled", p = "rejected";
-function f(e2) {
-  return Object.prototype.toString.call(e2).slice(8, -1).toLowerCase();
-}
-function g(e2) {
-  return "object" === f(e2);
-}
-function m(e2) {
-  return "function" == typeof e2;
-}
-function y(e2) {
-  return function() {
-    try {
-      return e2.apply(e2, arguments);
-    } catch (e3) {
-      console.error(e3);
-    }
-  };
-}
-const _ = "REJECTED", w = "NOT_PENDING";
-class v {
-  constructor({ createPromise: e2, retryRule: t2 = _ } = {}) {
-    this.createPromise = e2, this.status = null, this.promise = null, this.retryRule = t2;
-  }
-  get needRetry() {
-    if (!this.status)
-      return true;
-    switch (this.retryRule) {
-      case _:
-        return this.status === p;
-      case w:
-        return this.status !== l;
-    }
-  }
-  exec() {
-    return this.needRetry ? (this.status = l, this.promise = this.createPromise().then((e2) => (this.status = d, Promise.resolve(e2)), (e2) => (this.status = p, Promise.reject(e2))), this.promise) : this.promise;
-  }
-}
-function I(e2) {
-  return e2 && "string" == typeof e2 ? JSON.parse(e2) : e2;
-}
-const S = true, b = "mp-weixin", A = I([]), P = b, T = I(""), C = I("[]") || [];
-let O = "";
-try {
-  O = "__UNI__048050D";
-} catch (e2) {
-}
-let E = {};
-function L(e2, t2 = {}) {
-  var n2, s2;
-  return n2 = E, s2 = e2, Object.prototype.hasOwnProperty.call(n2, s2) || (E[e2] = t2), E[e2];
-}
-const R = ["invoke", "success", "fail", "complete"], U = L("_globalUniCloudInterceptor");
-function N(e2, t2) {
-  U[e2] || (U[e2] = {}), g(t2) && Object.keys(t2).forEach((n2) => {
-    R.indexOf(n2) > -1 && function(e3, t3, n3) {
-      let s2 = U[e3][t3];
-      s2 || (s2 = U[e3][t3] = []), -1 === s2.indexOf(n3) && m(n3) && s2.push(n3);
-    }(e2, n2, t2[n2]);
-  });
-}
-function D(e2, t2) {
-  U[e2] || (U[e2] = {}), g(t2) ? Object.keys(t2).forEach((n2) => {
-    R.indexOf(n2) > -1 && function(e3, t3, n3) {
-      const s2 = U[e3][t3];
-      if (!s2)
-        return;
-      const r2 = s2.indexOf(n3);
-      r2 > -1 && s2.splice(r2, 1);
-    }(e2, n2, t2[n2]);
-  }) : delete U[e2];
-}
-function M(e2, t2) {
-  return e2 && 0 !== e2.length ? e2.reduce((e3, n2) => e3.then(() => n2(t2)), Promise.resolve()) : Promise.resolve();
-}
-function q(e2, t2) {
-  return U[e2] && U[e2][t2] || [];
-}
-function F(e2) {
-  N("callObject", e2);
-}
-const K = L("_globalUniCloudListener"), j = "response", $ = "needLogin", B = "refreshToken", W = "clientdb", H = "cloudfunction", z = "cloudobject";
-function J(e2) {
-  return K[e2] || (K[e2] = []), K[e2];
-}
-function G(e2, t2) {
-  const n2 = J(e2);
-  n2.includes(t2) || n2.push(t2);
-}
-function V(e2, t2) {
-  const n2 = J(e2), s2 = n2.indexOf(t2);
-  -1 !== s2 && n2.splice(s2, 1);
-}
-function Y(e2, t2) {
-  const n2 = J(e2);
-  for (let e3 = 0; e3 < n2.length; e3++) {
-    (0, n2[e3])(t2);
-  }
-}
-let Q, X = false;
-function Z() {
-  return Q || (Q = new Promise((e2) => {
-    X && e2(), function t2() {
-      if ("function" == typeof getCurrentPages) {
-        const t3 = getCurrentPages();
-        t3 && t3[0] && (X = true, e2());
-      }
-      X || setTimeout(() => {
-        t2();
-      }, 30);
-    }();
-  }), Q);
-}
-function ee(e2) {
-  const t2 = {};
-  for (const n2 in e2) {
-    const s2 = e2[n2];
-    m(s2) && (t2[n2] = y(s2));
-  }
-  return t2;
-}
-class te extends Error {
-  constructor(e2) {
-    super(e2.message), this.errMsg = e2.message || e2.errMsg || "unknown system error", this.code = this.errCode = e2.code || e2.errCode || "SYSTEM_ERROR", this.errSubject = this.subject = e2.subject || e2.errSubject, this.cause = e2.cause, this.requestId = e2.requestId;
-  }
-  toJson(e2 = 0) {
-    if (!(e2 >= 10))
-      return e2++, { errCode: this.errCode, errMsg: this.errMsg, errSubject: this.errSubject, cause: this.cause && this.cause.toJson ? this.cause.toJson(e2) : this.cause };
-  }
-}
-var ne = { request: (e2) => index.request(e2), uploadFile: (e2) => index.uploadFile(e2), setStorageSync: (e2, t2) => index.setStorageSync(e2, t2), getStorageSync: (e2) => index.getStorageSync(e2), removeStorageSync: (e2) => index.removeStorageSync(e2), clearStorageSync: () => index.clearStorageSync() };
-function se(e2) {
-  return e2 && se(e2.__v_raw) || e2;
-}
-function re() {
-  return { token: ne.getStorageSync("uni_id_token") || ne.getStorageSync("uniIdToken"), tokenExpired: ne.getStorageSync("uni_id_token_expired") };
-}
-function ie({ token: e2, tokenExpired: t2 } = {}) {
-  e2 && ne.setStorageSync("uni_id_token", e2), t2 && ne.setStorageSync("uni_id_token_expired", t2);
-}
-let oe, ae;
-function ce() {
-  return oe || (oe = index.getSystemInfoSync()), oe;
-}
-function ue() {
-  let e2, t2;
-  try {
-    if (index.getLaunchOptionsSync) {
-      if (index.getLaunchOptionsSync.toString().indexOf("not yet implemented") > -1)
-        return;
-      const { scene: n2, channel: s2 } = index.getLaunchOptionsSync();
-      e2 = s2, t2 = n2;
-    }
-  } catch (e3) {
-  }
-  return { channel: e2, scene: t2 };
-}
-function he() {
-  const e2 = index.getLocale && index.getLocale() || "en";
-  if (ae)
-    return { ...ae, locale: e2, LOCALE: e2 };
-  const t2 = ce(), { deviceId: n2, osName: s2, uniPlatform: r2, appId: i2 } = t2, o2 = ["pixelRatio", "brand", "model", "system", "language", "version", "platform", "host", "SDKVersion", "swanNativeVersion", "app", "AppPlatform", "fontSizeSetting"];
-  for (let e3 = 0; e3 < o2.length; e3++) {
-    delete t2[o2[e3]];
-  }
-  return ae = { PLATFORM: r2, OS: s2, APPID: i2, DEVICEID: n2, ...ue(), ...t2 }, { ...ae, locale: e2, LOCALE: e2 };
-}
-var le = { sign: function(e2, t2) {
-  let n2 = "";
-  return Object.keys(e2).sort().forEach(function(t3) {
-    e2[t3] && (n2 = n2 + "&" + t3 + "=" + e2[t3]);
-  }), n2 = n2.slice(1), i(n2, t2).toString();
-}, wrappedRequest: function(e2, t2) {
-  return new Promise((n2, s2) => {
-    t2(Object.assign(e2, { complete(e3) {
-      e3 || (e3 = {});
-      const t3 = e3.data && e3.data.header && e3.data.header["x-serverless-request-id"] || e3.header && e3.header["request-id"];
-      if (!e3.statusCode || e3.statusCode >= 400)
-        return s2(new te({ code: "SYS_ERR", message: e3.errMsg || "request:fail", requestId: t3 }));
-      const r2 = e3.data;
-      if (r2.error)
-        return s2(new te({ code: r2.error.code, message: r2.error.message, requestId: t3 }));
-      r2.result = r2.data, r2.requestId = t3, delete r2.data, n2(r2);
-    } }));
-  });
-}, toBase64: function(e2) {
-  return a.stringify(o.parse(e2));
-} };
-var de = class {
-  constructor(e2) {
-    ["spaceId", "clientSecret"].forEach((t2) => {
-      if (!Object.prototype.hasOwnProperty.call(e2, t2))
-        throw new Error(`${t2} required`);
-    }), this.config = Object.assign({}, { endpoint: 0 === e2.spaceId.indexOf("mp-") ? "https://api.next.bspapp.com" : "https://api.bspapp.com" }, e2), this.config.provider = "aliyun", this.config.requestUrl = this.config.endpoint + "/client", this.config.envType = this.config.envType || "public", this.config.accessTokenKey = "access_token_" + this.config.spaceId, this.adapter = ne, this._getAccessTokenPromiseHub = new v({ createPromise: () => this.requestAuth(this.setupRequest({ method: "serverless.auth.user.anonymousAuthorize", params: "{}" }, "auth")).then((e3) => {
-      if (!e3.result || !e3.result.accessToken)
-        throw new te({ code: "AUTH_FAILED", message: "获取accessToken失败" });
-      this.setAccessToken(e3.result.accessToken);
-    }), retryRule: w });
-  }
-  get hasAccessToken() {
-    return !!this.accessToken;
-  }
-  setAccessToken(e2) {
-    this.accessToken = e2;
-  }
-  requestWrapped(e2) {
-    return le.wrappedRequest(e2, this.adapter.request);
-  }
-  requestAuth(e2) {
-    return this.requestWrapped(e2);
-  }
-  request(e2, t2) {
-    return Promise.resolve().then(() => this.hasAccessToken ? t2 ? this.requestWrapped(e2) : this.requestWrapped(e2).catch((t3) => new Promise((e3, n2) => {
-      !t3 || "GATEWAY_INVALID_TOKEN" !== t3.code && "InvalidParameter.InvalidToken" !== t3.code ? n2(t3) : e3();
-    }).then(() => this.getAccessToken()).then(() => {
-      const t4 = this.rebuildRequest(e2);
-      return this.request(t4, true);
-    })) : this.getAccessToken().then(() => {
-      const t3 = this.rebuildRequest(e2);
-      return this.request(t3, true);
-    }));
-  }
-  rebuildRequest(e2) {
-    const t2 = Object.assign({}, e2);
-    return t2.data.token = this.accessToken, t2.header["x-basement-token"] = this.accessToken, t2.header["x-serverless-sign"] = le.sign(t2.data, this.config.clientSecret), t2;
-  }
-  setupRequest(e2, t2) {
-    const n2 = Object.assign({}, e2, { spaceId: this.config.spaceId, timestamp: Date.now() }), s2 = { "Content-Type": "application/json" };
-    return "auth" !== t2 && (n2.token = this.accessToken, s2["x-basement-token"] = this.accessToken), s2["x-serverless-sign"] = le.sign(n2, this.config.clientSecret), { url: this.config.requestUrl, method: "POST", data: n2, dataType: "json", header: s2 };
-  }
-  getAccessToken() {
-    return this._getAccessTokenPromiseHub.exec();
-  }
-  async authorize() {
-    await this.getAccessToken();
-  }
-  callFunction(e2) {
-    const t2 = { method: "serverless.function.runtime.invoke", params: JSON.stringify({ functionTarget: e2.name, functionArgs: e2.data || {} }) };
-    return this.request(this.setupRequest(t2));
-  }
-  getOSSUploadOptionsFromPath(e2) {
-    const t2 = { method: "serverless.file.resource.generateProximalSign", params: JSON.stringify(e2) };
-    return this.request(this.setupRequest(t2));
-  }
-  uploadFileToOSS({ url: e2, formData: t2, name: n2, filePath: s2, fileType: r2, onUploadProgress: i2 }) {
-    return new Promise((o2, a2) => {
-      const c2 = this.adapter.uploadFile({ url: e2, formData: t2, name: n2, filePath: s2, fileType: r2, header: { "X-OSS-server-side-encrpytion": "AES256" }, success(e3) {
-        e3 && e3.statusCode < 400 ? o2(e3) : a2(new te({ code: "UPLOAD_FAILED", message: "文件上传失败" }));
-      }, fail(e3) {
-        a2(new te({ code: e3.code || "UPLOAD_FAILED", message: e3.message || e3.errMsg || "文件上传失败" }));
-      } });
-      "function" == typeof i2 && c2 && "function" == typeof c2.onProgressUpdate && c2.onProgressUpdate((e3) => {
-        i2({ loaded: e3.totalBytesSent, total: e3.totalBytesExpectedToSend });
-      });
-    });
-  }
-  reportOSSUpload(e2) {
-    const t2 = { method: "serverless.file.resource.report", params: JSON.stringify(e2) };
-    return this.request(this.setupRequest(t2));
-  }
-  async uploadFile({ filePath: e2, cloudPath: t2, fileType: n2 = "image", cloudPathAsRealPath: s2 = false, onUploadProgress: r2, config: i2 }) {
-    if ("string" !== f(t2))
-      throw new te({ code: "INVALID_PARAM", message: "cloudPath必须为字符串类型" });
-    if (!(t2 = t2.trim()))
-      throw new te({ code: "INVALID_PARAM", message: "cloudPath不可为空" });
-    if (/:\/\//.test(t2))
-      throw new te({ code: "INVALID_PARAM", message: "cloudPath不合法" });
-    const o2 = i2 && i2.envType || this.config.envType;
-    if (s2 && ("/" !== t2[0] && (t2 = "/" + t2), t2.indexOf("\\") > -1))
-      throw new te({ code: "INVALID_PARAM", message: "使用cloudPath作为路径时，cloudPath不可包含“\\”" });
-    const a2 = (await this.getOSSUploadOptionsFromPath({ env: o2, filename: s2 ? t2.split("/").pop() : t2, fileId: s2 ? t2 : void 0 })).result, c2 = "https://" + a2.cdnDomain + "/" + a2.ossPath, { securityToken: u2, accessKeyId: h2, signature: l2, host: d2, ossPath: p2, id: g2, policy: m2, ossCallbackUrl: y2 } = a2, _2 = { "Cache-Control": "max-age=2592000", "Content-Disposition": "attachment", OSSAccessKeyId: h2, Signature: l2, host: d2, id: g2, key: p2, policy: m2, success_action_status: 200 };
-    if (u2 && (_2["x-oss-security-token"] = u2), y2) {
-      const e3 = JSON.stringify({ callbackUrl: y2, callbackBody: JSON.stringify({ fileId: g2, spaceId: this.config.spaceId }), callbackBodyType: "application/json" });
-      _2.callback = le.toBase64(e3);
-    }
-    const w2 = { url: "https://" + a2.host, formData: _2, fileName: "file", name: "file", filePath: e2, fileType: n2 };
-    if (await this.uploadFileToOSS(Object.assign({}, w2, { onUploadProgress: r2 })), y2)
-      return { success: true, filePath: e2, fileID: c2 };
-    if ((await this.reportOSSUpload({ id: g2 })).success)
-      return { success: true, filePath: e2, fileID: c2 };
-    throw new te({ code: "UPLOAD_FAILED", message: "文件上传失败" });
-  }
-  getTempFileURL({ fileList: e2 } = {}) {
-    return new Promise((t2, n2) => {
-      Array.isArray(e2) && 0 !== e2.length || n2(new te({ code: "INVALID_PARAM", message: "fileList的元素必须是非空的字符串" })), t2({ fileList: e2.map((e3) => ({ fileID: e3, tempFileURL: e3 })) });
-    });
-  }
-  async getFileInfo({ fileList: e2 } = {}) {
-    if (!Array.isArray(e2) || 0 === e2.length)
-      throw new te({ code: "INVALID_PARAM", message: "fileList的元素必须是非空的字符串" });
-    const t2 = { method: "serverless.file.resource.info", params: JSON.stringify({ id: e2.map((e3) => e3.split("?")[0]).join(",") }) };
-    return { fileList: (await this.request(this.setupRequest(t2))).result };
-  }
-};
-var pe = { init(e2) {
-  const t2 = new de(e2), n2 = { signInAnonymously: function() {
-    return t2.authorize();
-  }, getLoginState: function() {
-    return Promise.resolve(false);
-  } };
-  return t2.auth = function() {
-    return n2;
-  }, t2.customAuth = t2.auth, t2;
-} };
-const fe = "undefined" != typeof location && "http:" === location.protocol ? "http:" : "https:";
-var ge;
-!function(e2) {
-  e2.local = "local", e2.none = "none", e2.session = "session";
-}(ge || (ge = {}));
-var me = function() {
-}, ye = n(function(e2, t2) {
-  var n2;
-  e2.exports = (n2 = r, function(e3) {
-    var t3 = n2, s2 = t3.lib, r2 = s2.WordArray, i2 = s2.Hasher, o2 = t3.algo, a2 = [], c2 = [];
-    !function() {
-      function t4(t5) {
-        for (var n4 = e3.sqrt(t5), s4 = 2; s4 <= n4; s4++)
-          if (!(t5 % s4))
-            return false;
-        return true;
-      }
-      function n3(e4) {
-        return 4294967296 * (e4 - (0 | e4)) | 0;
-      }
-      for (var s3 = 2, r3 = 0; r3 < 64; )
-        t4(s3) && (r3 < 8 && (a2[r3] = n3(e3.pow(s3, 0.5))), c2[r3] = n3(e3.pow(s3, 1 / 3)), r3++), s3++;
-    }();
-    var u2 = [], h2 = o2.SHA256 = i2.extend({ _doReset: function() {
-      this._hash = new r2.init(a2.slice(0));
-    }, _doProcessBlock: function(e4, t4) {
-      for (var n3 = this._hash.words, s3 = n3[0], r3 = n3[1], i3 = n3[2], o3 = n3[3], a3 = n3[4], h3 = n3[5], l2 = n3[6], d2 = n3[7], p2 = 0; p2 < 64; p2++) {
-        if (p2 < 16)
-          u2[p2] = 0 | e4[t4 + p2];
-        else {
-          var f2 = u2[p2 - 15], g2 = (f2 << 25 | f2 >>> 7) ^ (f2 << 14 | f2 >>> 18) ^ f2 >>> 3, m2 = u2[p2 - 2], y2 = (m2 << 15 | m2 >>> 17) ^ (m2 << 13 | m2 >>> 19) ^ m2 >>> 10;
-          u2[p2] = g2 + u2[p2 - 7] + y2 + u2[p2 - 16];
-        }
-        var _2 = s3 & r3 ^ s3 & i3 ^ r3 & i3, w2 = (s3 << 30 | s3 >>> 2) ^ (s3 << 19 | s3 >>> 13) ^ (s3 << 10 | s3 >>> 22), v2 = d2 + ((a3 << 26 | a3 >>> 6) ^ (a3 << 21 | a3 >>> 11) ^ (a3 << 7 | a3 >>> 25)) + (a3 & h3 ^ ~a3 & l2) + c2[p2] + u2[p2];
-        d2 = l2, l2 = h3, h3 = a3, a3 = o3 + v2 | 0, o3 = i3, i3 = r3, r3 = s3, s3 = v2 + (w2 + _2) | 0;
-      }
-      n3[0] = n3[0] + s3 | 0, n3[1] = n3[1] + r3 | 0, n3[2] = n3[2] + i3 | 0, n3[3] = n3[3] + o3 | 0, n3[4] = n3[4] + a3 | 0, n3[5] = n3[5] + h3 | 0, n3[6] = n3[6] + l2 | 0, n3[7] = n3[7] + d2 | 0;
-    }, _doFinalize: function() {
-      var t4 = this._data, n3 = t4.words, s3 = 8 * this._nDataBytes, r3 = 8 * t4.sigBytes;
-      return n3[r3 >>> 5] |= 128 << 24 - r3 % 32, n3[14 + (r3 + 64 >>> 9 << 4)] = e3.floor(s3 / 4294967296), n3[15 + (r3 + 64 >>> 9 << 4)] = s3, t4.sigBytes = 4 * n3.length, this._process(), this._hash;
-    }, clone: function() {
-      var e4 = i2.clone.call(this);
-      return e4._hash = this._hash.clone(), e4;
-    } });
-    t3.SHA256 = i2._createHelper(h2), t3.HmacSHA256 = i2._createHmacHelper(h2);
-  }(Math), n2.SHA256);
-}), _e = ye, we = n(function(e2, t2) {
-  e2.exports = r.HmacSHA256;
-});
-const ve = () => {
-  let e2;
-  if (!Promise) {
-    e2 = () => {
-    }, e2.promise = {};
-    const t3 = () => {
-      throw new te({ message: 'Your Node runtime does support ES6 Promises. Set "global.Promise" to your preferred implementation of promises.' });
-    };
-    return Object.defineProperty(e2.promise, "then", { get: t3 }), Object.defineProperty(e2.promise, "catch", { get: t3 }), e2;
-  }
-  const t2 = new Promise((t3, n2) => {
-    e2 = (e3, s2) => e3 ? n2(e3) : t3(s2);
-  });
-  return e2.promise = t2, e2;
-};
-function Ie(e2) {
-  return void 0 === e2;
-}
-function Se(e2) {
-  return "[object Null]" === Object.prototype.toString.call(e2);
-}
-var be;
-function ke(e2) {
-  const t2 = (n2 = e2, "[object Array]" === Object.prototype.toString.call(n2) ? e2 : [e2]);
-  var n2;
-  for (const e3 of t2) {
-    const { isMatch: t3, genAdapter: n3, runtime: s2 } = e3;
-    if (t3())
-      return { adapter: n3(), runtime: s2 };
-  }
-}
-!function(e2) {
-  e2.WEB = "web", e2.WX_MP = "wx_mp";
-}(be || (be = {}));
-const Ae = { adapter: null, runtime: void 0 }, Pe = ["anonymousUuidKey"];
-class Te extends me {
-  constructor() {
-    super(), Ae.adapter.root.tcbObject || (Ae.adapter.root.tcbObject = {});
-  }
-  setItem(e2, t2) {
-    Ae.adapter.root.tcbObject[e2] = t2;
-  }
-  getItem(e2) {
-    return Ae.adapter.root.tcbObject[e2];
-  }
-  removeItem(e2) {
-    delete Ae.adapter.root.tcbObject[e2];
-  }
-  clear() {
-    delete Ae.adapter.root.tcbObject;
-  }
-}
-function Ce(e2, t2) {
-  switch (e2) {
-    case "local":
-      return t2.localStorage || new Te();
-    case "none":
-      return new Te();
-    default:
-      return t2.sessionStorage || new Te();
-  }
-}
-class xe {
-  constructor(e2) {
-    if (!this._storage) {
-      this._persistence = Ae.adapter.primaryStorage || e2.persistence, this._storage = Ce(this._persistence, Ae.adapter);
-      const t2 = `access_token_${e2.env}`, n2 = `access_token_expire_${e2.env}`, s2 = `refresh_token_${e2.env}`, r2 = `anonymous_uuid_${e2.env}`, i2 = `login_type_${e2.env}`, o2 = `user_info_${e2.env}`;
-      this.keys = { accessTokenKey: t2, accessTokenExpireKey: n2, refreshTokenKey: s2, anonymousUuidKey: r2, loginTypeKey: i2, userInfoKey: o2 };
-    }
-  }
-  updatePersistence(e2) {
-    if (e2 === this._persistence)
-      return;
-    const t2 = "local" === this._persistence;
-    this._persistence = e2;
-    const n2 = Ce(e2, Ae.adapter);
-    for (const e3 in this.keys) {
-      const s2 = this.keys[e3];
-      if (t2 && Pe.includes(e3))
-        continue;
-      const r2 = this._storage.getItem(s2);
-      Ie(r2) || Se(r2) || (n2.setItem(s2, r2), this._storage.removeItem(s2));
-    }
-    this._storage = n2;
-  }
-  setStore(e2, t2, n2) {
-    if (!this._storage)
-      return;
-    const s2 = { version: n2 || "localCachev1", content: t2 }, r2 = JSON.stringify(s2);
-    try {
-      this._storage.setItem(e2, r2);
-    } catch (e3) {
-      throw e3;
-    }
-  }
-  getStore(e2, t2) {
-    try {
-      if (!this._storage)
-        return;
-    } catch (e3) {
-      return "";
-    }
-    t2 = t2 || "localCachev1";
-    const n2 = this._storage.getItem(e2);
-    if (!n2)
-      return "";
-    if (n2.indexOf(t2) >= 0) {
-      return JSON.parse(n2).content;
-    }
-    return "";
-  }
-  removeStore(e2) {
-    this._storage.removeItem(e2);
-  }
-}
-const Oe = {}, Ee = {};
-function Le(e2) {
-  return Oe[e2];
-}
-class Re {
-  constructor(e2, t2) {
-    this.data = t2 || null, this.name = e2;
-  }
-}
-class Ue extends Re {
-  constructor(e2, t2) {
-    super("error", { error: e2, data: t2 }), this.error = e2;
-  }
-}
-const Ne = new class {
-  constructor() {
-    this._listeners = {};
-  }
-  on(e2, t2) {
-    return function(e3, t3, n2) {
-      n2[e3] = n2[e3] || [], n2[e3].push(t3);
-    }(e2, t2, this._listeners), this;
-  }
-  off(e2, t2) {
-    return function(e3, t3, n2) {
-      if (n2 && n2[e3]) {
-        const s2 = n2[e3].indexOf(t3);
-        -1 !== s2 && n2[e3].splice(s2, 1);
-      }
-    }(e2, t2, this._listeners), this;
-  }
-  fire(e2, t2) {
-    if (e2 instanceof Ue)
-      return console.error(e2.error), this;
-    const n2 = "string" == typeof e2 ? new Re(e2, t2 || {}) : e2;
-    const s2 = n2.name;
-    if (this._listens(s2)) {
-      n2.target = this;
-      const e3 = this._listeners[s2] ? [...this._listeners[s2]] : [];
-      for (const t3 of e3)
-        t3.call(this, n2);
-    }
-    return this;
-  }
-  _listens(e2) {
-    return this._listeners[e2] && this._listeners[e2].length > 0;
-  }
-}();
-function De(e2, t2) {
-  Ne.on(e2, t2);
-}
-function Me(e2, t2 = {}) {
-  Ne.fire(e2, t2);
-}
-function qe(e2, t2) {
-  Ne.off(e2, t2);
-}
-const Fe = "loginStateChanged", Ke = "loginStateExpire", je = "loginTypeChanged", $e = "anonymousConverted", Be = "refreshAccessToken";
-var We;
-!function(e2) {
-  e2.ANONYMOUS = "ANONYMOUS", e2.WECHAT = "WECHAT", e2.WECHAT_PUBLIC = "WECHAT-PUBLIC", e2.WECHAT_OPEN = "WECHAT-OPEN", e2.CUSTOM = "CUSTOM", e2.EMAIL = "EMAIL", e2.USERNAME = "USERNAME", e2.NULL = "NULL";
-}(We || (We = {}));
-const He = ["auth.getJwt", "auth.logout", "auth.signInWithTicket", "auth.signInAnonymously", "auth.signIn", "auth.fetchAccessTokenWithRefreshToken", "auth.signUpWithEmailAndPassword", "auth.activateEndUserMail", "auth.sendPasswordResetEmail", "auth.resetPasswordWithToken", "auth.isUsernameRegistered"], ze = { "X-SDK-Version": "1.3.5" };
-function Je(e2, t2, n2) {
-  const s2 = e2[t2];
-  e2[t2] = function(t3) {
-    const r2 = {}, i2 = {};
-    n2.forEach((n3) => {
-      const { data: s3, headers: o3 } = n3.call(e2, t3);
-      Object.assign(r2, s3), Object.assign(i2, o3);
-    });
-    const o2 = t3.data;
-    return o2 && (() => {
-      var e3;
-      if (e3 = o2, "[object FormData]" !== Object.prototype.toString.call(e3))
-        t3.data = { ...o2, ...r2 };
-      else
-        for (const e4 in r2)
-          o2.append(e4, r2[e4]);
-    })(), t3.headers = { ...t3.headers || {}, ...i2 }, s2.call(e2, t3);
-  };
-}
-function Ge() {
-  const e2 = Math.random().toString(16).slice(2);
-  return { data: { seqId: e2 }, headers: { ...ze, "x-seqid": e2 } };
-}
-class Ve {
-  constructor(e2 = {}) {
-    var t2;
-    this.config = e2, this._reqClass = new Ae.adapter.reqClass({ timeout: this.config.timeout, timeoutMsg: `请求在${this.config.timeout / 1e3}s内未完成，已中断`, restrictedMethods: ["post"] }), this._cache = Le(this.config.env), this._localCache = (t2 = this.config.env, Ee[t2]), Je(this._reqClass, "post", [Ge]), Je(this._reqClass, "upload", [Ge]), Je(this._reqClass, "download", [Ge]);
-  }
-  async post(e2) {
-    return await this._reqClass.post(e2);
-  }
-  async upload(e2) {
-    return await this._reqClass.upload(e2);
-  }
-  async download(e2) {
-    return await this._reqClass.download(e2);
-  }
-  async refreshAccessToken() {
-    let e2, t2;
-    this._refreshAccessTokenPromise || (this._refreshAccessTokenPromise = this._refreshAccessToken());
-    try {
-      e2 = await this._refreshAccessTokenPromise;
-    } catch (e3) {
-      t2 = e3;
-    }
-    if (this._refreshAccessTokenPromise = null, this._shouldRefreshAccessTokenHook = null, t2)
-      throw t2;
-    return e2;
-  }
-  async _refreshAccessToken() {
-    const { accessTokenKey: e2, accessTokenExpireKey: t2, refreshTokenKey: n2, loginTypeKey: s2, anonymousUuidKey: r2 } = this._cache.keys;
-    this._cache.removeStore(e2), this._cache.removeStore(t2);
-    let i2 = this._cache.getStore(n2);
-    if (!i2)
-      throw new te({ message: "未登录CloudBase" });
-    const o2 = { refresh_token: i2 }, a2 = await this.request("auth.fetchAccessTokenWithRefreshToken", o2);
-    if (a2.data.code) {
-      const { code: e3 } = a2.data;
-      if ("SIGN_PARAM_INVALID" === e3 || "REFRESH_TOKEN_EXPIRED" === e3 || "INVALID_REFRESH_TOKEN" === e3) {
-        if (this._cache.getStore(s2) === We.ANONYMOUS && "INVALID_REFRESH_TOKEN" === e3) {
-          const e4 = this._cache.getStore(r2), t3 = this._cache.getStore(n2), s3 = await this.send("auth.signInAnonymously", { anonymous_uuid: e4, refresh_token: t3 });
-          return this.setRefreshToken(s3.refresh_token), this._refreshAccessToken();
-        }
-        Me(Ke), this._cache.removeStore(n2);
-      }
-      throw new te({ code: a2.data.code, message: `刷新access token失败：${a2.data.code}` });
-    }
-    if (a2.data.access_token)
-      return Me(Be), this._cache.setStore(e2, a2.data.access_token), this._cache.setStore(t2, a2.data.access_token_expire + Date.now()), { accessToken: a2.data.access_token, accessTokenExpire: a2.data.access_token_expire };
-    a2.data.refresh_token && (this._cache.removeStore(n2), this._cache.setStore(n2, a2.data.refresh_token), this._refreshAccessToken());
-  }
-  async getAccessToken() {
-    const { accessTokenKey: e2, accessTokenExpireKey: t2, refreshTokenKey: n2 } = this._cache.keys;
-    if (!this._cache.getStore(n2))
-      throw new te({ message: "refresh token不存在，登录状态异常" });
-    let s2 = this._cache.getStore(e2), r2 = this._cache.getStore(t2), i2 = true;
-    return this._shouldRefreshAccessTokenHook && !await this._shouldRefreshAccessTokenHook(s2, r2) && (i2 = false), (!s2 || !r2 || r2 < Date.now()) && i2 ? this.refreshAccessToken() : { accessToken: s2, accessTokenExpire: r2 };
-  }
-  async request(e2, t2, n2) {
-    const s2 = `x-tcb-trace_${this.config.env}`;
-    let r2 = "application/x-www-form-urlencoded";
-    const i2 = { action: e2, env: this.config.env, dataVersion: "2019-08-16", ...t2 };
-    if (-1 === He.indexOf(e2)) {
-      const { refreshTokenKey: e3 } = this._cache.keys;
-      this._cache.getStore(e3) && (i2.access_token = (await this.getAccessToken()).accessToken);
-    }
-    let o2;
-    if ("storage.uploadFile" === e2) {
-      o2 = new FormData();
-      for (let e3 in o2)
-        o2.hasOwnProperty(e3) && void 0 !== o2[e3] && o2.append(e3, i2[e3]);
-      r2 = "multipart/form-data";
-    } else {
-      r2 = "application/json", o2 = {};
-      for (let e3 in i2)
-        void 0 !== i2[e3] && (o2[e3] = i2[e3]);
-    }
-    let a2 = { headers: { "content-type": r2 } };
-    n2 && n2.onUploadProgress && (a2.onUploadProgress = n2.onUploadProgress);
-    const c2 = this._localCache.getStore(s2);
-    c2 && (a2.headers["X-TCB-Trace"] = c2);
-    const { parse: u2, inQuery: h2, search: l2 } = t2;
-    let d2 = { env: this.config.env };
-    u2 && (d2.parse = true), h2 && (d2 = { ...h2, ...d2 });
-    let p2 = function(e3, t3, n3 = {}) {
-      const s3 = /\?/.test(t3);
-      let r3 = "";
-      for (let e4 in n3)
-        "" === r3 ? !s3 && (t3 += "?") : r3 += "&", r3 += `${e4}=${encodeURIComponent(n3[e4])}`;
-      return /^http(s)?\:\/\//.test(t3 += r3) ? t3 : `${e3}${t3}`;
-    }(fe, "//tcb-api.tencentcloudapi.com/web", d2);
-    l2 && (p2 += l2);
-    const f2 = await this.post({ url: p2, data: o2, ...a2 }), g2 = f2.header && f2.header["x-tcb-trace"];
-    if (g2 && this._localCache.setStore(s2, g2), 200 !== Number(f2.status) && 200 !== Number(f2.statusCode) || !f2.data)
-      throw new te({ code: "NETWORK_ERROR", message: "network request error" });
-    return f2;
-  }
-  async send(e2, t2 = {}) {
-    const n2 = await this.request(e2, t2, { onUploadProgress: t2.onUploadProgress });
-    if ("ACCESS_TOKEN_EXPIRED" === n2.data.code && -1 === He.indexOf(e2)) {
-      await this.refreshAccessToken();
-      const n3 = await this.request(e2, t2, { onUploadProgress: t2.onUploadProgress });
-      if (n3.data.code)
-        throw new te({ code: n3.data.code, message: n3.data.message });
-      return n3.data;
-    }
-    if (n2.data.code)
-      throw new te({ code: n2.data.code, message: n2.data.message });
-    return n2.data;
-  }
-  setRefreshToken(e2) {
-    const { accessTokenKey: t2, accessTokenExpireKey: n2, refreshTokenKey: s2 } = this._cache.keys;
-    this._cache.removeStore(t2), this._cache.removeStore(n2), this._cache.setStore(s2, e2);
-  }
-}
-const Ye = {};
-function Qe(e2) {
-  return Ye[e2];
-}
-class Xe {
-  constructor(e2) {
-    this.config = e2, this._cache = Le(e2.env), this._request = Qe(e2.env);
-  }
-  setRefreshToken(e2) {
-    const { accessTokenKey: t2, accessTokenExpireKey: n2, refreshTokenKey: s2 } = this._cache.keys;
-    this._cache.removeStore(t2), this._cache.removeStore(n2), this._cache.setStore(s2, e2);
-  }
-  setAccessToken(e2, t2) {
-    const { accessTokenKey: n2, accessTokenExpireKey: s2 } = this._cache.keys;
-    this._cache.setStore(n2, e2), this._cache.setStore(s2, t2);
-  }
-  async refreshUserInfo() {
-    const { data: e2 } = await this._request.send("auth.getUserInfo", {});
-    return this.setLocalUserInfo(e2), e2;
-  }
-  setLocalUserInfo(e2) {
-    const { userInfoKey: t2 } = this._cache.keys;
-    this._cache.setStore(t2, e2);
-  }
-}
-class Ze {
-  constructor(e2) {
-    if (!e2)
-      throw new te({ code: "PARAM_ERROR", message: "envId is not defined" });
-    this._envId = e2, this._cache = Le(this._envId), this._request = Qe(this._envId), this.setUserInfo();
-  }
-  linkWithTicket(e2) {
-    if ("string" != typeof e2)
-      throw new te({ code: "PARAM_ERROR", message: "ticket must be string" });
-    return this._request.send("auth.linkWithTicket", { ticket: e2 });
-  }
-  linkWithRedirect(e2) {
-    e2.signInWithRedirect();
-  }
-  updatePassword(e2, t2) {
-    return this._request.send("auth.updatePassword", { oldPassword: t2, newPassword: e2 });
-  }
-  updateEmail(e2) {
-    return this._request.send("auth.updateEmail", { newEmail: e2 });
-  }
-  updateUsername(e2) {
-    if ("string" != typeof e2)
-      throw new te({ code: "PARAM_ERROR", message: "username must be a string" });
-    return this._request.send("auth.updateUsername", { username: e2 });
-  }
-  async getLinkedUidList() {
-    const { data: e2 } = await this._request.send("auth.getLinkedUidList", {});
-    let t2 = false;
-    const { users: n2 } = e2;
-    return n2.forEach((e3) => {
-      e3.wxOpenId && e3.wxPublicId && (t2 = true);
-    }), { users: n2, hasPrimaryUid: t2 };
-  }
-  setPrimaryUid(e2) {
-    return this._request.send("auth.setPrimaryUid", { uid: e2 });
-  }
-  unlink(e2) {
-    return this._request.send("auth.unlink", { platform: e2 });
-  }
-  async update(e2) {
-    const { nickName: t2, gender: n2, avatarUrl: s2, province: r2, country: i2, city: o2 } = e2, { data: a2 } = await this._request.send("auth.updateUserInfo", { nickName: t2, gender: n2, avatarUrl: s2, province: r2, country: i2, city: o2 });
-    this.setLocalUserInfo(a2);
-  }
-  async refresh() {
-    const { data: e2 } = await this._request.send("auth.getUserInfo", {});
-    return this.setLocalUserInfo(e2), e2;
-  }
-  setUserInfo() {
-    const { userInfoKey: e2 } = this._cache.keys, t2 = this._cache.getStore(e2);
-    ["uid", "loginType", "openid", "wxOpenId", "wxPublicId", "unionId", "qqMiniOpenId", "email", "hasPassword", "customUserId", "nickName", "gender", "avatarUrl"].forEach((e3) => {
-      this[e3] = t2[e3];
-    }), this.location = { country: t2.country, province: t2.province, city: t2.city };
-  }
-  setLocalUserInfo(e2) {
-    const { userInfoKey: t2 } = this._cache.keys;
-    this._cache.setStore(t2, e2), this.setUserInfo();
-  }
-}
-class et {
-  constructor(e2) {
-    if (!e2)
-      throw new te({ code: "PARAM_ERROR", message: "envId is not defined" });
-    this._cache = Le(e2);
-    const { refreshTokenKey: t2, accessTokenKey: n2, accessTokenExpireKey: s2 } = this._cache.keys, r2 = this._cache.getStore(t2), i2 = this._cache.getStore(n2), o2 = this._cache.getStore(s2);
-    this.credential = { refreshToken: r2, accessToken: i2, accessTokenExpire: o2 }, this.user = new Ze(e2);
-  }
-  get isAnonymousAuth() {
-    return this.loginType === We.ANONYMOUS;
-  }
-  get isCustomAuth() {
-    return this.loginType === We.CUSTOM;
-  }
-  get isWeixinAuth() {
-    return this.loginType === We.WECHAT || this.loginType === We.WECHAT_OPEN || this.loginType === We.WECHAT_PUBLIC;
-  }
-  get loginType() {
-    return this._cache.getStore(this._cache.keys.loginTypeKey);
-  }
-}
-class tt extends Xe {
-  async signIn() {
-    this._cache.updatePersistence("local");
-    const { anonymousUuidKey: e2, refreshTokenKey: t2 } = this._cache.keys, n2 = this._cache.getStore(e2) || void 0, s2 = this._cache.getStore(t2) || void 0, r2 = await this._request.send("auth.signInAnonymously", { anonymous_uuid: n2, refresh_token: s2 });
-    if (r2.uuid && r2.refresh_token) {
-      this._setAnonymousUUID(r2.uuid), this.setRefreshToken(r2.refresh_token), await this._request.refreshAccessToken(), Me(Fe), Me(je, { env: this.config.env, loginType: We.ANONYMOUS, persistence: "local" });
-      const e3 = new et(this.config.env);
-      return await e3.user.refresh(), e3;
-    }
-    throw new te({ message: "匿名登录失败" });
-  }
-  async linkAndRetrieveDataWithTicket(e2) {
-    const { anonymousUuidKey: t2, refreshTokenKey: n2 } = this._cache.keys, s2 = this._cache.getStore(t2), r2 = this._cache.getStore(n2), i2 = await this._request.send("auth.linkAndRetrieveDataWithTicket", { anonymous_uuid: s2, refresh_token: r2, ticket: e2 });
-    if (i2.refresh_token)
-      return this._clearAnonymousUUID(), this.setRefreshToken(i2.refresh_token), await this._request.refreshAccessToken(), Me($e, { env: this.config.env }), Me(je, { loginType: We.CUSTOM, persistence: "local" }), { credential: { refreshToken: i2.refresh_token } };
-    throw new te({ message: "匿名转化失败" });
-  }
-  _setAnonymousUUID(e2) {
-    const { anonymousUuidKey: t2, loginTypeKey: n2 } = this._cache.keys;
-    this._cache.removeStore(t2), this._cache.setStore(t2, e2), this._cache.setStore(n2, We.ANONYMOUS);
-  }
-  _clearAnonymousUUID() {
-    this._cache.removeStore(this._cache.keys.anonymousUuidKey);
-  }
-}
-class nt extends Xe {
-  async signIn(e2) {
-    if ("string" != typeof e2)
-      throw new te({ code: "PARAM_ERROR", message: "ticket must be a string" });
-    const { refreshTokenKey: t2 } = this._cache.keys, n2 = await this._request.send("auth.signInWithTicket", { ticket: e2, refresh_token: this._cache.getStore(t2) || "" });
-    if (n2.refresh_token)
-      return this.setRefreshToken(n2.refresh_token), await this._request.refreshAccessToken(), Me(Fe), Me(je, { env: this.config.env, loginType: We.CUSTOM, persistence: this.config.persistence }), await this.refreshUserInfo(), new et(this.config.env);
-    throw new te({ message: "自定义登录失败" });
-  }
-}
-class st extends Xe {
-  async signIn(e2, t2) {
-    if ("string" != typeof e2)
-      throw new te({ code: "PARAM_ERROR", message: "email must be a string" });
-    const { refreshTokenKey: n2 } = this._cache.keys, s2 = await this._request.send("auth.signIn", { loginType: "EMAIL", email: e2, password: t2, refresh_token: this._cache.getStore(n2) || "" }), { refresh_token: r2, access_token: i2, access_token_expire: o2 } = s2;
-    if (r2)
-      return this.setRefreshToken(r2), i2 && o2 ? this.setAccessToken(i2, o2) : await this._request.refreshAccessToken(), await this.refreshUserInfo(), Me(Fe), Me(je, { env: this.config.env, loginType: We.EMAIL, persistence: this.config.persistence }), new et(this.config.env);
-    throw s2.code ? new te({ code: s2.code, message: `邮箱登录失败: ${s2.message}` }) : new te({ message: "邮箱登录失败" });
-  }
-  async activate(e2) {
-    return this._request.send("auth.activateEndUserMail", { token: e2 });
-  }
-  async resetPasswordWithToken(e2, t2) {
-    return this._request.send("auth.resetPasswordWithToken", { token: e2, newPassword: t2 });
-  }
-}
-class rt extends Xe {
-  async signIn(e2, t2) {
-    if ("string" != typeof e2)
-      throw new te({ code: "PARAM_ERROR", message: "username must be a string" });
-    "string" != typeof t2 && (t2 = "", console.warn("password is empty"));
-    const { refreshTokenKey: n2 } = this._cache.keys, s2 = await this._request.send("auth.signIn", { loginType: We.USERNAME, username: e2, password: t2, refresh_token: this._cache.getStore(n2) || "" }), { refresh_token: r2, access_token_expire: i2, access_token: o2 } = s2;
-    if (r2)
-      return this.setRefreshToken(r2), o2 && i2 ? this.setAccessToken(o2, i2) : await this._request.refreshAccessToken(), await this.refreshUserInfo(), Me(Fe), Me(je, { env: this.config.env, loginType: We.USERNAME, persistence: this.config.persistence }), new et(this.config.env);
-    throw s2.code ? new te({ code: s2.code, message: `用户名密码登录失败: ${s2.message}` }) : new te({ message: "用户名密码登录失败" });
-  }
-}
-class it {
-  constructor(e2) {
-    this.config = e2, this._cache = Le(e2.env), this._request = Qe(e2.env), this._onAnonymousConverted = this._onAnonymousConverted.bind(this), this._onLoginTypeChanged = this._onLoginTypeChanged.bind(this), De(je, this._onLoginTypeChanged);
-  }
-  get currentUser() {
-    const e2 = this.hasLoginState();
-    return e2 && e2.user || null;
-  }
-  get loginType() {
-    return this._cache.getStore(this._cache.keys.loginTypeKey);
-  }
-  anonymousAuthProvider() {
-    return new tt(this.config);
-  }
-  customAuthProvider() {
-    return new nt(this.config);
-  }
-  emailAuthProvider() {
-    return new st(this.config);
-  }
-  usernameAuthProvider() {
-    return new rt(this.config);
-  }
-  async signInAnonymously() {
-    return new tt(this.config).signIn();
-  }
-  async signInWithEmailAndPassword(e2, t2) {
-    return new st(this.config).signIn(e2, t2);
-  }
-  signInWithUsernameAndPassword(e2, t2) {
-    return new rt(this.config).signIn(e2, t2);
-  }
-  async linkAndRetrieveDataWithTicket(e2) {
-    this._anonymousAuthProvider || (this._anonymousAuthProvider = new tt(this.config)), De($e, this._onAnonymousConverted);
-    return await this._anonymousAuthProvider.linkAndRetrieveDataWithTicket(e2);
-  }
-  async signOut() {
-    if (this.loginType === We.ANONYMOUS)
-      throw new te({ message: "匿名用户不支持登出操作" });
-    const { refreshTokenKey: e2, accessTokenKey: t2, accessTokenExpireKey: n2 } = this._cache.keys, s2 = this._cache.getStore(e2);
-    if (!s2)
-      return;
-    const r2 = await this._request.send("auth.logout", { refresh_token: s2 });
-    return this._cache.removeStore(e2), this._cache.removeStore(t2), this._cache.removeStore(n2), Me(Fe), Me(je, { env: this.config.env, loginType: We.NULL, persistence: this.config.persistence }), r2;
-  }
-  async signUpWithEmailAndPassword(e2, t2) {
-    return this._request.send("auth.signUpWithEmailAndPassword", { email: e2, password: t2 });
-  }
-  async sendPasswordResetEmail(e2) {
-    return this._request.send("auth.sendPasswordResetEmail", { email: e2 });
-  }
-  onLoginStateChanged(e2) {
-    De(Fe, () => {
-      const t3 = this.hasLoginState();
-      e2.call(this, t3);
-    });
-    const t2 = this.hasLoginState();
-    e2.call(this, t2);
-  }
-  onLoginStateExpired(e2) {
-    De(Ke, e2.bind(this));
-  }
-  onAccessTokenRefreshed(e2) {
-    De(Be, e2.bind(this));
-  }
-  onAnonymousConverted(e2) {
-    De($e, e2.bind(this));
-  }
-  onLoginTypeChanged(e2) {
-    De(je, () => {
-      const t2 = this.hasLoginState();
-      e2.call(this, t2);
-    });
-  }
-  async getAccessToken() {
-    return { accessToken: (await this._request.getAccessToken()).accessToken, env: this.config.env };
-  }
-  hasLoginState() {
-    const { refreshTokenKey: e2 } = this._cache.keys;
-    return this._cache.getStore(e2) ? new et(this.config.env) : null;
-  }
-  async isUsernameRegistered(e2) {
-    if ("string" != typeof e2)
-      throw new te({ code: "PARAM_ERROR", message: "username must be a string" });
-    const { data: t2 } = await this._request.send("auth.isUsernameRegistered", { username: e2 });
-    return t2 && t2.isRegistered;
-  }
-  getLoginState() {
-    return Promise.resolve(this.hasLoginState());
-  }
-  async signInWithTicket(e2) {
-    return new nt(this.config).signIn(e2);
-  }
-  shouldRefreshAccessToken(e2) {
-    this._request._shouldRefreshAccessTokenHook = e2.bind(this);
-  }
-  getUserInfo() {
-    return this._request.send("auth.getUserInfo", {}).then((e2) => e2.code ? e2 : { ...e2.data, requestId: e2.seqId });
-  }
-  getAuthHeader() {
-    const { refreshTokenKey: e2, accessTokenKey: t2 } = this._cache.keys, n2 = this._cache.getStore(e2);
-    return { "x-cloudbase-credentials": this._cache.getStore(t2) + "/@@/" + n2 };
-  }
-  _onAnonymousConverted(e2) {
-    const { env: t2 } = e2.data;
-    t2 === this.config.env && this._cache.updatePersistence(this.config.persistence);
-  }
-  _onLoginTypeChanged(e2) {
-    const { loginType: t2, persistence: n2, env: s2 } = e2.data;
-    s2 === this.config.env && (this._cache.updatePersistence(n2), this._cache.setStore(this._cache.keys.loginTypeKey, t2));
-  }
-}
-const ot = function(e2, t2) {
-  t2 = t2 || ve();
-  const n2 = Qe(this.config.env), { cloudPath: s2, filePath: r2, onUploadProgress: i2, fileType: o2 = "image" } = e2;
-  return n2.send("storage.getUploadMetadata", { path: s2 }).then((e3) => {
-    const { data: { url: a2, authorization: c2, token: u2, fileId: h2, cosFileId: l2 }, requestId: d2 } = e3, p2 = { key: s2, signature: c2, "x-cos-meta-fileid": l2, success_action_status: "201", "x-cos-security-token": u2 };
-    n2.upload({ url: a2, data: p2, file: r2, name: s2, fileType: o2, onUploadProgress: i2 }).then((e4) => {
-      201 === e4.statusCode ? t2(null, { fileID: h2, requestId: d2 }) : t2(new te({ code: "STORAGE_REQUEST_FAIL", message: `STORAGE_REQUEST_FAIL: ${e4.data}` }));
-    }).catch((e4) => {
-      t2(e4);
-    });
-  }).catch((e3) => {
-    t2(e3);
-  }), t2.promise;
-}, at = function(e2, t2) {
-  t2 = t2 || ve();
-  const n2 = Qe(this.config.env), { cloudPath: s2 } = e2;
-  return n2.send("storage.getUploadMetadata", { path: s2 }).then((e3) => {
-    t2(null, e3);
-  }).catch((e3) => {
-    t2(e3);
-  }), t2.promise;
-}, ct = function({ fileList: e2 }, t2) {
-  if (t2 = t2 || ve(), !e2 || !Array.isArray(e2))
-    return { code: "INVALID_PARAM", message: "fileList必须是非空的数组" };
-  for (let t3 of e2)
-    if (!t3 || "string" != typeof t3)
-      return { code: "INVALID_PARAM", message: "fileList的元素必须是非空的字符串" };
-  const n2 = { fileid_list: e2 };
-  return Qe(this.config.env).send("storage.batchDeleteFile", n2).then((e3) => {
-    e3.code ? t2(null, e3) : t2(null, { fileList: e3.data.delete_list, requestId: e3.requestId });
-  }).catch((e3) => {
-    t2(e3);
-  }), t2.promise;
-}, ut = function({ fileList: e2 }, t2) {
-  t2 = t2 || ve(), e2 && Array.isArray(e2) || t2(null, { code: "INVALID_PARAM", message: "fileList必须是非空的数组" });
-  let n2 = [];
-  for (let s3 of e2)
-    "object" == typeof s3 ? (s3.hasOwnProperty("fileID") && s3.hasOwnProperty("maxAge") || t2(null, { code: "INVALID_PARAM", message: "fileList的元素必须是包含fileID和maxAge的对象" }), n2.push({ fileid: s3.fileID, max_age: s3.maxAge })) : "string" == typeof s3 ? n2.push({ fileid: s3 }) : t2(null, { code: "INVALID_PARAM", message: "fileList的元素必须是字符串" });
-  const s2 = { file_list: n2 };
-  return Qe(this.config.env).send("storage.batchGetDownloadUrl", s2).then((e3) => {
-    e3.code ? t2(null, e3) : t2(null, { fileList: e3.data.download_list, requestId: e3.requestId });
-  }).catch((e3) => {
-    t2(e3);
-  }), t2.promise;
-}, ht = async function({ fileID: e2 }, t2) {
-  const n2 = (await ut.call(this, { fileList: [{ fileID: e2, maxAge: 600 }] })).fileList[0];
-  if ("SUCCESS" !== n2.code)
-    return t2 ? t2(n2) : new Promise((e3) => {
-      e3(n2);
-    });
-  const s2 = Qe(this.config.env);
-  let r2 = n2.download_url;
-  if (r2 = encodeURI(r2), !t2)
-    return s2.download({ url: r2 });
-  t2(await s2.download({ url: r2 }));
-}, lt = function({ name: e2, data: t2, query: n2, parse: s2, search: r2 }, i2) {
-  const o2 = i2 || ve();
-  let a2;
-  try {
-    a2 = t2 ? JSON.stringify(t2) : "";
-  } catch (e3) {
-    return Promise.reject(e3);
-  }
-  if (!e2)
-    return Promise.reject(new te({ code: "PARAM_ERROR", message: "函数名不能为空" }));
-  const c2 = { inQuery: n2, parse: s2, search: r2, function_name: e2, request_data: a2 };
-  return Qe(this.config.env).send("functions.invokeFunction", c2).then((e3) => {
-    if (e3.code)
-      o2(null, e3);
-    else {
-      let t3 = e3.data.response_data;
-      if (s2)
-        o2(null, { result: t3, requestId: e3.requestId });
-      else
-        try {
-          t3 = JSON.parse(e3.data.response_data), o2(null, { result: t3, requestId: e3.requestId });
-        } catch (e4) {
-          o2(new te({ message: "response data must be json" }));
-        }
-    }
-    return o2.promise;
-  }).catch((e3) => {
-    o2(e3);
-  }), o2.promise;
-}, dt = { timeout: 15e3, persistence: "session" }, pt = {};
-class ft {
-  constructor(e2) {
-    this.config = e2 || this.config, this.authObj = void 0;
-  }
-  init(e2) {
-    switch (Ae.adapter || (this.requestClient = new Ae.adapter.reqClass({ timeout: e2.timeout || 5e3, timeoutMsg: `请求在${(e2.timeout || 5e3) / 1e3}s内未完成，已中断` })), this.config = { ...dt, ...e2 }, true) {
-      case this.config.timeout > 6e5:
-        console.warn("timeout大于可配置上限[10分钟]，已重置为上限数值"), this.config.timeout = 6e5;
-        break;
-      case this.config.timeout < 100:
-        console.warn("timeout小于可配置下限[100ms]，已重置为下限数值"), this.config.timeout = 100;
-    }
-    return new ft(this.config);
-  }
-  auth({ persistence: e2 } = {}) {
-    if (this.authObj)
-      return this.authObj;
-    const t2 = e2 || Ae.adapter.primaryStorage || dt.persistence;
-    var n2;
-    return t2 !== this.config.persistence && (this.config.persistence = t2), function(e3) {
-      const { env: t3 } = e3;
-      Oe[t3] = new xe(e3), Ee[t3] = new xe({ ...e3, persistence: "local" });
-    }(this.config), n2 = this.config, Ye[n2.env] = new Ve(n2), this.authObj = new it(this.config), this.authObj;
-  }
-  on(e2, t2) {
-    return De.apply(this, [e2, t2]);
-  }
-  off(e2, t2) {
-    return qe.apply(this, [e2, t2]);
-  }
-  callFunction(e2, t2) {
-    return lt.apply(this, [e2, t2]);
-  }
-  deleteFile(e2, t2) {
-    return ct.apply(this, [e2, t2]);
-  }
-  getTempFileURL(e2, t2) {
-    return ut.apply(this, [e2, t2]);
-  }
-  downloadFile(e2, t2) {
-    return ht.apply(this, [e2, t2]);
-  }
-  uploadFile(e2, t2) {
-    return ot.apply(this, [e2, t2]);
-  }
-  getUploadMetadata(e2, t2) {
-    return at.apply(this, [e2, t2]);
-  }
-  registerExtension(e2) {
-    pt[e2.name] = e2;
-  }
-  async invokeExtension(e2, t2) {
-    const n2 = pt[e2];
-    if (!n2)
-      throw new te({ message: `扩展${e2} 必须先注册` });
-    return await n2.invoke(t2, this);
-  }
-  useAdapters(e2) {
-    const { adapter: t2, runtime: n2 } = ke(e2) || {};
-    t2 && (Ae.adapter = t2), n2 && (Ae.runtime = n2);
-  }
-}
-var gt = new ft();
-function mt(e2, t2, n2) {
-  void 0 === n2 && (n2 = {});
-  var s2 = /\?/.test(t2), r2 = "";
-  for (var i2 in n2)
-    "" === r2 ? !s2 && (t2 += "?") : r2 += "&", r2 += i2 + "=" + encodeURIComponent(n2[i2]);
-  return /^http(s)?:\/\//.test(t2 += r2) ? t2 : "" + e2 + t2;
-}
-class yt {
-  post(e2) {
-    const { url: t2, data: n2, headers: s2 } = e2;
-    return new Promise((e3, r2) => {
-      ne.request({ url: mt("https:", t2), data: n2, method: "POST", header: s2, success(t3) {
-        e3(t3);
-      }, fail(e4) {
-        r2(e4);
-      } });
-    });
-  }
-  upload(e2) {
-    return new Promise((t2, n2) => {
-      const { url: s2, file: r2, data: i2, headers: o2, fileType: a2 } = e2, c2 = ne.uploadFile({ url: mt("https:", s2), name: "file", formData: Object.assign({}, i2), filePath: r2, fileType: a2, header: o2, success(e3) {
-        const n3 = { statusCode: e3.statusCode, data: e3.data || {} };
-        200 === e3.statusCode && i2.success_action_status && (n3.statusCode = parseInt(i2.success_action_status, 10)), t2(n3);
-      }, fail(e3) {
-        n2(new Error(e3.errMsg || "uploadFile:fail"));
-      } });
-      "function" == typeof e2.onUploadProgress && c2 && "function" == typeof c2.onProgressUpdate && c2.onProgressUpdate((t3) => {
-        e2.onUploadProgress({ loaded: t3.totalBytesSent, total: t3.totalBytesExpectedToSend });
-      });
-    });
-  }
-}
-const _t = { setItem(e2, t2) {
-  ne.setStorageSync(e2, t2);
-}, getItem: (e2) => ne.getStorageSync(e2), removeItem(e2) {
-  ne.removeStorageSync(e2);
-}, clear() {
-  ne.clearStorageSync();
-} };
-var wt = { genAdapter: function() {
-  return { root: {}, reqClass: yt, localStorage: _t, primaryStorage: "local" };
-}, isMatch: function() {
-  return true;
-}, runtime: "uni_app" };
-gt.useAdapters(wt);
-const vt = gt, It = vt.init;
-vt.init = function(e2) {
-  e2.env = e2.spaceId;
-  const t2 = It.call(this, e2);
-  t2.config.provider = "tencent", t2.config.spaceId = e2.spaceId;
-  const n2 = t2.auth;
-  return t2.auth = function(e3) {
-    const t3 = n2.call(this, e3);
-    return ["linkAndRetrieveDataWithTicket", "signInAnonymously", "signOut", "getAccessToken", "getLoginState", "signInWithTicket", "getUserInfo"].forEach((e4) => {
-      var n3;
-      t3[e4] = (n3 = t3[e4], function(e5) {
-        e5 = e5 || {};
-        const { success: t4, fail: s2, complete: r2 } = ee(e5);
-        if (!(t4 || s2 || r2))
-          return n3.call(this, e5);
-        n3.call(this, e5).then((e6) => {
-          t4 && t4(e6), r2 && r2(e6);
-        }, (e6) => {
-          s2 && s2(e6), r2 && r2(e6);
-        });
-      }).bind(t3);
-    }), t3;
-  }, t2.customAuth = t2.auth, t2;
-};
-var St = vt;
-var bt = class extends de {
-  getAccessToken() {
-    return new Promise((e2, t2) => {
-      const n2 = "Anonymous_Access_token";
-      this.setAccessToken(n2), e2(n2);
-    });
-  }
-  setupRequest(e2, t2) {
-    const n2 = Object.assign({}, e2, { spaceId: this.config.spaceId, timestamp: Date.now() }), s2 = { "Content-Type": "application/json" };
-    "auth" !== t2 && (n2.token = this.accessToken, s2["x-basement-token"] = this.accessToken), s2["x-serverless-sign"] = le.sign(n2, this.config.clientSecret);
-    const r2 = he();
-    s2["x-client-info"] = encodeURIComponent(JSON.stringify(r2));
-    const { token: i2 } = re();
-    return s2["x-client-token"] = i2, { url: this.config.requestUrl, method: "POST", data: n2, dataType: "json", header: JSON.parse(JSON.stringify(s2)) };
-  }
-  uploadFileToOSS({ url: e2, formData: t2, name: n2, filePath: s2, fileType: r2, onUploadProgress: i2 }) {
-    return new Promise((o2, a2) => {
-      const c2 = this.adapter.uploadFile({ url: e2, formData: t2, name: n2, filePath: s2, fileType: r2, success(e3) {
-        e3 && e3.statusCode < 400 ? o2(e3) : a2(new te({ code: "UPLOAD_FAILED", message: "文件上传失败" }));
-      }, fail(e3) {
-        a2(new te({ code: e3.code || "UPLOAD_FAILED", message: e3.message || e3.errMsg || "文件上传失败" }));
-      } });
-      "function" == typeof i2 && c2 && "function" == typeof c2.onProgressUpdate && c2.onProgressUpdate((e3) => {
-        i2({ loaded: e3.totalBytesSent, total: e3.totalBytesExpectedToSend });
-      });
-    });
-  }
-  uploadFile({ filePath: e2, cloudPath: t2, fileType: n2 = "image", onUploadProgress: s2 }) {
-    if (!t2)
-      throw new te({ code: "CLOUDPATH_REQUIRED", message: "cloudPath不可为空" });
-    let r2;
-    return this.getOSSUploadOptionsFromPath({ cloudPath: t2 }).then((t3) => {
-      const { url: i2, formData: o2, name: a2 } = t3.result;
-      r2 = t3.result.fileUrl;
-      const c2 = { url: i2, formData: o2, name: a2, filePath: e2, fileType: n2 };
-      return this.uploadFileToOSS(Object.assign({}, c2, { onUploadProgress: s2 }));
-    }).then(() => this.reportOSSUpload({ cloudPath: t2 })).then((t3) => new Promise((n3, s3) => {
-      t3.success ? n3({ success: true, filePath: e2, fileID: r2 }) : s3(new te({ code: "UPLOAD_FAILED", message: "文件上传失败" }));
-    }));
-  }
-  deleteFile({ fileList: e2 }) {
-    const t2 = { method: "serverless.file.resource.delete", params: JSON.stringify({ fileList: e2 }) };
-    return this.request(this.setupRequest(t2)).then((e3) => {
-      if (e3.success)
-        return e3.result;
-      throw new te({ code: "DELETE_FILE_FAILED", message: "删除文件失败" });
-    });
-  }
-  getTempFileURL({ fileList: e2, maxAge: t2 } = {}) {
-    if (!Array.isArray(e2) || 0 === e2.length)
-      throw new te({ code: "INVALID_PARAM", message: "fileList的元素必须是非空的字符串" });
-    const n2 = { method: "serverless.file.resource.getTempFileURL", params: JSON.stringify({ fileList: e2, maxAge: t2 }) };
-    return this.request(this.setupRequest(n2)).then((e3) => {
-      if (e3.success)
-        return { fileList: e3.result.fileList.map((e4) => ({ fileID: e4.fileID, tempFileURL: e4.tempFileURL })) };
-      throw new te({ code: "GET_TEMP_FILE_URL_FAILED", message: "获取临时文件链接失败" });
-    });
-  }
-};
-var kt = { init(e2) {
-  const t2 = new bt(e2), n2 = { signInAnonymously: function() {
-    return t2.authorize();
-  }, getLoginState: function() {
-    return Promise.resolve(false);
-  } };
-  return t2.auth = function() {
-    return n2;
-  }, t2.customAuth = t2.auth, t2;
-} }, At = n(function(e2, t2) {
-  e2.exports = r.enc.Hex;
-});
-function Pt(e2 = "", t2 = {}) {
-  const { data: n2, functionName: s2, method: r2, headers: i2, signHeaderKeys: o2 = [], config: a2 } = t2, c2 = Date.now(), u2 = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(e3) {
-    var t3 = 16 * Math.random() | 0;
-    return ("x" === e3 ? t3 : 3 & t3 | 8).toString(16);
-  }), h2 = Object.assign({}, i2, { "x-from-app-id": a2.spaceAppId, "x-from-env-id": a2.spaceId, "x-to-env-id": a2.spaceId, "x-from-instance-id": c2, "x-from-function-name": s2, "x-client-timestamp": c2, "x-alipay-source": "client", "x-request-id": u2, "x-alipay-callid": u2, "x-trace-id": u2 }), l2 = ["x-from-app-id", "x-from-env-id", "x-to-env-id", "x-from-instance-id", "x-from-function-name", "x-client-timestamp"].concat(o2), [d2 = "", p2 = ""] = e2.split("?") || [], f2 = function(e3) {
-    const t3 = e3.signedHeaders.join(";"), n3 = e3.signedHeaders.map((t4) => `${t4.toLowerCase()}:${e3.headers[t4]}
-`).join(""), s3 = _e(e3.body).toString(At), r3 = `${e3.method.toUpperCase()}
-${e3.path}
-${e3.query}
-${n3}
-${t3}
-${s3}
-`, i3 = _e(r3).toString(At), o3 = `HMAC-SHA256
-${e3.timestamp}
-${i3}
-`, a3 = we(o3, e3.secretKey).toString(At);
-    return `HMAC-SHA256 Credential=${e3.secretId}, SignedHeaders=${t3}, Signature=${a3}`;
-  }({ path: d2, query: p2, method: r2, headers: h2, timestamp: c2, body: JSON.stringify(n2), secretId: a2.accessKey, secretKey: a2.secretKey, signedHeaders: l2.sort() });
-  return { url: `${a2.endpoint}${e2}`, headers: Object.assign({}, h2, { Authorization: f2 }) };
-}
-function Tt({ url: e2, data: t2, method: n2 = "POST", headers: s2 = {} }) {
-  return new Promise((r2, i2) => {
-    ne.request({ url: e2, method: n2, data: t2, header: s2, dataType: "json", complete: (e3 = {}) => {
-      const t3 = s2["x-trace-id"] || "";
-      if (!e3.statusCode || e3.statusCode >= 400) {
-        const { message: n3, errMsg: s3, trace_id: r3 } = e3.data || {};
-        return i2(new te({ code: "SYS_ERR", message: n3 || s3 || "request:fail", requestId: r3 || t3 }));
-      }
-      r2({ status: e3.statusCode, data: e3.data, headers: e3.header, requestId: t3 });
-    } });
-  });
-}
-function Ct(e2, t2) {
-  const { path: n2, data: s2, method: r2 = "GET" } = e2, { url: i2, headers: o2 } = Pt(n2, { functionName: "", data: s2, method: r2, headers: { "x-alipay-cloud-mode": "oss", "x-data-api-type": "oss", "x-expire-timestamp": Date.now() + 6e4 }, signHeaderKeys: ["x-data-api-type", "x-expire-timestamp"], config: t2 });
-  return Tt({ url: i2, data: s2, method: r2, headers: o2 }).then((e3) => {
-    const t3 = e3.data || {};
-    if (!t3.success)
-      throw new te({ code: e3.errCode, message: e3.errMsg, requestId: e3.requestId });
-    return t3.data || {};
-  }).catch((e3) => {
-    throw new te({ code: e3.errCode, message: e3.errMsg, requestId: e3.requestId });
-  });
-}
-function xt(e2 = "") {
-  const t2 = e2.trim().replace(/^cloud:\/\//, ""), n2 = t2.indexOf("/");
-  if (n2 <= 0)
-    throw new te({ code: "INVALID_PARAM", message: "fileID不合法" });
-  const s2 = t2.substring(0, n2), r2 = t2.substring(n2 + 1);
-  return s2 !== this.config.spaceId && console.warn("file ".concat(e2, " does not belong to env ").concat(this.config.spaceId)), r2;
-}
-function Ot(e2 = "") {
-  return "cloud://".concat(this.config.spaceId, "/").concat(e2.replace(/^\/+/, ""));
-}
-var Et = class {
-  constructor(e2) {
-    if (["spaceId", "spaceAppId", "accessKey", "secretKey"].forEach((t2) => {
-      if (!Object.prototype.hasOwnProperty.call(e2, t2))
-        throw new Error(`${t2} required`);
-    }), e2.endpoint) {
-      if ("string" != typeof e2.endpoint)
-        throw new Error("endpoint must be string");
-      if (!/^https:\/\//.test(e2.endpoint))
-        throw new Error("endpoint must start with https://");
-      e2.endpoint = e2.endpoint.replace(/\/$/, "");
-    }
-    this.config = Object.assign({}, e2, { endpoint: e2.endpoint || `https://${e2.spaceId}.api-hz.cloudbasefunction.cn` });
-  }
-  callFunction(e2) {
-    return function(e3, t2) {
-      const { name: n2, data: s2 } = e3, r2 = "POST", { url: i2, headers: o2 } = Pt("/functions/invokeFunction", { functionName: n2, data: s2, method: r2, headers: { "x-to-function-name": n2 }, signHeaderKeys: ["x-to-function-name"], config: t2 });
-      return Tt({ url: i2, data: s2, method: r2, headers: o2 }).then((e4) => ({ errCode: 0, success: true, requestId: e4.requestId, result: e4.data })).catch((e4) => {
-        throw new te({ code: e4.errCode, message: e4.errMsg, requestId: e4.requestId });
-      });
-    }(e2, this.config);
-  }
-  uploadFileToOSS({ url: e2, filePath: t2, fileType: n2, formData: s2, onUploadProgress: r2 }) {
-    return new Promise((i2, o2) => {
-      const a2 = ne.uploadFile({ url: e2, filePath: t2, fileType: n2, formData: s2, name: "file", success(e3) {
-        e3 && e3.statusCode < 400 ? i2(e3) : o2(new te({ code: "UPLOAD_FAILED", message: "文件上传失败" }));
-      }, fail(e3) {
-        o2(new te({ code: e3.code || "UPLOAD_FAILED", message: e3.message || e3.errMsg || "文件上传失败" }));
-      } });
-      "function" == typeof r2 && a2 && "function" == typeof a2.onProgressUpdate && a2.onProgressUpdate((e3) => {
-        r2({ loaded: e3.totalBytesSent, total: e3.totalBytesExpectedToSend });
-      });
-    });
-  }
-  async uploadFile({ filePath: e2, cloudPath: t2 = "", fileType: n2 = "image", onUploadProgress: s2 }) {
-    if ("string" !== f(t2))
-      throw new te({ code: "INVALID_PARAM", message: "cloudPath必须为字符串类型" });
-    if (!(t2 = t2.trim()))
-      throw new te({ code: "INVALID_PARAM", message: "cloudPath不可为空" });
-    if (/:\/\//.test(t2))
-      throw new te({ code: "INVALID_PARAM", message: "cloudPath不合法" });
-    const r2 = await Ct({ path: "/".concat(t2.replace(/^\//, ""), "?post_url") }, this.config), { file_id: i2, upload_url: o2, form_data: a2 } = r2, c2 = a2 && a2.reduce((e3, t3) => (e3[t3.key] = t3.value, e3), {});
-    return this.uploadFileToOSS({ url: o2, filePath: e2, fileType: n2, formData: c2, onUploadProgress: s2 }).then(() => ({ fileID: i2 }));
-  }
-  async getTempFileURL({ fileList: e2 }) {
-    return new Promise((t2, n2) => {
-      (!e2 || e2.length < 0) && n2(new te({ errCode: "INVALID_PARAM", errMsg: "fileList不能为空数组" })), e2.length > 50 && n2(new te({ errCode: "INVALID_PARAM", errMsg: "fileList数组长度不能超过50" }));
-      const s2 = [];
-      for (const t3 of e2) {
-        "string" !== f(t3) && n2(new te({ errCode: "INVALID_PARAM", errMsg: "fileList的元素必须是非空的字符串" }));
-        const e3 = xt.call(this, t3);
-        s2.push({ file_id: e3, expire: 600 });
-      }
-      Ct({ path: "/?download_url", data: { file_list: s2 }, method: "POST" }, this.config).then((e3) => {
-        const { file_list: n3 = [] } = e3;
-        t2({ fileList: n3.map((e4) => ({ fileID: Ot.call(this, e4.file_id), tempFileURL: e4.download_url })) });
-      }).catch((e3) => n2(e3));
-    });
-  }
-};
-var Lt = { init: (e2) => {
-  e2.provider = "alipay";
-  const t2 = new Et(e2);
-  return t2.auth = function() {
-    return { signInAnonymously: function() {
-      return Promise.resolve();
-    }, getLoginState: function() {
-      return Promise.resolve(true);
-    } };
-  }, t2;
-} };
-function Rt({ data: e2 }) {
-  let t2;
-  t2 = he();
-  const n2 = JSON.parse(JSON.stringify(e2 || {}));
-  if (Object.assign(n2, { clientInfo: t2 }), !n2.uniIdToken) {
-    const { token: e3 } = re();
-    e3 && (n2.uniIdToken = e3);
-  }
-  return n2;
-}
-async function Ut({ name: e2, data: t2 } = {}) {
-  await this.__dev__.initLocalNetwork();
-  const { localAddress: n2, localPort: s2 } = this.__dev__, r2 = { aliyun: "aliyun", tencent: "tcb", alipay: "alipay" }[this.config.provider], i2 = this.config.spaceId, o2 = `http://${n2}:${s2}/system/check-function`, a2 = `http://${n2}:${s2}/cloudfunctions/${e2}`;
-  return new Promise((t3, n3) => {
-    ne.request({ method: "POST", url: o2, data: { name: e2, platform: P, provider: r2, spaceId: i2 }, timeout: 3e3, success(e3) {
-      t3(e3);
-    }, fail() {
-      t3({ data: { code: "NETWORK_ERROR", message: "连接本地调试服务失败，请检查客户端是否和主机在同一局域网下，自动切换为已部署的云函数。" } });
-    } });
-  }).then(({ data: e3 } = {}) => {
-    const { code: t3, message: n3 } = e3 || {};
-    return { code: 0 === t3 ? 0 : t3 || "SYS_ERR", message: n3 || "SYS_ERR" };
-  }).then(({ code: n3, message: s3 }) => {
-    if (0 !== n3) {
-      switch (n3) {
-        case "MODULE_ENCRYPTED":
-          console.error(`此云函数（${e2}）依赖加密公共模块不可本地调试，自动切换为云端已部署的云函数`);
-          break;
-        case "FUNCTION_ENCRYPTED":
-          console.error(`此云函数（${e2}）已加密不可本地调试，自动切换为云端已部署的云函数`);
-          break;
-        case "ACTION_ENCRYPTED":
-          console.error(s3 || "需要访问加密的uni-clientDB-action，自动切换为云端环境");
-          break;
-        case "NETWORK_ERROR": {
-          const e3 = "连接本地调试服务失败，请检查客户端是否和主机在同一局域网下";
-          throw console.error(e3), new Error(e3);
-        }
-        case "SWITCH_TO_CLOUD":
-          break;
-        default: {
-          const e3 = `检测本地调试服务出现错误：${s3}，请检查网络环境或重启客户端再试`;
-          throw console.error(e3), new Error(e3);
-        }
-      }
-      return this._callCloudFunction({ name: e2, data: t2 });
-    }
-    return new Promise((e3, n4) => {
-      const s4 = Rt.call(this, { data: t2 });
-      ne.request({ method: "POST", url: a2, data: { provider: r2, platform: P, param: s4 }, success: ({ statusCode: t3, data: s5 } = {}) => !t3 || t3 >= 400 ? n4(new te({ code: s5.code || "SYS_ERR", message: s5.message || "request:fail" })) : e3({ result: s5 }), fail(e4) {
-        n4(new te({ code: e4.code || e4.errCode || "SYS_ERR", message: e4.message || e4.errMsg || "request:fail" }));
-      } });
-    });
-  });
-}
-const Nt = [{ rule: /fc_function_not_found|FUNCTION_NOT_FOUND/, content: "，云函数[{functionName}]在云端不存在，请检查此云函数名称是否正确以及该云函数是否已上传到服务空间", mode: "append" }];
-var Dt = /[\\^$.*+?()[\]{}|]/g, Mt = RegExp(Dt.source);
-function qt(e2, t2, n2) {
-  return e2.replace(new RegExp((s2 = t2) && Mt.test(s2) ? s2.replace(Dt, "\\$&") : s2, "g"), n2);
-  var s2;
-}
-const Kt = "request", jt = "response", $t = "both";
-const An = { code: 2e4, message: "System error" }, Pn = { code: 20101, message: "Invalid client" };
-function xn(e2) {
-  const { errSubject: t2, subject: n2, errCode: s2, errMsg: r2, code: i2, message: o2, cause: a2 } = e2 || {};
-  return new te({ subject: t2 || n2 || "uni-secure-network", code: s2 || i2 || An.code, message: r2 || o2, cause: a2 });
-}
-let En;
-function Dn({ secretType: e2 } = {}) {
-  return e2 === Kt || e2 === jt || e2 === $t;
-}
-function Mn({ name: e2, data: t2 = {} } = {}) {
-  return "app" === P;
-}
-function qn({ provider: e2, spaceId: t2, functionName: n2 } = {}) {
-  const { appId: s2, uniPlatform: r2, osName: i2 } = ce();
-  let o2 = r2;
-  "app" === r2 && (o2 = i2);
-  const a2 = function({ provider: e3, spaceId: t3 } = {}) {
-    const n3 = A;
-    if (!n3)
-      return {};
-    e3 = function(e4) {
-      return "tencent" === e4 ? "tcb" : e4;
-    }(e3);
-    const s3 = n3.find((n4) => n4.provider === e3 && n4.spaceId === t3);
-    return s3 && s3.config;
-  }({ provider: e2, spaceId: t2 });
-  if (!a2 || !a2.accessControl || !a2.accessControl.enable)
-    return false;
-  const c2 = a2.accessControl.function || {}, u2 = Object.keys(c2);
-  if (0 === u2.length)
-    return true;
-  const h2 = function(e3, t3) {
-    let n3, s3, r3;
-    for (let i3 = 0; i3 < e3.length; i3++) {
-      const o3 = e3[i3];
-      o3 !== t3 ? "*" !== o3 ? o3.split(",").map((e4) => e4.trim()).indexOf(t3) > -1 && (s3 = o3) : r3 = o3 : n3 = o3;
-    }
-    return n3 || s3 || r3;
-  }(u2, n2);
-  if (!h2)
-    return false;
-  if ((c2[h2] || []).find((e3 = {}) => e3.appId === s2 && (e3.platform || "").toLowerCase() === o2.toLowerCase()))
-    return true;
-  throw console.error(`此应用[appId: ${s2}, platform: ${o2}]不在云端配置的允许访问的应用列表内，参考：https://uniapp.dcloud.net.cn/uniCloud/secure-network.html#verify-client`), xn(Pn);
-}
-function Fn({ functionName: e2, result: t2, logPvd: n2 }) {
-  if (this.__dev__.debugLog && t2 && t2.requestId) {
-    const s2 = JSON.stringify({ spaceId: this.config.spaceId, functionName: e2, requestId: t2.requestId });
-    console.log(`[${n2}-request]${s2}[/${n2}-request]`);
-  }
-}
-function Kn(e2) {
-  const t2 = e2.callFunction, n2 = function(n3) {
-    const s2 = n3.name;
-    n3.data = Rt.call(e2, { data: n3.data });
-    const r2 = { aliyun: "aliyun", tencent: "tcb", tcb: "tcb", alipay: "alipay" }[this.config.provider], i2 = Dn(n3), o2 = Mn(n3), a2 = i2 || o2;
-    return t2.call(this, n3).then((e3) => (e3.errCode = 0, !a2 && Fn.call(this, { functionName: s2, result: e3, logPvd: r2 }), Promise.resolve(e3)), (e3) => (!a2 && Fn.call(this, { functionName: s2, result: e3, logPvd: r2 }), e3 && e3.message && (e3.message = function({ message: e4 = "", extraInfo: t3 = {}, formatter: n4 = [] } = {}) {
-      for (let s3 = 0; s3 < n4.length; s3++) {
-        const { rule: r3, content: i3, mode: o3 } = n4[s3], a3 = e4.match(r3);
-        if (!a3)
-          continue;
-        let c2 = i3;
-        for (let e5 = 1; e5 < a3.length; e5++)
-          c2 = qt(c2, `{$${e5}}`, a3[e5]);
-        for (const e5 in t3)
-          c2 = qt(c2, `{${e5}}`, t3[e5]);
-        return "replace" === o3 ? c2 : e4 + c2;
-      }
-      return e4;
-    }({ message: `[${n3.name}]: ${e3.message}`, formatter: Nt, extraInfo: { functionName: s2 } })), Promise.reject(e3)));
-  };
-  e2.callFunction = function(t3) {
-    const { provider: s2, spaceId: r2 } = e2.config, i2 = t3.name;
-    let o2, a2;
-    if (t3.data = t3.data || {}, e2.__dev__.debugInfo && !e2.__dev__.debugInfo.forceRemote && C ? (e2._callCloudFunction || (e2._callCloudFunction = n2, e2._callLocalFunction = Ut), o2 = Ut) : o2 = n2, o2 = o2.bind(e2), Mn(t3))
-      ;
-    else if (function({ name: e3, data: t4 = {} }) {
-      return "uni-id-co" === e3 && "secureNetworkHandshakeByWeixin" === t4.method;
-    }(t3))
-      a2 = o2.call(e2, t3);
-    else if (Dn(t3)) {
-      a2 = new En({ secretType: t3.secretType, uniCloudIns: e2 }).wrapEncryptDataCallFunction(n2.bind(e2))(t3);
-    } else if (qn({ provider: s2, spaceId: r2, functionName: i2 })) {
-      a2 = new En({ secretType: t3.secretType, uniCloudIns: e2 }).wrapVerifyClientCallFunction(n2.bind(e2))(t3);
-    } else
-      a2 = o2(t3);
-    return Object.defineProperty(a2, "result", { get: () => (console.warn("当前返回结果为Promise类型，不可直接访问其result属性，详情请参考：https://uniapp.dcloud.net.cn/uniCloud/faq?id=promise"), {}) }), a2.then((e3) => ("undefined" != typeof UTSJSONObject && (e3.result = new UTSJSONObject(e3.result)), e3));
-  };
-}
-En = class {
-  constructor() {
-    throw xn({ message: `Platform ${P} is not enabled, please check whether secure network module is enabled in your manifest.json` });
-  }
-};
-const jn = Symbol("CLIENT_DB_INTERNAL");
-function $n(e2, t2) {
-  return e2.then = "DoNotReturnProxyWithAFunctionNamedThen", e2._internalType = jn, e2.inspect = null, e2.__v_raw = void 0, new Proxy(e2, { get(e3, n2, s2) {
-    if ("_uniClient" === n2)
-      return null;
-    if ("symbol" == typeof n2)
-      return e3[n2];
-    if (n2 in e3 || "string" != typeof n2) {
-      const t3 = e3[n2];
-      return "function" == typeof t3 ? t3.bind(e3) : t3;
-    }
-    return t2.get(e3, n2, s2);
-  } });
-}
-function Bn(e2) {
-  return { on: (t2, n2) => {
-    e2[t2] = e2[t2] || [], e2[t2].indexOf(n2) > -1 || e2[t2].push(n2);
-  }, off: (t2, n2) => {
-    e2[t2] = e2[t2] || [];
-    const s2 = e2[t2].indexOf(n2);
-    -1 !== s2 && e2[t2].splice(s2, 1);
-  } };
-}
-const Wn = ["db.Geo", "db.command", "command.aggregate"];
-function Hn(e2, t2) {
-  return Wn.indexOf(`${e2}.${t2}`) > -1;
-}
-function zn(e2) {
-  switch (f(e2 = se(e2))) {
-    case "array":
-      return e2.map((e3) => zn(e3));
-    case "object":
-      return e2._internalType === jn || Object.keys(e2).forEach((t2) => {
-        e2[t2] = zn(e2[t2]);
-      }), e2;
-    case "regexp":
-      return { $regexp: { source: e2.source, flags: e2.flags } };
-    case "date":
-      return { $date: e2.toISOString() };
-    default:
-      return e2;
-  }
-}
-function Jn(e2) {
-  return e2 && e2.content && e2.content.$method;
-}
-class Gn {
-  constructor(e2, t2, n2) {
-    this.content = e2, this.prevStage = t2 || null, this.udb = null, this._database = n2;
-  }
-  toJSON() {
-    let e2 = this;
-    const t2 = [e2.content];
-    for (; e2.prevStage; )
-      e2 = e2.prevStage, t2.push(e2.content);
-    return { $db: t2.reverse().map((e3) => ({ $method: e3.$method, $param: zn(e3.$param) })) };
-  }
-  toString() {
-    return JSON.stringify(this.toJSON());
-  }
-  getAction() {
-    const e2 = this.toJSON().$db.find((e3) => "action" === e3.$method);
-    return e2 && e2.$param && e2.$param[0];
-  }
-  getCommand() {
-    return { $db: this.toJSON().$db.filter((e2) => "action" !== e2.$method) };
-  }
-  get isAggregate() {
-    let e2 = this;
-    for (; e2; ) {
-      const t2 = Jn(e2), n2 = Jn(e2.prevStage);
-      if ("aggregate" === t2 && "collection" === n2 || "pipeline" === t2)
-        return true;
-      e2 = e2.prevStage;
-    }
-    return false;
-  }
-  get isCommand() {
-    let e2 = this;
-    for (; e2; ) {
-      if ("command" === Jn(e2))
-        return true;
-      e2 = e2.prevStage;
-    }
-    return false;
-  }
-  get isAggregateCommand() {
-    let e2 = this;
-    for (; e2; ) {
-      const t2 = Jn(e2), n2 = Jn(e2.prevStage);
-      if ("aggregate" === t2 && "command" === n2)
-        return true;
-      e2 = e2.prevStage;
-    }
-    return false;
-  }
-  getNextStageFn(e2) {
-    const t2 = this;
-    return function() {
-      return Vn({ $method: e2, $param: zn(Array.from(arguments)) }, t2, t2._database);
-    };
-  }
-  get count() {
-    return this.isAggregate ? this.getNextStageFn("count") : function() {
-      return this._send("count", Array.from(arguments));
-    };
-  }
-  get remove() {
-    return this.isCommand ? this.getNextStageFn("remove") : function() {
-      return this._send("remove", Array.from(arguments));
-    };
-  }
-  get() {
-    return this._send("get", Array.from(arguments));
-  }
-  get add() {
-    return this.isCommand ? this.getNextStageFn("add") : function() {
-      return this._send("add", Array.from(arguments));
-    };
-  }
-  update() {
-    return this._send("update", Array.from(arguments));
-  }
-  end() {
-    return this._send("end", Array.from(arguments));
-  }
-  get set() {
-    return this.isCommand ? this.getNextStageFn("set") : function() {
-      throw new Error("JQL禁止使用set方法");
-    };
-  }
-  _send(e2, t2) {
-    const n2 = this.getAction(), s2 = this.getCommand();
-    if (s2.$db.push({ $method: e2, $param: zn(t2) }), S) {
-      const e3 = s2.$db.find((e4) => "collection" === e4.$method), t3 = e3 && e3.$param;
-      t3 && 1 === t3.length && "string" == typeof e3.$param[0] && e3.$param[0].indexOf(",") > -1 && console.warn("检测到使用JQL语法联表查询时，未使用getTemp先过滤主表数据，在主表数据量大的情况下可能会查询缓慢。\n- 如何优化请参考此文档：https://uniapp.dcloud.net.cn/uniCloud/jql?id=lookup-with-temp \n- 如果主表数据量很小请忽略此信息，项目发行时不会出现此提示。");
-    }
-    return this._database._callCloudFunction({ action: n2, command: s2 });
-  }
-}
-function Vn(e2, t2, n2) {
-  return $n(new Gn(e2, t2, n2), { get(e3, t3) {
-    let s2 = "db";
-    return e3 && e3.content && (s2 = e3.content.$method), Hn(s2, t3) ? Vn({ $method: t3 }, e3, n2) : function() {
-      return Vn({ $method: t3, $param: zn(Array.from(arguments)) }, e3, n2);
-    };
-  } });
-}
-function Yn({ path: e2, method: t2 }) {
-  return class {
-    constructor() {
-      this.param = Array.from(arguments);
-    }
-    toJSON() {
-      return { $newDb: [...e2.map((e3) => ({ $method: e3 })), { $method: t2, $param: this.param }] };
-    }
-    toString() {
-      return JSON.stringify(this.toJSON());
-    }
-  };
-}
-function Qn(e2, t2 = {}) {
-  return $n(new e2(t2), { get: (e3, t3) => Hn("db", t3) ? Vn({ $method: t3 }, null, e3) : function() {
-    return Vn({ $method: t3, $param: zn(Array.from(arguments)) }, null, e3);
-  } });
-}
-class Xn extends class {
-  constructor({ uniClient: e2 = {}, isJQL: t2 = false } = {}) {
-    this._uniClient = e2, this._authCallBacks = {}, this._dbCallBacks = {}, e2._isDefault && (this._dbCallBacks = L("_globalUniCloudDatabaseCallback")), t2 || (this.auth = Bn(this._authCallBacks)), this._isJQL = t2, Object.assign(this, Bn(this._dbCallBacks)), this.env = $n({}, { get: (e3, t3) => ({ $env: t3 }) }), this.Geo = $n({}, { get: (e3, t3) => Yn({ path: ["Geo"], method: t3 }) }), this.serverDate = Yn({ path: [], method: "serverDate" }), this.RegExp = Yn({ path: [], method: "RegExp" });
-  }
-  getCloudEnv(e2) {
-    if ("string" != typeof e2 || !e2.trim())
-      throw new Error("getCloudEnv参数错误");
-    return { $env: e2.replace("$cloudEnv_", "") };
-  }
-  _callback(e2, t2) {
-    const n2 = this._dbCallBacks;
-    n2[e2] && n2[e2].forEach((e3) => {
-      e3(...t2);
-    });
-  }
-  _callbackAuth(e2, t2) {
-    const n2 = this._authCallBacks;
-    n2[e2] && n2[e2].forEach((e3) => {
-      e3(...t2);
-    });
-  }
-  multiSend() {
-    const e2 = Array.from(arguments), t2 = e2.map((e3) => {
-      const t3 = e3.getAction(), n2 = e3.getCommand();
-      if ("getTemp" !== n2.$db[n2.$db.length - 1].$method)
-        throw new Error("multiSend只支持子命令内使用getTemp");
-      return { action: t3, command: n2 };
-    });
-    return this._callCloudFunction({ multiCommand: t2, queryList: e2 });
-  }
-} {
-  _parseResult(e2) {
-    return this._isJQL ? e2.result : e2;
-  }
-  _callCloudFunction({ action: e2, command: t2, multiCommand: n2, queryList: s2 }) {
-    function r2(e3, t3) {
-      if (n2 && s2)
-        for (let n3 = 0; n3 < s2.length; n3++) {
-          const r3 = s2[n3];
-          r3.udb && "function" == typeof r3.udb.setResult && (t3 ? r3.udb.setResult(t3) : r3.udb.setResult(e3.result.dataList[n3]));
-        }
-    }
-    const i2 = this, o2 = this._isJQL ? "databaseForJQL" : "database";
-    function a2(e3) {
-      return i2._callback("error", [e3]), M(q(o2, "fail"), e3).then(() => M(q(o2, "complete"), e3)).then(() => (r2(null, e3), Y(j, { type: W, content: e3 }), Promise.reject(e3)));
-    }
-    const c2 = M(q(o2, "invoke")), u2 = this._uniClient;
-    return c2.then(() => u2.callFunction({ name: "DCloud-clientDB", type: h, data: { action: e2, command: t2, multiCommand: n2 } })).then((e3) => {
-      const { code: t3, message: n3, token: s3, tokenExpired: c3, systemInfo: u3 = [] } = e3.result;
-      if (u3)
-        for (let e4 = 0; e4 < u3.length; e4++) {
-          const { level: t4, message: n4, detail: s4 } = u3[e4], r3 = console[t4] || console.log;
-          let i3 = "[System Info]" + n4;
-          s4 && (i3 = `${i3}
-详细信息：${s4}`), r3(i3);
-        }
-      if (t3) {
-        return a2(new te({ code: t3, message: n3, requestId: e3.requestId }));
-      }
-      e3.result.errCode = e3.result.errCode || e3.result.code, e3.result.errMsg = e3.result.errMsg || e3.result.message, s3 && c3 && (ie({ token: s3, tokenExpired: c3 }), this._callbackAuth("refreshToken", [{ token: s3, tokenExpired: c3 }]), this._callback("refreshToken", [{ token: s3, tokenExpired: c3 }]), Y(B, { token: s3, tokenExpired: c3 }));
-      const h2 = [{ prop: "affectedDocs", tips: "affectedDocs不再推荐使用，请使用inserted/deleted/updated/data.length替代" }, { prop: "code", tips: "code不再推荐使用，请使用errCode替代" }, { prop: "message", tips: "message不再推荐使用，请使用errMsg替代" }];
-      for (let t4 = 0; t4 < h2.length; t4++) {
-        const { prop: n4, tips: s4 } = h2[t4];
-        if (n4 in e3.result) {
-          const t5 = e3.result[n4];
-          Object.defineProperty(e3.result, n4, { get: () => (console.warn(s4), t5) });
-        }
-      }
-      return function(e4) {
-        return M(q(o2, "success"), e4).then(() => M(q(o2, "complete"), e4)).then(() => {
-          r2(e4, null);
-          const t4 = i2._parseResult(e4);
-          return Y(j, { type: W, content: t4 }), Promise.resolve(t4);
-        });
-      }(e3);
-    }, (e3) => {
-      /fc_function_not_found|FUNCTION_NOT_FOUND/g.test(e3.message) && console.warn("clientDB未初始化，请在web控制台保存一次schema以开启clientDB");
-      return a2(new te({ code: e3.code || "SYSTEM_ERROR", message: e3.message, requestId: e3.requestId }));
-    });
-  }
-}
-const Zn = "token无效，跳转登录页面", es = "token过期，跳转登录页面", ts = { TOKEN_INVALID_TOKEN_EXPIRED: es, TOKEN_INVALID_INVALID_CLIENTID: Zn, TOKEN_INVALID: Zn, TOKEN_INVALID_WRONG_TOKEN: Zn, TOKEN_INVALID_ANONYMOUS_USER: Zn }, ns = { "uni-id-token-expired": es, "uni-id-check-token-failed": Zn, "uni-id-token-not-exist": Zn, "uni-id-check-device-feature-failed": Zn };
-function ss(e2, t2) {
-  let n2 = "";
-  return n2 = e2 ? `${e2}/${t2}` : t2, n2.replace(/^\//, "");
-}
-function rs(e2 = [], t2 = "") {
-  const n2 = [], s2 = [];
-  return e2.forEach((e3) => {
-    true === e3.needLogin ? n2.push(ss(t2, e3.path)) : false === e3.needLogin && s2.push(ss(t2, e3.path));
-  }), { needLoginPage: n2, notNeedLoginPage: s2 };
-}
-function is(e2) {
-  return e2.split("?")[0].replace(/^\//, "");
-}
-function os() {
-  return function(e2) {
-    let t2 = e2 && e2.$page && e2.$page.fullPath || "";
-    return t2 ? ("/" !== t2.charAt(0) && (t2 = "/" + t2), t2) : t2;
-  }(function() {
-    const e2 = getCurrentPages();
-    return e2[e2.length - 1];
-  }());
-}
-function as() {
-  return is(os());
-}
-function cs(e2 = "", t2 = {}) {
-  if (!e2)
-    return false;
-  if (!(t2 && t2.list && t2.list.length))
-    return false;
-  const n2 = t2.list, s2 = is(e2);
-  return n2.some((e3) => e3.pagePath === s2);
-}
-const us = !!e.uniIdRouter;
-const { loginPage: hs, routerNeedLogin: ls, resToLogin: ds, needLoginPage: ps, notNeedLoginPage: fs, loginPageInTabBar: gs } = function({ pages: t2 = [], subPackages: n2 = [], uniIdRouter: s2 = {}, tabBar: r2 = {} } = e) {
-  const { loginPage: i2, needLogin: o2 = [], resToLogin: a2 = true } = s2, { needLoginPage: c2, notNeedLoginPage: u2 } = rs(t2), { needLoginPage: h2, notNeedLoginPage: l2 } = function(e2 = []) {
-    const t3 = [], n3 = [];
-    return e2.forEach((e3) => {
-      const { root: s3, pages: r3 = [] } = e3, { needLoginPage: i3, notNeedLoginPage: o3 } = rs(r3, s3);
-      t3.push(...i3), n3.push(...o3);
-    }), { needLoginPage: t3, notNeedLoginPage: n3 };
-  }(n2);
-  return { loginPage: i2, routerNeedLogin: o2, resToLogin: a2, needLoginPage: [...c2, ...h2], notNeedLoginPage: [...u2, ...l2], loginPageInTabBar: cs(i2, r2) };
-}();
-if (ps.indexOf(hs) > -1)
-  throw new Error(`Login page [${hs}] should not be "needLogin", please check your pages.json`);
-function ms(e2) {
-  const t2 = as();
-  if ("/" === e2.charAt(0))
-    return e2;
-  const [n2, s2] = e2.split("?"), r2 = n2.replace(/^\//, "").split("/"), i2 = t2.split("/");
-  i2.pop();
-  for (let e3 = 0; e3 < r2.length; e3++) {
-    const t3 = r2[e3];
-    ".." === t3 ? i2.pop() : "." !== t3 && i2.push(t3);
-  }
-  return "" === i2[0] && i2.shift(), "/" + i2.join("/") + (s2 ? "?" + s2 : "");
-}
-function ys(e2) {
-  const t2 = is(ms(e2));
-  return !(fs.indexOf(t2) > -1) && (ps.indexOf(t2) > -1 || ls.some((t3) => function(e3, t4) {
-    return new RegExp(t4).test(e3);
-  }(e2, t3)));
-}
-function _s({ redirect: e2 }) {
-  const t2 = is(e2), n2 = is(hs);
-  return as() !== n2 && t2 !== n2;
-}
-function ws({ api: e2, redirect: t2 } = {}) {
-  if (!t2 || !_s({ redirect: t2 }))
-    return;
-  const n2 = function(e3, t3) {
-    return "/" !== e3.charAt(0) && (e3 = "/" + e3), t3 ? e3.indexOf("?") > -1 ? e3 + `&uniIdRedirectUrl=${encodeURIComponent(t3)}` : e3 + `?uniIdRedirectUrl=${encodeURIComponent(t3)}` : e3;
-  }(hs, t2);
-  gs ? "navigateTo" !== e2 && "redirectTo" !== e2 || (e2 = "switchTab") : "switchTab" === e2 && (e2 = "navigateTo");
-  const s2 = { navigateTo: index.navigateTo, redirectTo: index.redirectTo, switchTab: index.switchTab, reLaunch: index.reLaunch };
-  setTimeout(() => {
-    s2[e2]({ url: n2 });
-  });
-}
-function vs({ url: e2 } = {}) {
-  const t2 = { abortLoginPageJump: false, autoToLoginPage: false }, n2 = function() {
-    const { token: e3, tokenExpired: t3 } = re();
-    let n3;
-    if (e3) {
-      if (t3 < Date.now()) {
-        const e4 = "uni-id-token-expired";
-        n3 = { errCode: e4, errMsg: ns[e4] };
-      }
-    } else {
-      const e4 = "uni-id-check-token-failed";
-      n3 = { errCode: e4, errMsg: ns[e4] };
-    }
-    return n3;
-  }();
-  if (ys(e2) && n2) {
-    n2.uniIdRedirectUrl = e2;
-    if (J($).length > 0)
-      return setTimeout(() => {
-        Y($, n2);
-      }, 0), t2.abortLoginPageJump = true, t2;
-    t2.autoToLoginPage = true;
-  }
-  return t2;
-}
-function Is() {
-  !function() {
-    const e3 = os(), { abortLoginPageJump: t2, autoToLoginPage: n2 } = vs({ url: e3 });
-    t2 || n2 && ws({ api: "redirectTo", redirect: e3 });
-  }();
-  const e2 = ["navigateTo", "redirectTo", "reLaunch", "switchTab"];
-  for (let t2 = 0; t2 < e2.length; t2++) {
-    const n2 = e2[t2];
-    index.addInterceptor(n2, { invoke(e3) {
-      const { abortLoginPageJump: t3, autoToLoginPage: s2 } = vs({ url: e3.url });
-      return t3 ? e3 : s2 ? (ws({ api: n2, redirect: ms(e3.url) }), false) : e3;
-    } });
-  }
-}
-function Ss() {
-  this.onResponse((e2) => {
-    const { type: t2, content: n2 } = e2;
-    let s2 = false;
-    switch (t2) {
-      case "cloudobject":
-        s2 = function(e3) {
-          if ("object" != typeof e3)
-            return false;
-          const { errCode: t3 } = e3 || {};
-          return t3 in ns;
-        }(n2);
-        break;
-      case "clientdb":
-        s2 = function(e3) {
-          if ("object" != typeof e3)
-            return false;
-          const { errCode: t3 } = e3 || {};
-          return t3 in ts;
-        }(n2);
-    }
-    s2 && function(e3 = {}) {
-      const t3 = J($);
-      Z().then(() => {
-        const n3 = os();
-        if (n3 && _s({ redirect: n3 }))
-          return t3.length > 0 ? Y($, Object.assign({ uniIdRedirectUrl: n3 }, e3)) : void (hs && ws({ api: "navigateTo", redirect: n3 }));
-      });
-    }(n2);
-  });
-}
-function bs(e2) {
-  !function(e3) {
-    e3.onResponse = function(e4) {
-      G(j, e4);
-    }, e3.offResponse = function(e4) {
-      V(j, e4);
-    };
-  }(e2), function(e3) {
-    e3.onNeedLogin = function(e4) {
-      G($, e4);
-    }, e3.offNeedLogin = function(e4) {
-      V($, e4);
-    }, us && (L("_globalUniCloudStatus").needLoginInit || (L("_globalUniCloudStatus").needLoginInit = true, Z().then(() => {
-      Is.call(e3);
-    }), ds && Ss.call(e3)));
-  }(e2), function(e3) {
-    e3.onRefreshToken = function(e4) {
-      G(B, e4);
-    }, e3.offRefreshToken = function(e4) {
-      V(B, e4);
-    };
-  }(e2);
-}
-let ks;
-const As = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", Ps = /^(?:[A-Za-z\d+/]{4})*?(?:[A-Za-z\d+/]{2}(?:==)?|[A-Za-z\d+/]{3}=?)?$/;
-function Ts() {
-  const e2 = re().token || "", t2 = e2.split(".");
-  if (!e2 || 3 !== t2.length)
-    return { uid: null, role: [], permission: [], tokenExpired: 0 };
-  let n2;
-  try {
-    n2 = JSON.parse((s2 = t2[1], decodeURIComponent(ks(s2).split("").map(function(e3) {
-      return "%" + ("00" + e3.charCodeAt(0).toString(16)).slice(-2);
-    }).join(""))));
-  } catch (e3) {
-    throw new Error("获取当前用户信息出错，详细错误信息为：" + e3.message);
-  }
-  var s2;
-  return n2.tokenExpired = 1e3 * n2.exp, delete n2.exp, delete n2.iat, n2;
-}
-ks = "function" != typeof atob ? function(e2) {
-  if (e2 = String(e2).replace(/[\t\n\f\r ]+/g, ""), !Ps.test(e2))
-    throw new Error("Failed to execute 'atob' on 'Window': The string to be decoded is not correctly encoded.");
-  var t2;
-  e2 += "==".slice(2 - (3 & e2.length));
-  for (var n2, s2, r2 = "", i2 = 0; i2 < e2.length; )
-    t2 = As.indexOf(e2.charAt(i2++)) << 18 | As.indexOf(e2.charAt(i2++)) << 12 | (n2 = As.indexOf(e2.charAt(i2++))) << 6 | (s2 = As.indexOf(e2.charAt(i2++))), r2 += 64 === n2 ? String.fromCharCode(t2 >> 16 & 255) : 64 === s2 ? String.fromCharCode(t2 >> 16 & 255, t2 >> 8 & 255) : String.fromCharCode(t2 >> 16 & 255, t2 >> 8 & 255, 255 & t2);
-  return r2;
-} : atob;
-var Cs = n(function(e2, t2) {
-  Object.defineProperty(t2, "__esModule", { value: true });
-  const n2 = "chooseAndUploadFile:ok", s2 = "chooseAndUploadFile:fail";
-  function r2(e3, t3) {
-    return e3.tempFiles.forEach((e4, n3) => {
-      e4.name || (e4.name = e4.path.substring(e4.path.lastIndexOf("/") + 1)), t3 && (e4.fileType = t3), e4.cloudPath = Date.now() + "_" + n3 + e4.name.substring(e4.name.lastIndexOf("."));
-    }), e3.tempFilePaths || (e3.tempFilePaths = e3.tempFiles.map((e4) => e4.path)), e3;
-  }
-  function i2(e3, t3, { onChooseFile: s3, onUploadProgress: r3 }) {
-    return t3.then((e4) => {
-      if (s3) {
-        const t4 = s3(e4);
-        if (void 0 !== t4)
-          return Promise.resolve(t4).then((t5) => void 0 === t5 ? e4 : t5);
-      }
-      return e4;
-    }).then((t4) => false === t4 ? { errMsg: n2, tempFilePaths: [], tempFiles: [] } : function(e4, t5, s4 = 5, r4) {
-      (t5 = Object.assign({}, t5)).errMsg = n2;
-      const i3 = t5.tempFiles, o2 = i3.length;
-      let a2 = 0;
-      return new Promise((n3) => {
-        for (; a2 < s4; )
-          c2();
-        function c2() {
-          const s5 = a2++;
-          if (s5 >= o2)
-            return void (!i3.find((e5) => !e5.url && !e5.errMsg) && n3(t5));
-          const u2 = i3[s5];
-          e4.uploadFile({ provider: u2.provider, filePath: u2.path, cloudPath: u2.cloudPath, fileType: u2.fileType, cloudPathAsRealPath: u2.cloudPathAsRealPath, onUploadProgress(e5) {
-            e5.index = s5, e5.tempFile = u2, e5.tempFilePath = u2.path, r4 && r4(e5);
-          } }).then((e5) => {
-            u2.url = e5.fileID, s5 < o2 && c2();
-          }).catch((e5) => {
-            u2.errMsg = e5.errMsg || e5.message, s5 < o2 && c2();
-          });
-        }
-      });
-    }(e3, t4, 5, r3));
-  }
-  t2.initChooseAndUploadFile = function(e3) {
-    return function(t3 = { type: "all" }) {
-      return "image" === t3.type ? i2(e3, function(e4) {
-        const { count: t4, sizeType: n3, sourceType: i3 = ["album", "camera"], extension: o2 } = e4;
-        return new Promise((e5, a2) => {
-          index.chooseImage({ count: t4, sizeType: n3, sourceType: i3, extension: o2, success(t5) {
-            e5(r2(t5, "image"));
-          }, fail(e6) {
-            a2({ errMsg: e6.errMsg.replace("chooseImage:fail", s2) });
-          } });
-        });
-      }(t3), t3) : "video" === t3.type ? i2(e3, function(e4) {
-        const { camera: t4, compressed: n3, maxDuration: i3, sourceType: o2 = ["album", "camera"], extension: a2 } = e4;
-        return new Promise((e5, c2) => {
-          index.chooseVideo({ camera: t4, compressed: n3, maxDuration: i3, sourceType: o2, extension: a2, success(t5) {
-            const { tempFilePath: n4, duration: s3, size: i4, height: o3, width: a3 } = t5;
-            e5(r2({ errMsg: "chooseVideo:ok", tempFilePaths: [n4], tempFiles: [{ name: t5.tempFile && t5.tempFile.name || "", path: n4, size: i4, type: t5.tempFile && t5.tempFile.type || "", width: a3, height: o3, duration: s3, fileType: "video", cloudPath: "" }] }, "video"));
-          }, fail(e6) {
-            c2({ errMsg: e6.errMsg.replace("chooseVideo:fail", s2) });
-          } });
-        });
-      }(t3), t3) : i2(e3, function(e4) {
-        const { count: t4, extension: n3 } = e4;
-        return new Promise((e5, i3) => {
-          let o2 = index.chooseFile;
-          if ("undefined" != typeof wx$1 && "function" == typeof wx$1.chooseMessageFile && (o2 = wx$1.chooseMessageFile), "function" != typeof o2)
-            return i3({ errMsg: s2 + " 请指定 type 类型，该平台仅支持选择 image 或 video。" });
-          o2({ type: "all", count: t4, extension: n3, success(t5) {
-            e5(r2(t5));
-          }, fail(e6) {
-            i3({ errMsg: e6.errMsg.replace("chooseFile:fail", s2) });
-          } });
-        });
-      }(t3), t3);
-    };
-  };
-}), xs = t(Cs);
-const Os = "manual";
-function Es(e2) {
-  return { props: { localdata: { type: Array, default: () => [] }, options: { type: [Object, Array], default: () => ({}) }, spaceInfo: { type: Object, default: () => ({}) }, collection: { type: [String, Array], default: "" }, action: { type: String, default: "" }, field: { type: String, default: "" }, orderby: { type: String, default: "" }, where: { type: [String, Object], default: "" }, pageData: { type: String, default: "add" }, pageCurrent: { type: Number, default: 1 }, pageSize: { type: Number, default: 20 }, getcount: { type: [Boolean, String], default: false }, gettree: { type: [Boolean, String], default: false }, gettreepath: { type: [Boolean, String], default: false }, startwith: { type: String, default: "" }, limitlevel: { type: Number, default: 10 }, groupby: { type: String, default: "" }, groupField: { type: String, default: "" }, distinct: { type: [Boolean, String], default: false }, foreignKey: { type: String, default: "" }, loadtime: { type: String, default: "auto" }, manual: { type: Boolean, default: false } }, data: () => ({ mixinDatacomLoading: false, mixinDatacomHasMore: false, mixinDatacomResData: [], mixinDatacomErrorMessage: "", mixinDatacomPage: {}, mixinDatacomError: null }), created() {
-    this.mixinDatacomPage = { current: this.pageCurrent, size: this.pageSize, count: 0 }, this.$watch(() => {
-      var e3 = [];
-      return ["pageCurrent", "pageSize", "localdata", "collection", "action", "field", "orderby", "where", "getont", "getcount", "gettree", "groupby", "groupField", "distinct"].forEach((t2) => {
-        e3.push(this[t2]);
-      }), e3;
-    }, (e3, t2) => {
-      if (this.loadtime === Os)
-        return;
-      let n2 = false;
-      const s2 = [];
-      for (let r2 = 2; r2 < e3.length; r2++)
-        e3[r2] !== t2[r2] && (s2.push(e3[r2]), n2 = true);
-      e3[0] !== t2[0] && (this.mixinDatacomPage.current = this.pageCurrent), this.mixinDatacomPage.size = this.pageSize, this.onMixinDatacomPropsChange(n2, s2);
-    });
-  }, methods: { onMixinDatacomPropsChange(e3, t2) {
-  }, mixinDatacomEasyGet({ getone: e3 = false, success: t2, fail: n2 } = {}) {
-    this.mixinDatacomLoading || (this.mixinDatacomLoading = true, this.mixinDatacomErrorMessage = "", this.mixinDatacomError = null, this.mixinDatacomGet().then((n3) => {
-      this.mixinDatacomLoading = false;
-      const { data: s2, count: r2 } = n3.result;
-      this.getcount && (this.mixinDatacomPage.count = r2), this.mixinDatacomHasMore = s2.length < this.pageSize;
-      const i2 = e3 ? s2.length ? s2[0] : void 0 : s2;
-      this.mixinDatacomResData = i2, t2 && t2(i2);
-    }).catch((e4) => {
-      this.mixinDatacomLoading = false, this.mixinDatacomErrorMessage = e4, this.mixinDatacomError = e4, n2 && n2(e4);
-    }));
-  }, mixinDatacomGet(t2 = {}) {
-    let n2;
-    t2 = t2 || {}, n2 = "undefined" != typeof __uniX && __uniX ? e2.databaseForJQL(this.spaceInfo) : e2.database(this.spaceInfo);
-    const s2 = t2.action || this.action;
-    s2 && (n2 = n2.action(s2));
-    const r2 = t2.collection || this.collection;
-    n2 = Array.isArray(r2) ? n2.collection(...r2) : n2.collection(r2);
-    const i2 = t2.where || this.where;
-    i2 && Object.keys(i2).length && (n2 = n2.where(i2));
-    const o2 = t2.field || this.field;
-    o2 && (n2 = n2.field(o2));
-    const a2 = t2.foreignKey || this.foreignKey;
-    a2 && (n2 = n2.foreignKey(a2));
-    const c2 = t2.groupby || this.groupby;
-    c2 && (n2 = n2.groupBy(c2));
-    const u2 = t2.groupField || this.groupField;
-    u2 && (n2 = n2.groupField(u2));
-    true === (void 0 !== t2.distinct ? t2.distinct : this.distinct) && (n2 = n2.distinct());
-    const h2 = t2.orderby || this.orderby;
-    h2 && (n2 = n2.orderBy(h2));
-    const l2 = void 0 !== t2.pageCurrent ? t2.pageCurrent : this.mixinDatacomPage.current, d2 = void 0 !== t2.pageSize ? t2.pageSize : this.mixinDatacomPage.size, p2 = void 0 !== t2.getcount ? t2.getcount : this.getcount, f2 = void 0 !== t2.gettree ? t2.gettree : this.gettree, g2 = void 0 !== t2.gettreepath ? t2.gettreepath : this.gettreepath, m2 = { getCount: p2 }, y2 = { limitLevel: void 0 !== t2.limitlevel ? t2.limitlevel : this.limitlevel, startWith: void 0 !== t2.startwith ? t2.startwith : this.startwith };
-    return f2 && (m2.getTree = y2), g2 && (m2.getTreePath = y2), n2 = n2.skip(d2 * (l2 - 1)).limit(d2).get(m2), n2;
-  } } };
-}
-function Ls(e2) {
-  return function(t2, n2 = {}) {
-    n2 = function(e3, t3 = {}) {
-      return e3.customUI = t3.customUI || e3.customUI, e3.parseSystemError = t3.parseSystemError || e3.parseSystemError, Object.assign(e3.loadingOptions, t3.loadingOptions), Object.assign(e3.errorOptions, t3.errorOptions), "object" == typeof t3.secretMethods && (e3.secretMethods = t3.secretMethods), e3;
-    }({ customUI: false, loadingOptions: { title: "加载中...", mask: true }, errorOptions: { type: "modal", retry: false } }, n2);
-    const { customUI: s2, loadingOptions: r2, errorOptions: i2, parseSystemError: o2 } = n2, a2 = !s2;
-    return new Proxy({}, { get(s3, c2) {
-      switch (c2) {
-        case "toString":
-          return "[object UniCloudObject]";
-        case "toJSON":
-          return {};
-      }
-      return function({ fn: e3, interceptorName: t3, getCallbackArgs: n3 } = {}) {
-        return async function(...s4) {
-          const r3 = n3 ? n3({ params: s4 }) : {};
-          let i3, o3;
-          try {
-            return await M(q(t3, "invoke"), { ...r3 }), i3 = await e3(...s4), await M(q(t3, "success"), { ...r3, result: i3 }), i3;
-          } catch (e4) {
-            throw o3 = e4, await M(q(t3, "fail"), { ...r3, error: o3 }), o3;
-          } finally {
-            await M(q(t3, "complete"), o3 ? { ...r3, error: o3 } : { ...r3, result: i3 });
-          }
-        };
-      }({ fn: async function s4(...h2) {
-        let l2;
-        a2 && index.showLoading({ title: r2.title, mask: r2.mask });
-        const d2 = { name: t2, type: u, data: { method: c2, params: h2 } };
-        "object" == typeof n2.secretMethods && function(e3, t3) {
-          const n3 = t3.data.method, s5 = e3.secretMethods || {}, r3 = s5[n3] || s5["*"];
-          r3 && (t3.secretType = r3);
-        }(n2, d2);
-        let p2 = false;
-        try {
-          l2 = await e2.callFunction(d2);
-        } catch (e3) {
-          p2 = true, l2 = { result: new te(e3) };
-        }
-        const { errSubject: f2, errCode: g2, errMsg: m2, newToken: y2 } = l2.result || {};
-        if (a2 && index.hideLoading(), y2 && y2.token && y2.tokenExpired && (ie(y2), Y(B, { ...y2 })), g2) {
-          let e3 = m2;
-          if (p2 && o2) {
-            e3 = (await o2({ objectName: t2, methodName: c2, params: h2, errSubject: f2, errCode: g2, errMsg: m2 })).errMsg || m2;
-          }
-          if (a2)
-            if ("toast" === i2.type)
-              index.showToast({ title: e3, icon: "none" });
-            else {
-              if ("modal" !== i2.type)
-                throw new Error(`Invalid errorOptions.type: ${i2.type}`);
-              {
-                const { confirm: t3 } = await async function({ title: e4, content: t4, showCancel: n4, cancelText: s5, confirmText: r3 } = {}) {
-                  return new Promise((i3, o3) => {
-                    index.showModal({ title: e4, content: t4, showCancel: n4, cancelText: s5, confirmText: r3, success(e5) {
-                      i3(e5);
-                    }, fail() {
-                      i3({ confirm: false, cancel: true });
-                    } });
-                  });
-                }({ title: "提示", content: e3, showCancel: i2.retry, cancelText: "取消", confirmText: i2.retry ? "重试" : "确定" });
-                if (i2.retry && t3)
-                  return s4(...h2);
-              }
-            }
-          const n3 = new te({ subject: f2, code: g2, message: m2, requestId: l2.requestId });
-          throw n3.detail = l2.result, Y(j, { type: z, content: n3 }), n3;
-        }
-        return Y(j, { type: z, content: l2.result }), l2.result;
-      }, interceptorName: "callObject", getCallbackArgs: function({ params: e3 } = {}) {
-        return { objectName: t2, methodName: c2, params: e3 };
-      } });
-    } });
-  };
-}
-function Rs(e2) {
-  return L("_globalUniCloudSecureNetworkCache__{spaceId}".replace("{spaceId}", e2.config.spaceId));
-}
-async function Us({ openid: e2, callLoginByWeixin: t2 = false } = {}) {
-  const n2 = Rs(this);
-  if (e2 && t2)
-    throw new Error("[SecureNetwork] openid and callLoginByWeixin cannot be passed at the same time");
-  if (e2)
-    return n2.mpWeixinOpenid = e2, {};
-  const s2 = await new Promise((e3, t3) => {
-    index.login({ success(t4) {
-      e3(t4.code);
-    }, fail(e4) {
-      t3(new Error(e4.errMsg));
-    } });
-  }), r2 = this.importObject("uni-id-co", { customUI: true });
-  return await r2.secureNetworkHandshakeByWeixin({ code: s2, callLoginByWeixin: t2 }), n2.mpWeixinCode = s2, { code: s2 };
-}
-async function Ns(e2) {
-  const t2 = Rs(this);
-  return t2.initPromise || (t2.initPromise = Us.call(this, e2).then((e3) => e3).catch((e3) => {
-    throw delete t2.initPromise, e3;
-  })), t2.initPromise;
-}
-function Ds(e2) {
-  return function({ openid: t2, callLoginByWeixin: n2 = false } = {}) {
-    return Ns.call(e2, { openid: t2, callLoginByWeixin: n2 });
-  };
-}
-function Ms(e2) {
-  const t2 = { getSystemInfo: index.getSystemInfo, getPushClientId: index.getPushClientId };
-  return function(n2) {
-    return new Promise((s2, r2) => {
-      t2[e2]({ ...n2, success(e3) {
-        s2(e3);
-      }, fail(e3) {
-        r2(e3);
-      } });
-    });
-  };
-}
-class qs extends class {
-  constructor() {
-    this._callback = {};
-  }
-  addListener(e2, t2) {
-    this._callback[e2] || (this._callback[e2] = []), this._callback[e2].push(t2);
-  }
-  on(e2, t2) {
-    return this.addListener(e2, t2);
-  }
-  removeListener(e2, t2) {
-    if (!t2)
-      throw new Error('The "listener" argument must be of type function. Received undefined');
-    const n2 = this._callback[e2];
-    if (!n2)
-      return;
-    const s2 = function(e3, t3) {
-      for (let n3 = e3.length - 1; n3 >= 0; n3--)
-        if (e3[n3] === t3)
-          return n3;
-      return -1;
-    }(n2, t2);
-    n2.splice(s2, 1);
-  }
-  off(e2, t2) {
-    return this.removeListener(e2, t2);
-  }
-  removeAllListener(e2) {
-    delete this._callback[e2];
-  }
-  emit(e2, ...t2) {
-    const n2 = this._callback[e2];
-    if (n2)
-      for (let e3 = 0; e3 < n2.length; e3++)
-        n2[e3](...t2);
-  }
-} {
-  constructor() {
-    super(), this._uniPushMessageCallback = this._receivePushMessage.bind(this), this._currentMessageId = -1, this._payloadQueue = [];
-  }
-  init() {
-    return Promise.all([Ms("getSystemInfo")(), Ms("getPushClientId")()]).then(([{ appId: e2 } = {}, { cid: t2 } = {}] = []) => {
-      if (!e2)
-        throw new Error("Invalid appId, please check the manifest.json file");
-      if (!t2)
-        throw new Error("Invalid push client id");
-      this._appId = e2, this._pushClientId = t2, this._seqId = Date.now() + "-" + Math.floor(9e5 * Math.random() + 1e5), this.emit("open"), this._initMessageListener();
-    }, (e2) => {
-      throw this.emit("error", e2), this.close(), e2;
-    });
-  }
-  async open() {
-    return this.init();
-  }
-  _isUniCloudSSE(e2) {
-    if ("receive" !== e2.type)
-      return false;
-    const t2 = e2 && e2.data && e2.data.payload;
-    return !(!t2 || "UNI_CLOUD_SSE" !== t2.channel || t2.seqId !== this._seqId);
-  }
-  _receivePushMessage(e2) {
-    if (!this._isUniCloudSSE(e2))
-      return;
-    const t2 = e2 && e2.data && e2.data.payload, { action: n2, messageId: s2, message: r2 } = t2;
-    this._payloadQueue.push({ action: n2, messageId: s2, message: r2 }), this._consumMessage();
-  }
-  _consumMessage() {
-    for (; ; ) {
-      const e2 = this._payloadQueue.find((e3) => e3.messageId === this._currentMessageId + 1);
-      if (!e2)
-        break;
-      this._currentMessageId++, this._parseMessagePayload(e2);
-    }
-  }
-  _parseMessagePayload(e2) {
-    const { action: t2, messageId: n2, message: s2 } = e2;
-    "end" === t2 ? this._end({ messageId: n2, message: s2 }) : "message" === t2 && this._appendMessage({ messageId: n2, message: s2 });
-  }
-  _appendMessage({ messageId: e2, message: t2 } = {}) {
-    this.emit("message", t2);
-  }
-  _end({ messageId: e2, message: t2 } = {}) {
-    this.emit("end", t2), this.close();
-  }
-  _initMessageListener() {
-    index.onPushMessage(this._uniPushMessageCallback);
-  }
-  _destroy() {
-    index.offPushMessage(this._uniPushMessageCallback);
-  }
-  toJSON() {
-    return { appId: this._appId, pushClientId: this._pushClientId, seqId: this._seqId };
-  }
-  close() {
-    this._destroy(), this.emit("close");
-  }
-}
-async function Fs(e2, t2) {
-  const n2 = `http://${e2}:${t2}/system/ping`;
-  try {
-    const e3 = await (s2 = { url: n2, timeout: 500 }, new Promise((e4, t3) => {
-      ne.request({ ...s2, success(t4) {
-        e4(t4);
-      }, fail(e5) {
-        t3(e5);
-      } });
-    }));
-    return !(!e3.data || 0 !== e3.data.code);
-  } catch (e3) {
-    return false;
-  }
-  var s2;
-}
-async function Ks(e2) {
-  const t2 = e2.__dev__;
-  if (!t2.debugInfo)
-    return;
-  const { address: n2, servePort: s2 } = t2.debugInfo, { address: r2 } = await async function(e3, t3) {
-    let n3;
-    for (let s3 = 0; s3 < e3.length; s3++) {
-      const r3 = e3[s3];
-      if (await Fs(r3, t3)) {
-        n3 = r3;
-        break;
-      }
-    }
-    return { address: n3, port: t3 };
-  }(n2, s2);
-  if (r2)
-    return t2.localAddress = r2, void (t2.localPort = s2);
-  const i2 = console["warn"];
-  let o2 = "";
-  if ("remote" === t2.debugInfo.initialLaunchType ? (t2.debugInfo.forceRemote = true, o2 = "当前客户端和HBuilderX不在同一局域网下（或其他网络原因无法连接HBuilderX），uniCloud本地调试服务不对当前客户端生效。\n- 如果不使用uniCloud本地调试服务，请直接忽略此信息。\n- 如需使用uniCloud本地调试服务，请将客户端与主机连接到同一局域网下并重新运行到客户端。") : o2 = "无法连接uniCloud本地调试服务，请检查当前客户端是否与主机在同一局域网下。\n- 如需使用uniCloud本地调试服务，请将客户端与主机连接到同一局域网下并重新运行到客户端。", o2 += "\n- 如果在HBuilderX开启的状态下切换过网络环境，请重启HBuilderX后再试\n- 检查系统防火墙是否拦截了HBuilderX自带的nodejs\n- 检查是否错误的使用拦截器修改uni.request方法的参数", 0 === P.indexOf("mp-") && (o2 += "\n- 小程序中如何使用uniCloud，请参考：https://uniapp.dcloud.net.cn/uniCloud/publish.html#useinmp"), !t2.debugInfo.forceRemote)
-    throw new Error(o2);
-  i2(o2);
-}
-function js(e2) {
-  e2._initPromiseHub || (e2._initPromiseHub = new v({ createPromise: function() {
-    let t2 = Promise.resolve();
-    var n2;
-    n2 = 1, t2 = new Promise((e3) => {
-      setTimeout(() => {
-        e3();
-      }, n2);
-    });
-    const s2 = e2.auth();
-    return t2.then(() => s2.getLoginState()).then((e3) => e3 ? Promise.resolve() : s2.signInAnonymously());
-  } }));
-}
-const $s = { tcb: St, tencent: St, aliyun: pe, private: kt, alipay: Lt };
-let Bs = new class {
-  init(e2) {
-    let t2 = {};
-    const n2 = $s[e2.provider];
-    if (!n2)
-      throw new Error("未提供正确的provider参数");
-    t2 = n2.init(e2), function(e3) {
-      const t3 = {};
-      e3.__dev__ = t3, t3.debugLog = "app" === P;
-      const n3 = T;
-      n3 && !n3.code && (t3.debugInfo = n3);
-      const s2 = new v({ createPromise: function() {
-        return Ks(e3);
-      } });
-      t3.initLocalNetwork = function() {
-        return s2.exec();
-      };
-    }(t2), js(t2), Kn(t2), function(e3) {
-      const t3 = e3.uploadFile;
-      e3.uploadFile = function(e4) {
-        return t3.call(this, e4);
-      };
-    }(t2), function(e3) {
-      e3.database = function(t3) {
-        if (t3 && Object.keys(t3).length > 0)
-          return e3.init(t3).database();
-        if (this._database)
-          return this._database;
-        const n3 = Qn(Xn, { uniClient: e3 });
-        return this._database = n3, n3;
-      }, e3.databaseForJQL = function(t3) {
-        if (t3 && Object.keys(t3).length > 0)
-          return e3.init(t3).databaseForJQL();
-        if (this._databaseForJQL)
-          return this._databaseForJQL;
-        const n3 = Qn(Xn, { uniClient: e3, isJQL: true });
-        return this._databaseForJQL = n3, n3;
-      };
-    }(t2), function(e3) {
-      e3.getCurrentUserInfo = Ts, e3.chooseAndUploadFile = xs.initChooseAndUploadFile(e3), Object.assign(e3, { get mixinDatacom() {
-        return Es(e3);
-      } }), e3.SSEChannel = qs, e3.initSecureNetworkByWeixin = Ds(e3), e3.importObject = Ls(e3);
-    }(t2);
-    return ["callFunction", "uploadFile", "deleteFile", "getTempFileURL", "downloadFile", "chooseAndUploadFile"].forEach((e3) => {
-      if (!t2[e3])
-        return;
-      const n3 = t2[e3];
-      t2[e3] = function() {
-        return n3.apply(t2, Array.from(arguments));
-      }, t2[e3] = function(e4, t3) {
-        return function(n4) {
-          let s2 = false;
-          if ("callFunction" === t3) {
-            const e5 = n4 && n4.type || c;
-            s2 = e5 !== c;
-          }
-          const r2 = "callFunction" === t3 && !s2, i2 = this._initPromiseHub.exec();
-          n4 = n4 || {};
-          const { success: o2, fail: a2, complete: u2 } = ee(n4), h2 = i2.then(() => s2 ? Promise.resolve() : M(q(t3, "invoke"), n4)).then(() => e4.call(this, n4)).then((e5) => s2 ? Promise.resolve(e5) : M(q(t3, "success"), e5).then(() => M(q(t3, "complete"), e5)).then(() => (r2 && Y(j, { type: H, content: e5 }), Promise.resolve(e5))), (e5) => s2 ? Promise.reject(e5) : M(q(t3, "fail"), e5).then(() => M(q(t3, "complete"), e5)).then(() => (Y(j, { type: H, content: e5 }), Promise.reject(e5))));
-          if (!(o2 || a2 || u2))
-            return h2;
-          h2.then((e5) => {
-            o2 && o2(e5), u2 && u2(e5), r2 && Y(j, { type: H, content: e5 });
-          }, (e5) => {
-            a2 && a2(e5), u2 && u2(e5), r2 && Y(j, { type: H, content: e5 });
-          });
-        };
-      }(t2[e3], e3).bind(t2);
-    }), t2.init = this.init, t2;
-  }
-}();
-(() => {
-  const e2 = C;
-  let t2 = {};
-  if (e2 && 1 === e2.length)
-    t2 = e2[0], Bs = Bs.init(t2), Bs._isDefault = true;
-  else {
-    const t3 = ["auth", "callFunction", "uploadFile", "deleteFile", "getTempFileURL", "downloadFile", "database", "getCurrentUSerInfo", "importObject"];
-    let n2;
-    n2 = e2 && e2.length > 0 ? "应用有多个服务空间，请通过uniCloud.init方法指定要使用的服务空间" : "应用未关联服务空间，请在uniCloud目录右键关联服务空间", t3.forEach((e3) => {
-      Bs[e3] = function() {
-        return console.error(n2), Promise.reject(new te({ code: "SYS_ERR", message: n2 }));
-      };
-    });
-  }
-  Object.assign(Bs, { get mixinDatacom() {
-    return Es(Bs);
-  } }), bs(Bs), Bs.addInterceptor = N, Bs.removeInterceptor = D, Bs.interceptObject = F;
-})();
-var Ws = Bs;
-const sys = index.getSystemInfoSync();
-const STAT_VERSION = "4.08";
-const STAT_URL = "https://tongji.dcloud.io/uni/stat";
-const STAT_H5_URL = "https://tongji.dcloud.io/uni/stat.gif";
-const PAGE_PVER_TIME = 1800;
-const APP_PVER_TIME = 300;
-const OPERATING_TIME = 10;
-const DIFF_TIME = 60 * 1e3 * 60 * 24;
-const appid = "__UNI__048050D";
-const dbSet = (name, value) => {
-  let data = index.getStorageSync("$$STAT__DBDATA:" + appid) || {};
-  if (!data) {
-    data = {};
-  }
-  data[name] = value;
-  index.setStorageSync("$$STAT__DBDATA:" + appid, data);
-};
-const dbGet = (name) => {
-  let data = index.getStorageSync("$$STAT__DBDATA:" + appid) || {};
-  if (!data[name]) {
-    let dbdata = index.getStorageSync("$$STAT__DBDATA:" + appid);
-    if (!dbdata) {
-      dbdata = {};
-    }
-    if (!dbdata[name]) {
-      return void 0;
-    }
-    data[name] = dbdata[name];
-  }
-  return data[name];
-};
-const dbRemove = (name) => {
-  let data = index.getStorageSync("$$STAT__DBDATA:" + appid) || {};
-  if (data[name]) {
-    delete data[name];
-    index.setStorageSync("$$STAT__DBDATA:" + appid, data);
-  } else {
-    data = index.getStorageSync("$$STAT__DBDATA:" + appid);
-    if (data[name]) {
-      delete data[name];
-      index.setStorageSync("$$STAT__DBDATA:" + appid, data);
-    }
-  }
-};
-const uniStatisticsConfig = { "version": "2", "enable": true };
-let statConfig = {
-  appid: "__UNI__048050D"
-};
-let titleJsons = {};
-titleJsons = { "pages/tabBar/index/index": "首页", "pages/tabBar/about/about": "关于SS", "pages/tabBar/my/my": "我的", "pages/tabBar/my/myHousing": "我的房源", "pages/tabBar/my/uploadHousing": "上传房源", "pages/public/search/search": "搜索房源", "pages/public/searchAddress/searchAddress": "选择房源地址", "pages/tabBar/my/housingList/housingList": "待审核房源", "pages/tabBar/my/myHome/myHome": "个人主页", "pages/tabBar/my/updateMyInfo/updateMyInfo": "编辑个人信息", "pages/houseDetail/houseDetail": "房源详情", "pages/rules/rules": "协议" };
-const UUID_KEY = "__DC_STAT_UUID";
-const UUID_VALUE = "__DC_UUID_VALUE";
-function getUuid() {
-  let uuid = "";
-  if (get_platform_name() === "n") {
-    try {
-      uuid = plus.runtime.getDCloudId();
-    } catch (e2) {
-      uuid = "";
-    }
-    return uuid;
-  }
-  try {
-    uuid = index.getStorageSync(UUID_KEY);
-  } catch (e2) {
-    uuid = UUID_VALUE;
-  }
-  if (!uuid) {
-    uuid = Date.now() + "" + Math.floor(Math.random() * 1e7);
-    try {
-      index.setStorageSync(UUID_KEY, uuid);
-    } catch (e2) {
-      index.setStorageSync(UUID_KEY, UUID_VALUE);
-    }
-  }
-  return uuid;
-}
-const get_uuid = (statData2) => {
-  return sys.deviceId || getUuid();
-};
-const get_odid = (statData2) => {
-  let odid = "";
-  if (get_platform_name() === "n") {
-    try {
-      odid = plus.device.uuid;
-    } catch (e2) {
-      odid = "";
-    }
-    return odid;
-  }
-  return sys.deviceId || getUuid();
-};
-const stat_config = statConfig;
-const get_sgin = (statData2) => {
-  let arr = Object.keys(statData2);
-  let sortArr = arr.sort();
-  let sgin = {};
-  let sginStr = "";
-  for (var i2 in sortArr) {
-    sgin[sortArr[i2]] = statData2[sortArr[i2]];
-    sginStr += sortArr[i2] + "=" + statData2[sortArr[i2]] + "&";
-  }
-  return {
-    sign: "",
-    options: sginStr.substr(0, sginStr.length - 1)
-  };
-};
-const get_encodeURIComponent_options = (statData2) => {
-  let data = {};
-  for (let prop in statData2) {
-    data[prop] = encodeURIComponent(statData2[prop]);
-  }
-  return data;
-};
-const get_platform_name = () => {
-  const aliArr = ["y", "a", "p", "mp-ali"];
-  const platformList = {
-    app: "n",
-    "app-plus": "n",
-    h5: "h5",
-    "mp-weixin": "wx",
-    [aliArr.reverse().join("")]: "ali",
-    "mp-baidu": "bd",
-    "mp-toutiao": "tt",
-    "mp-qq": "qq",
-    "quickapp-native": "qn",
-    "mp-kuaishou": "ks",
-    "mp-lark": "lark",
-    "quickapp-webview": "qw"
-  };
-  if (platformList["mp-weixin"] === "ali") {
-    if (my && my.env) {
-      const clientName = my.env.clientName;
-      if (clientName === "ap")
-        return "ali";
-      if (clientName === "dingtalk")
-        return "dt";
-    }
-  }
-  return platformList["mp-weixin"];
-};
-const get_pack_name = () => {
-  let packName = "";
-  if (get_platform_name() === "wx" || get_platform_name() === "qq") {
-    if (index.canIUse("getAccountInfoSync")) {
-      packName = index.getAccountInfoSync().miniProgram.appId || "";
-    }
-  }
-  if (get_platform_name() === "n")
-    ;
-  return packName;
-};
-const get_version = () => {
-  return get_platform_name() === "n" ? plus.runtime.version : "";
-};
-const get_channel = () => {
-  const platformName = get_platform_name();
-  let channel = "";
-  if (platformName === "n") {
-    channel = plus.runtime.channel;
-  }
-  return channel;
-};
-const get_scene = (options) => {
-  const platformName = get_platform_name();
-  let scene = "";
-  if (options) {
-    return options;
-  }
-  if (platformName === "wx") {
-    scene = index.getLaunchOptionsSync().scene;
-  }
-  return scene;
-};
-const get_route$1 = (pageVm) => {
-  let _self = pageVm || get_page_vm();
-  if (get_platform_name() === "bd") {
-    let mp_route = _self.$mp && _self.$mp.page && _self.$mp.page.is;
-    let scope_route = _self.$scope && _self.$scope.is;
-    return mp_route || scope_route || "";
-  } else {
-    return _self.route || _self.$scope && _self.$scope.route || _self.$mp && _self.$mp.page.route;
-  }
-};
-const get_page_route = (pageVm) => {
-  let page = pageVm && (pageVm.$page || pageVm.$scope && pageVm.$scope.$page);
-  let lastPageRoute = index.getStorageSync("_STAT_LAST_PAGE_ROUTE");
-  if (!page)
-    return lastPageRoute || "";
-  return page.fullPath === "/" ? page.route : page.fullPath || page.route;
-};
-const get_page_vm = () => {
-  let pages2 = getCurrentPages();
-  let $page = pages2[pages2.length - 1];
-  if (!$page)
-    return null;
-  return $page.$vm;
-};
-const get_page_types = (self) => {
-  if (self.mpType === "page" || self.$mpType === "page" || self.$mp && self.$mp.mpType === "page" || self.$options.mpType === "page") {
-    return "page";
-  }
-  if (self.mpType === "app" || self.$mpType === "app" || self.$mp && self.$mp.mpType === "app" || self.$options.mpType === "app") {
-    return "app";
-  }
-  return null;
-};
-const handle_data = (statData2) => {
-  let firstArr = [];
-  let contentArr = [];
-  let lastArr = [];
-  for (let i2 in statData2) {
-    const rd = statData2[i2];
-    rd.forEach((elm) => {
-      let newData = "";
-      {
-        newData = elm;
-      }
-      if (i2 === 0) {
-        firstArr.push(newData);
-      } else if (i2 === 3) {
-        lastArr.push(newData);
-      } else {
-        contentArr.push(newData);
-      }
-    });
-  }
-  firstArr.push(...contentArr, ...lastArr);
-  return JSON.stringify(firstArr);
-};
-const calibration = (eventName, options) => {
-  if (!eventName) {
-    console.error(`uni.report Missing [eventName] parameter`);
-    return true;
-  }
-  if (typeof eventName !== "string") {
-    console.error(
-      `uni.report [eventName] Parameter type error, it can only be of type String`
-    );
-    return true;
-  }
-  if (eventName.length > 255) {
-    console.error(
-      `uni.report [eventName] Parameter length cannot be greater than 255`
-    );
-    return true;
-  }
-  if (typeof options !== "string" && typeof options !== "object") {
-    console.error(
-      "uni.report [options] Parameter type error, Only supports String or Object type"
-    );
-    return true;
-  }
-  if (typeof options === "string" && options.length > 255) {
-    console.error(
-      `uni.report [options] Parameter length cannot be greater than 255`
-    );
-    return true;
-  }
-  if (eventName === "title" && typeof options !== "string") {
-    console.error(
-      `uni.report [eventName] When the parameter is title, the [options] parameter can only be of type String`
-    );
-    return true;
-  }
-};
-const get_page_name = (routepath) => {
-  return titleJsons && titleJsons[routepath] || "";
-};
-const Report_Data_Time = "Report_Data_Time";
-const Report_Status = "Report_Status";
-const is_report_data = () => {
-  return new Promise((resolve2, reject) => {
-    let start_time = "";
-    let end_time = (/* @__PURE__ */ new Date()).getTime();
-    let diff_time = DIFF_TIME;
-    let report_status = 1;
-    try {
-      start_time = index.getStorageSync(Report_Data_Time);
-      report_status = index.getStorageSync(Report_Status);
-    } catch (e2) {
-      start_time = "";
-      report_status = 1;
-    }
-    if (report_status === "") {
-      requestData(({ enable }) => {
-        index.setStorageSync(Report_Data_Time, end_time);
-        index.setStorageSync(Report_Status, enable);
-        if (enable === 1) {
-          resolve2();
-        }
-      });
-      return;
-    }
-    if (report_status === 1) {
-      resolve2();
-    }
-    if (!start_time) {
-      index.setStorageSync(Report_Data_Time, end_time);
-      start_time = end_time;
-    }
-    if (end_time - start_time > diff_time) {
-      requestData(({ enable }) => {
-        index.setStorageSync(Report_Data_Time, end_time);
-        index.setStorageSync(Report_Status, enable);
-      });
-    }
-  });
-};
-const requestData = (done) => {
-  const appid2 = "__UNI__048050D";
-  let formData = {
-    usv: STAT_VERSION,
-    conf: JSON.stringify({
-      ak: appid2
-    })
-  };
-  index.request({
-    url: STAT_URL,
-    method: "GET",
-    data: formData,
-    success: (res) => {
-      const { data } = res;
-      if (data.ret === 0) {
-        typeof done === "function" && done({
-          enable: data.enable
-        });
-      }
-    },
-    fail: (e2) => {
-      let report_status_code = 1;
-      try {
-        report_status_code = index.getStorageSync(Report_Status);
-      } catch (e3) {
-        report_status_code = 1;
-      }
-      if (report_status_code === "") {
-        report_status_code = 1;
-      }
-      typeof done === "function" && done({
-        enable: report_status_code
-      });
-    }
-  });
-};
-const uni_cloud_config = () => {
-  return {};
-};
-const get_space = (config) => {
-  const uniCloudConfig = uni_cloud_config();
-  const { spaceId, provider, clientSecret, secretKey, secretId } = uniCloudConfig;
-  const space_type = ["tcb", "tencent", "aliyun", "alipay"];
-  const is_provider = space_type.indexOf(provider) !== -1;
-  const is_aliyun = provider === "aliyun" && spaceId && clientSecret;
-  const is_tcb = (provider === "tcb" || provider === "tencent") && spaceId;
-  const is_alipay = provider === "alipay" && spaceId && secretKey && secretId;
-  if (is_provider && (is_aliyun || is_tcb || is_alipay)) {
-    return uniCloudConfig;
-  } else {
-    if (config && config.spaceId) {
-      return config;
-    }
-  }
-  return null;
-};
-const get_report_Interval = (defaultTime) => {
-  let time = uniStatisticsConfig.reportInterval;
-  if (Number(time) === 0)
-    return 0;
-  time = time || defaultTime;
-  let reg = /(^[1-9]\d*$)/;
-  if (!reg.test(time))
-    return defaultTime;
-  return Number(time);
-};
-const is_push_clientid = () => {
-  if (uniStatisticsConfig.collectItems) {
-    const ClientID = uniStatisticsConfig.collectItems.uniPushClientID;
-    return typeof ClientID === "boolean" ? ClientID : false;
-  }
-  return false;
-};
-const is_page_report = () => {
-  if (uniStatisticsConfig.collectItems) {
-    const statPageLog = uniStatisticsConfig.collectItems.uniStatPageLog;
-    if (statPageLog === void 0)
-      return true;
-    return typeof statPageLog === "boolean" ? statPageLog : true;
-  }
-  return true;
-};
-const IS_HANDLE_DEVECE_ID = "is_handle_device_id";
-const is_handle_device = () => {
-  let isHandleDevice = dbGet(IS_HANDLE_DEVECE_ID) || "";
-  dbSet(IS_HANDLE_DEVECE_ID, "1");
-  return isHandleDevice === "1";
-};
-const FIRST_VISIT_TIME_KEY = "__first__visit__time";
-const LAST_VISIT_TIME_KEY = "__last__visit__time";
-const get_time = () => {
-  return parseInt((/* @__PURE__ */ new Date()).getTime() / 1e3);
-};
-const get_first_visit_time = () => {
-  const timeStorge = dbGet(FIRST_VISIT_TIME_KEY);
-  let time = 0;
-  if (timeStorge) {
-    time = timeStorge;
-  } else {
-    time = get_time();
-    dbSet(FIRST_VISIT_TIME_KEY, time);
-    dbRemove(LAST_VISIT_TIME_KEY);
-  }
-  return time;
-};
-const get_last_visit_time = () => {
-  const timeStorge = dbGet(LAST_VISIT_TIME_KEY);
-  let time = 0;
-  if (timeStorge) {
-    time = timeStorge;
-  }
-  dbSet(LAST_VISIT_TIME_KEY, get_time());
-  return time;
-};
-const PAGE_RESIDENCE_TIME = "__page__residence__time";
-let First_Page_Residence_Time = 0;
-let Last_Page_Residence_Time = 0;
-const set_page_residence_time = () => {
-  First_Page_Residence_Time = get_time();
-  dbSet(PAGE_RESIDENCE_TIME, First_Page_Residence_Time);
-  return First_Page_Residence_Time;
-};
-const get_page_residence_time = () => {
-  Last_Page_Residence_Time = get_time();
-  First_Page_Residence_Time = dbGet(PAGE_RESIDENCE_TIME);
-  return Last_Page_Residence_Time - First_Page_Residence_Time;
-};
-const TOTAL_VISIT_COUNT = "__total__visit__count";
-const get_total_visit_count = () => {
-  const timeStorge = dbGet(TOTAL_VISIT_COUNT);
-  let count = 1;
-  if (timeStorge) {
-    count = timeStorge;
-    count++;
-  }
-  dbSet(TOTAL_VISIT_COUNT, count);
-  return count;
-};
-const FIRST_TIME = "__first_time";
-const set_first_time = () => {
-  let time = get_time();
-  const timeStorge = dbSet(FIRST_TIME, time);
-  return timeStorge;
-};
-const get_residence_time = (type) => {
-  let residenceTime = 0;
-  const first_time = dbGet(FIRST_TIME);
-  const last_time = get_time();
-  if (first_time !== 0) {
-    residenceTime = last_time - first_time;
-  }
-  residenceTime = residenceTime < 1 ? 1 : residenceTime;
-  if (type === "app") {
-    let overtime = residenceTime > APP_PVER_TIME ? true : false;
-    return {
-      residenceTime,
-      overtime
-    };
-  }
-  if (type === "page") {
-    let overtime = residenceTime > PAGE_PVER_TIME ? true : false;
-    return {
-      residenceTime,
-      overtime
-    };
-  }
-  return {
-    residenceTime
-  };
-};
-const eport_Interval = get_report_Interval(OPERATING_TIME);
-let statData = {
-  uuid: get_uuid(),
-  // 设备标识
-  ak: stat_config.appid,
-  // uni-app 应用 Appid
-  p: sys.platform === "android" ? "a" : "i",
-  // 手机系统
-  ut: get_platform_name(),
-  // 平台类型
-  mpn: get_pack_name(),
-  // 原生平台包名、小程序 appid
-  usv: STAT_VERSION,
-  // 统计 sdk 版本
-  v: get_version(),
-  // 应用版本，仅app
-  ch: get_channel(),
-  // 渠道信息
-  cn: "",
-  // 国家
-  pn: "",
-  // 省份
-  ct: "",
-  // 城市
-  t: get_time(),
-  // 上报数据时的时间戳
-  tt: "",
-  brand: sys.brand || "",
-  // 手机品牌
-  md: sys.model,
-  // 手机型号
-  sv: sys.system.replace(/(Android|iOS)\s/, ""),
-  // 手机系统版本
-  mpsdk: sys.SDKVersion || "",
-  // x程序 sdk version
-  mpv: sys.version || "",
-  // 小程序平台版本 ，如微信、支付宝
-  lang: sys.language,
-  // 语言
-  pr: sys.pixelRatio,
-  // pixelRatio 设备像素比
-  ww: sys.windowWidth,
-  // windowWidth 可使用窗口宽度
-  wh: sys.windowHeight,
-  // windowHeight 可使用窗口高度
-  sw: sys.screenWidth,
-  // screenWidth 屏幕宽度
-  sh: sys.screenHeight
-  // screenHeight 屏幕高度
-};
-class Report {
-  constructor() {
-    this.self = "";
-    this.__licationShow = false;
-    this.__licationHide = false;
-    this.statData = statData;
-    this._navigationBarTitle = {
-      config: "",
-      page: "",
-      report: "",
-      lt: ""
-    };
-    this._query = {};
-    let registerInterceptor = typeof index.addInterceptor === "function";
-    if (registerInterceptor) {
-      this.addInterceptorInit();
-      this.interceptLogin();
-      this.interceptShare(true);
-      this.interceptRequestPayment();
-    }
-  }
-  addInterceptorInit() {
-    let self = this;
-    index.addInterceptor("setNavigationBarTitle", {
-      invoke(args) {
-        self._navigationBarTitle.page = args.title;
-      }
-    });
-  }
-  interceptLogin() {
-    let self = this;
-    index.addInterceptor("login", {
-      complete() {
-        self._login();
-      }
-    });
-  }
-  interceptShare(type) {
-    let self = this;
-    if (!type) {
-      self._share();
-      return;
-    }
-    index.addInterceptor("share", {
-      success() {
-        self._share();
-      },
-      fail() {
-        self._share();
-      }
-    });
-  }
-  interceptRequestPayment() {
-    let self = this;
-    index.addInterceptor("requestPayment", {
-      success() {
-        self._payment("pay_success");
-      },
-      fail() {
-        self._payment("pay_fail");
-      }
-    });
-  }
-  _login() {
-    this.sendEventRequest(
-      {
-        key: "login"
-      },
-      0
-    );
-  }
-  _share() {
-    this.sendEventRequest(
-      {
-        key: "share"
-      },
-      0
-    );
-  }
-  _payment(key) {
-    this.sendEventRequest(
-      {
-        key
-      },
-      0
-    );
-  }
-  /**
-   * 进入应用触发
-   */
-  applicationShow() {
-    if (this.__licationHide) {
-      const time = get_residence_time("app");
-      if (time.overtime) {
-        let lastPageRoute = index.getStorageSync("_STAT_LAST_PAGE_ROUTE");
-        let options = {
-          path: lastPageRoute,
-          scene: this.statData.sc,
-          cst: 2
-        };
-        this.sendReportRequest(options);
-      }
-      this.__licationHide = false;
-    }
-  }
-  /**
-   * 离开应用触发
-   * @param {Object} self
-   * @param {Object} type
-   */
-  applicationHide(self, type) {
-    if (!self) {
-      self = get_page_vm();
-    }
-    this.__licationHide = true;
-    const time = get_residence_time();
-    const route = get_page_route(self);
-    index.setStorageSync("_STAT_LAST_PAGE_ROUTE", route);
-    this.sendHideRequest(
-      {
-        urlref: route,
-        urlref_ts: time.residenceTime
-      },
-      type
-    );
-    set_first_time();
-  }
-  /**
-   * 进入页面触发
-   */
-  pageShow(self) {
-    this._navigationBarTitle = {
-      config: "",
-      page: "",
-      report: "",
-      lt: ""
-    };
-    const route = get_page_route(self);
-    const routepath = get_route$1(self);
-    this._navigationBarTitle.config = get_page_name(routepath);
-    if (this.__licationShow) {
-      set_first_time();
-      index.setStorageSync("_STAT_LAST_PAGE_ROUTE", route);
-      this.__licationShow = false;
-      return;
-    }
-    const time = get_residence_time("page");
-    if (time.overtime) {
-      let options = {
-        path: route,
-        scene: this.statData.sc,
-        cst: 3
-      };
-      this.sendReportRequest(options);
-    }
-    set_first_time();
-  }
-  /**
-   * 离开页面触发
-   */
-  pageHide(self) {
-    if (!this.__licationHide) {
-      const time = get_residence_time("page");
-      let route = get_page_route(self);
-      let lastPageRoute = index.getStorageSync("_STAT_LAST_PAGE_ROUTE");
-      if (!lastPageRoute) {
-        lastPageRoute = route;
-      }
-      index.setStorageSync("_STAT_LAST_PAGE_ROUTE", route);
-      this.sendPageRequest({
-        url: route,
-        urlref: lastPageRoute,
-        urlref_ts: time.residenceTime
-      });
-      return;
-    }
-  }
-  /**
-   * 发送请求,应用维度上报
-   * @param {Object} options 页面信息
-   * @param {Boolean} type 是否立即上报
-   */
-  sendReportRequest(options, type) {
-    this._navigationBarTitle.lt = "1";
-    this._navigationBarTitle.config = get_page_name(options.path);
-    let is_opt = options.query && JSON.stringify(options.query) !== "{}";
-    let query = is_opt ? "?" + JSON.stringify(options.query) : "";
-    const last_time = get_last_visit_time();
-    if (last_time !== 0 || !last_time) {
-      const odid = get_odid();
-      {
-        const have_device = is_handle_device();
-        if (!have_device) {
-          this.statData.odid = odid;
-        }
-      }
-    }
-    Object.assign(this.statData, {
-      lt: "1",
-      url: options.path + query || "",
-      t: get_time(),
-      sc: get_scene(options.scene),
-      fvts: get_first_visit_time(),
-      lvts: last_time,
-      tvc: get_total_visit_count(),
-      // create session type  上报类型 ，1 应用进入 2.后台30min进入 3.页面30min进入
-      cst: options.cst || 1
-    });
-    if (get_platform_name() === "n") {
-      this.getProperty(type);
-    } else {
-      this.getNetworkInfo(type);
-    }
-  }
-  /**
-   * 发送请求,页面维度上报
-   * @param {Object} opt
-   */
-  sendPageRequest(opt) {
-    let { url, urlref, urlref_ts } = opt;
-    this._navigationBarTitle.lt = "11";
-    let options = {
-      ak: this.statData.ak,
-      uuid: this.statData.uuid,
-      p: this.statData.p,
-      lt: "11",
-      ut: this.statData.ut,
-      url,
-      tt: this.statData.tt,
-      urlref,
-      urlref_ts,
-      ch: this.statData.ch,
-      usv: this.statData.usv,
-      t: get_time()
-    };
-    this.request(options);
-  }
-  /**
-   * 进入后台上报数据
-   * @param {Object} opt
-   * @param {Object} type
-   */
-  sendHideRequest(opt, type) {
-    let { urlref, urlref_ts } = opt;
-    let options = {
-      ak: this.statData.ak,
-      uuid: this.statData.uuid,
-      p: this.statData.p,
-      lt: "3",
-      ut: this.statData.ut,
-      urlref,
-      urlref_ts,
-      ch: this.statData.ch,
-      usv: this.statData.usv,
-      t: get_time()
-    };
-    this.request(options, type);
-  }
-  /**
-   * 自定义事件上报
-   */
-  sendEventRequest({ key = "", value = "" } = {}) {
-    let routepath = "";
-    try {
-      routepath = get_route$1();
-    } catch (error) {
-      const launch_options = dbGet("__launch_options");
-      routepath = launch_options.path;
-    }
-    this._navigationBarTitle.config = get_page_name(routepath);
-    this._navigationBarTitle.lt = "21";
-    let options = {
-      ak: this.statData.ak,
-      uuid: this.statData.uuid,
-      p: this.statData.p,
-      lt: "21",
-      ut: this.statData.ut,
-      url: routepath,
-      ch: this.statData.ch,
-      e_n: key,
-      e_v: typeof value === "object" ? JSON.stringify(value) : value.toString(),
-      usv: this.statData.usv,
-      t: get_time()
-    };
-    this.request(options);
-  }
-  sendPushRequest(options, cid2) {
-    let time = get_time();
-    const statData2 = {
-      lt: "101",
-      cid: cid2,
-      t: time,
-      ut: this.statData.ut
-    };
-    const stat_data = handle_data({
-      101: [statData2]
-    });
-    let optionsData = {
-      usv: STAT_VERSION,
-      //统计 SDK 版本号
-      t: time,
-      //发送请求时的时间戮
-      requests: stat_data
-    };
-    if (get_platform_name() === "n" && this.statData.p === "a") {
-      setTimeout(() => {
-        this.sendRequest(optionsData);
-      }, 200);
-      return;
-    }
-    this.sendRequest(optionsData);
-  }
-  /**
-   * 获取wgt资源版本
-   */
-  getProperty(type) {
-    plus.runtime.getProperty(plus.runtime.appid, (wgtinfo) => {
-      this.statData.v = wgtinfo.version || "";
-      this.getNetworkInfo(type);
-    });
-  }
-  /**
-   * 获取网络信息
-   */
-  getNetworkInfo(type) {
-    index.getNetworkType({
-      success: (result) => {
-        this.statData.net = result.networkType;
-        this.getLocation(type);
-      }
-    });
-  }
-  /**
-   * 获取位置信息
-   */
-  getLocation(type) {
-    if (stat_config.getLocation) {
-      index.getLocation({
-        type: "wgs84",
-        geocode: true,
-        success: (result) => {
-          if (result.address) {
-            this.statData.cn = result.address.country;
-            this.statData.pn = result.address.province;
-            this.statData.ct = result.address.city;
-          }
-          this.statData.lat = result.latitude;
-          this.statData.lng = result.longitude;
-          this.request(this.statData, type);
-        }
-      });
-    } else {
-      this.statData.lat = 0;
-      this.statData.lng = 0;
-      this.request(this.statData, type);
-    }
-  }
-  /**
-   * 发送请求
-   * @param {Object} data 上报数据
-   * @param {Object} type 类型
-   */
-  request(data, type) {
-    let time = get_time();
-    const title = this._navigationBarTitle;
-    Object.assign(data, {
-      ttn: title.page,
-      ttpj: title.config,
-      ttc: title.report
-    });
-    let uniStatData = dbGet("__UNI__STAT__DATA") || {};
-    if (!uniStatData[data.lt]) {
-      uniStatData[data.lt] = [];
-    }
-    uniStatData[data.lt].push(data);
-    dbSet("__UNI__STAT__DATA", uniStatData);
-    let page_residence_time = get_page_residence_time();
-    if (page_residence_time < eport_Interval && !type)
-      return;
-    set_page_residence_time();
-    const stat_data = handle_data(uniStatData);
-    let optionsData = {
-      usv: STAT_VERSION,
-      //统计 SDK 版本号
-      t: time,
-      //发送请求时的时间戮
-      requests: stat_data
-    };
-    dbRemove("__UNI__STAT__DATA");
-    if (get_platform_name() === "n" && this.statData.p === "a") {
-      setTimeout(() => {
-        this.sendRequest(optionsData);
-      }, 200);
-      return;
-    }
-    this.sendRequest(optionsData);
-  }
-  getIsReportData() {
-    return is_report_data();
-  }
-  /**
-   * 数据上报
-   * @param {Object} optionsData 需要上报的数据
-   */
-  sendRequest(optionsData) {
-    {
-      if (!index.__stat_uniCloud_space) {
-        console.error(
-          "应用未关联服务空间，统计上报失败，请在uniCloud目录右键关联服务空间."
-        );
-        return;
-      }
-      const uniCloudObj = index.__stat_uniCloud_space.importObject(
-        "uni-stat-receiver",
-        {
-          customUI: true
-        }
-      );
-      uniCloudObj.report(optionsData).then(() => {
-      }).catch((err) => {
-      });
-    }
-  }
-  /**
-   * h5 请求
-   */
-  imageRequest(data) {
-    this.getIsReportData().then(() => {
-      let image = new Image();
-      let options = get_sgin(get_encodeURIComponent_options(data)).options;
-      image.src = STAT_H5_URL + "?" + options;
-    });
-  }
-  sendEvent(key, value) {
-    if (calibration(key, value))
-      return;
-    if (key === "title") {
-      this._navigationBarTitle.report = value;
-      return;
-    }
-    this.sendEventRequest(
-      {
-        key,
-        value: typeof value === "object" ? JSON.stringify(value) : value
-      },
-      1
-    );
-  }
-}
-class Stat extends Report {
-  static getInstance() {
-    if (!index.__stat_instance) {
-      index.__stat_instance = new Stat();
-    }
-    {
-      let space = get_space(Ws.config);
-      if (!index.__stat_uniCloud_space) {
-        if (space && Object.keys(space).length !== 0) {
-          let spaceData = {
-            provider: space.provider,
-            spaceId: space.spaceId,
-            clientSecret: space.clientSecret
-          };
-          if (space.endpoint) {
-            spaceData.endpoint = space.endpoint;
-          }
-          if (space.provider === "alipay") {
-            spaceData.secretKey = space.secretKey;
-            spaceData.accessKey = space.accessKey || space.secretId;
-            spaceData.spaceAppId = space.spaceAppId || space.appId;
-          }
-          index.__stat_uniCloud_space = Ws.init(spaceData);
-        } else {
-          console.error("应用未关联服务空间，请在uniCloud目录右键关联服务空间");
-        }
-      }
-    }
-    return index.__stat_instance;
-  }
-  constructor() {
-    super();
-  }
-  /**
-   * 获取推送id
-   */
-  pushEvent(options) {
-    const ClientID = is_push_clientid();
-    if (index.getPushClientId && ClientID) {
-      index.getPushClientId({
-        success: (res) => {
-          const cid2 = res.cid || false;
-          if (cid2) {
-            this.sendPushRequest(options, cid2);
-          }
-        }
-      });
-    }
-  }
-  /**
-   * 进入应用
-   * @param {Object} options 页面参数
-   * @param {Object} self	当前页面实例
-   */
-  launch(options, self) {
-    set_page_residence_time();
-    this.__licationShow = true;
-    dbSet("__launch_options", options);
-    options.cst = 1;
-    this.sendReportRequest(options, true);
-  }
-  load(options, self) {
-    this.self = self;
-    this._query = options;
-  }
-  appHide(self) {
-    this.applicationHide(self, true);
-  }
-  appShow(self) {
-    this.applicationShow(self);
-  }
-  show(self) {
-    this.self = self;
-    if (get_page_types(self) === "page") {
-      const isPageReport = is_page_report();
-      if (isPageReport) {
-        this.pageShow(self);
-      }
-    }
-    if (get_platform_name() === "h5" || get_platform_name() === "n") {
-      if (get_page_types(self) === "app") {
-        this.appShow();
-      }
-    }
-  }
-  hide(self) {
-    this.self = self;
-    if (get_page_types(self) === "page") {
-      const isPageReport = is_page_report();
-      if (isPageReport) {
-        this.pageHide(self);
-      }
-    }
-    if (get_platform_name() === "h5" || get_platform_name() === "n") {
-      if (get_page_types(self) === "app") {
-        this.appHide();
-      }
-    }
-  }
-  error(em) {
-    let emVal = "";
-    if (!em.message) {
-      emVal = JSON.stringify(em);
-    } else {
-      emVal = em.stack;
-    }
-    let route = "";
-    try {
-      route = get_route();
-    } catch (e2) {
-      route = "";
-    }
-    let options = {
-      ak: this.statData.ak,
-      uuid: this.statData.uuid,
-      p: this.statData.p,
-      lt: "31",
-      url: route,
-      ut: this.statData.ut,
-      ch: this.statData.ch,
-      mpsdk: this.statData.mpsdk,
-      mpv: this.statData.mpv,
-      v: this.statData.v,
-      em: emVal,
-      usv: this.statData.usv,
-      t: parseInt((/* @__PURE__ */ new Date()).getTime() / 1e3)
-    };
-    this.request(options);
-  }
-}
-var Stat$1 = Stat;
-Stat$1.getInstance();
-function main() {
-  {
-    {
-      index.report = function(type, options) {
-      };
-    }
-  }
-}
-main();
-=======
->>>>>>> c1596c72d753386a492b4d6e3b3fb4808dd9867a
 const createHook = (lifecycle) => (hook, target = getCurrentInstance()) => {
   !isInSSRComponentSetup && injectHook(lifecycle, hook, target);
 };
 const onLoad = /* @__PURE__ */ createHook(ON_LOAD);
+const onReachBottom = /* @__PURE__ */ createHook(ON_REACH_BOTTOM);
+const onPullDownRefresh = /* @__PURE__ */ createHook(ON_PULL_DOWN_REFRESH);
+const onShareAppMessage = /* @__PURE__ */ createHook(ON_SHARE_APP_MESSAGE);
 exports._export_sfc = _export_sfc;
 exports.createSSRApp = createSSRApp;
 exports.createStore = createStore;
 exports.e = e;
 exports.f = f;
 exports.index = index;
+exports.initVueI18n = initVueI18n;
 exports.mapMutations = mapMutations;
 exports.n = n;
 exports.o = o;
 exports.onLoad = onLoad;
+exports.onPullDownRefresh = onPullDownRefresh;
+exports.onReachBottom = onReachBottom;
+exports.onShareAppMessage = onShareAppMessage;
 exports.p = p;
 exports.reactive = reactive;
 exports.ref = ref;

@@ -40,10 +40,10 @@ export function wxGetPhoneLogin(code) {
 
 
 /**
- * 登录
+ * 微信授权登录
  */
-export function appMessageLogin(param) {
-	return post('user/appMessageLogin', param)
+export function userAuthor(param) {
+	return post('userAuthor', param)
 }
 
 

@@ -12,7 +12,9 @@
 			"path" : "pages/tabBar/index/index",
 			"style" : 
 			{
-				"navigationBarTitleText" : "首页"
+				"navigationBarTitleText" : "首页",
+				"enablePullDownRefresh": true,
+				"onReachBottomDistance": 100
 			}
 		},
 		{
