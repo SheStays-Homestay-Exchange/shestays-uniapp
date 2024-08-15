@@ -2,10 +2,10 @@
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
 const common_api_common = require("../../common/api/common.js");
+const common_js_cache = require("../../common/js/cache.js");
+const store_index = require("../../store/index.js");
 require("../../common/js/request.js");
 require("../../common/config/index.js");
-require("../../common/js/cache.js");
-require("../../store/index.js");
 require("../../common/js/util.js");
 const _sfc_main = {
   __name: "login",
@@ -17,26 +17,8 @@ const _sfc_main = {
       });
     };
     const wxLogin = () => {
-      common_vendor.index.getUserProfile({
-        desc: "个人中心展示昵称、头像",
-        success: function(infoRes) {
-          console.log("用户信息返回：", infoRes);
-        }
-      });
-      common_vendor.index.login({
-        "provider": "weixin",
-        "onlyAuthorize": true,
-        // 微信登录仅请求授权认证
-        success(event) {
-          console.log("登录成功", event);
-          common_vendor.index.showToast({
-            title: "获取code成功",
-            icon: "none"
-          });
-        },
-        fail(err) {
-          console.log("登录失败", err);
-        }
+      common_vendor.index.switchTab({
+        url: "/pages/tabBar/index/index"
       });
     };
     const getphonenumber = (e) => {
@@ -60,12 +42,22 @@ const _sfc_main = {
         iv: param.iv,
         code: loginCode
       }).then((res) => {
+        if (res.code == 200) {
+          common_js_cache.cache.put("token", res.data);
+          common_vendor.index.switchTab({
+            url: "/pages/tabBar/index/index"
+          });
+        }
       }).catch((err) => {
         console.log("登录失败");
+        common_vendor.index.showToast({
+          title: err.msg,
+          icon: "none"
+        });
       });
     };
     common_vendor.onLoad(() => {
-      console.log("进入登录页。。");
+      console.log("===", store_index.store);
     });
     return (_ctx, _cache) => {
       return {

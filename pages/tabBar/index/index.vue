@@ -10,49 +10,33 @@
 			<text class="search-text">搜索目的地</text>
 		</view>
 		<!-- 房源 -->
-		<view class="" v-if="listData.length>0">
-			<!-- 无图片房源来源于小红书 -->
-			<!-- <view class="book-card">
+		<view class="">
+			<!-- 无图片房源来源于小红书,有图片是小程序自己上传的房源 -->
+			<view :class="['new-house',(item.houseImgs?.length > 0)?'':'hava-border']" @click="goPage('/pages/houseDetail/houseDetail')" 
+				v-for="(item,i) in listData" :key="i">
+				<swiper class="swiper" circular :indicator-dots="true" :autoplay="false" indicator-active-color="#D8336D" v-if="item?.houseImgs?.length > 0">
+					<swiper-item v-for="(el,index) in item.houseImgs">
+						<image src="../../../static/image/Frame 48096034.png" class="house-image" mode=""></image>
+					</swiper-item>
+				</swiper>
 				<view class="time-body">
-					<text class="address">德国 - 柏林</text>
-					<text class="time">开发时间：6月24日</text>
+					<text class="address">{{item.countryName}} - {{item.regionName}}</text>
+					<text class="time">开放时间：{{item.startTime || '-'}}</text>
 				</view>
-				<view class="content-body">
-					<view class="left">
-						<view class="remark wrap1">
-							备注：1.爱干净，维护卫生，共用厨房设施。 2.想和欧洲的姐妹换宿 3.提供沙发床 希望能找到爱旅游和摄影的小伙 伴，我们可以一起出去旅拍，探索城市～
-						</view>
-						<view class="fold">
-							<image class="flod-icon" src="../../../static/image/chevron-home-right.png" mode=""></image>
-							<text>展开全部</text>
-						</view>
-					</view>
-					<view class="contact-button">
-						联系房东
-					</view>
-				</view>
-			</view> -->
-			<!-- 来源于我们小程序 -->
-			<view class="new-house" @click="goPage('/pages/houseDetail/houseDetail')"  v-for="(item,i) in 3" :key="i">
-				<image src="../../../static/image/Frame 48096034.png" class="house-image" mode=""></image>
-				<view class="time-body">
-					<text class="address">美国 - 洛杉矶</text>
-					<text class="time">开放时间：6月10日</text>
-				</view>
-				<view class="contact">
+				<view class="contact" v-if="item?.houseImgs?.length > 0">
 					房东：Lily11
 				</view>
 				<view class="content-body">
 					<view class="left">
-						<view class="remark wrap1">
-							备注：1.爱干净，维护卫生，共用厨房设施。 2.想和欧洲的姐妹换宿 3.提供沙发床 希望能找到爱旅游和摄影的小伙 伴，我们可以一起出去旅拍，探索城市～
+						<view class="remark wrap2">
+							备注：{{item.describle}}备注发的发发的发备注发的发发的发备注发的发发的发备注发的发发的发备注发的发发的发备注发的发发的发备注发的发发的发备注发的发发的发
 						</view>
-						<view class="fold">
+						<!-- <view class="fold">
 							<image class="flod-icon" src="../../../static/image/chevron-home-right.png" mode=""></image>
 							<text>展开全部</text>
-						</view>
+						</view> -->
 					</view>
-					<view class="contact-button">
+					<view class="contact-button" @tap.stop="contactHost(item)">
 						联系房东
 					</view>
 				</view>
@@ -60,9 +44,10 @@
 		</view>
 		
 		<!-- 加载更多 -->
-		<uni-load-more :status="loadStatus" v-if="listData.length > 0"></uni-load-more>
+		<uni-load-more :status="loadStatus" :contentText="contentText" v-if="listData.length > 0"></uni-load-more>
 		
-		
+		<!-- 联系弹窗 -->
+		<DetailPopup :show="popShow" @tapClose="popShow=false"/>
 	</view>
 </template>
 
@@ -70,12 +55,11 @@
 	import { reactive, ref, onMounted  } from 'vue'
 	import { onLoad, onReachBottom, onPullDownRefresh , onShareAppMessage } from '@dcloudio/uni-app'
 	import { getHouseList } from '@/common/api/common'
+	import  DetailPopup from '@/components/DetailPopup.vue'
 	
-	
-	const msg = ref('首页')
+
 	onLoad(()=>{
 		getHouseListFun()
-		console.log('进入首页11111')
 	})
 	
 	onShareAppMessage(() => {
@@ -97,6 +81,12 @@
 		getHouseListFun('refresh')
 	})
 	
+	const contentText = {
+			contentdown: '上拉显示更多',
+			contentrefresh: '正在加载...',
+			contentnomore: '暂时没有更多房源啦，期待更多寄宿家庭加入我们'
+		}
+	
 	// 搜索
 	function handleSearch() {
 		uni.navigateTo({
@@ -107,7 +97,11 @@
 	//测试接口
 	//加载更多状态
 	const loadStatus = ref('contentdown')	
-	const listData = ref([])
+	const listData = ref([
+		{
+			countryName:'中国'
+		}
+	])
 	const pages = reactive({
 		pageIndex:1,
 		totalPage: 0   //总共有多少页数据
@@ -137,6 +131,12 @@
 			//TODO handle the exception
 			console.log('列表错误==',e)
 		}
+	}
+	
+	//打开联系房主弹窗
+	const popShow = ref(false)
+	const contactHost = (item)=>{
+		popShow.value = true
 	}
 	
 	const goPage = (url)=>{
@@ -231,6 +231,14 @@
 				overflow: hidden;    /* 隐藏超出部分 */
 				text-overflow: ellipsis; /* 显示省略号 */
 			}
+			.wrap2 {
+				display: -webkit-box;  
+				    -webkit-line-clamp: 2; /* 限制为两行 */  
+				    -webkit-box-orient: vertical;  
+				    overflow: hidden; /* 隐藏超出部分 */  
+				    text-overflow: ellipsis; /* 超出部分用省略号表示 */  
+				    white-space: normal; /* 允许换行 */  
+			}
 		}
 		.contact-button {
 			width: 168rpx;
@@ -247,6 +255,11 @@
 	
 	.new-house {
 		margin-bottom: 24rpx;
+		&.hava-border{
+			border: 1rpx solid #ECECEC;
+			border-radius: 24rpx;
+			padding: 20rpx 28rpx;
+		}
 		.house-image {
 			width: 100%;
 			height: 496rpx;
