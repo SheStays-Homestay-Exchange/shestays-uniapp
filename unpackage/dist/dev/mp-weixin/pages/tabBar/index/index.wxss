@@ -60,112 +60,18 @@
   font-weight: 500;
   color: #909193;
 }
-.home-index-body .book-card.data-v-036b8cf8 {
-  border: 1rpx solid #ECECEC;
-  border-radius: 24rpx;
-  padding: 20rpx 28rpx;
-  background-color: #ffffff;
-  margin-bottom: 24rpx;
+.btn-box.data-v-036b8cf8 {
+  position: fixed;
+  bottom: 40rpx;
+  left: 10%;
+  width: 80%;
 }
-.home-index-body .book-card .time-body.data-v-036b8cf8 {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.btn-box .btn-img.data-v-036b8cf8 {
+  width: 38rpx;
+  height: 34rpx;
 }
-.home-index-body .book-card .time-body .address.data-v-036b8cf8 {
-  font-size: 32rpx;
-  font-weight: 600;
-}
-.home-index-body .book-card .time-body .time.data-v-036b8cf8 {
-  font-size: 28rpx;
-  font-weight: 400;
-}
-.home-index-body .content-body.data-v-036b8cf8 {
-  display: flex;
-  align-items: flex-end;
-}
-.home-index-body .content-body .left.data-v-036b8cf8 {
-  flex: 1;
-  overflow: hidden;
-}
-.home-index-body .content-body .left .remark.data-v-036b8cf8 {
-  font-weight: 400;
-  font-size: 28rpx;
-}
-.home-index-body .content-body .left .fold.data-v-036b8cf8 {
-  font-weight: 400;
-  color: #909193;
-  font-size: 20rpx;
-  margin-top: 10rpx;
-  display: inline-flex;
-  align-items: center;
-  margin-right: 6rpx;
-}
-.home-index-body .content-body .left .flod-icon.data-v-036b8cf8 {
-  width: 28rpx;
-  height: 28rpx;
-}
-.home-index-body .content-body .left .wrap1.data-v-036b8cf8 {
-  white-space: nowrap;
-  /* 保持文本在一行显示 */
-  overflow: hidden;
-  /* 隐藏超出部分 */
-  text-overflow: ellipsis;
-  /* 显示省略号 */
-}
-.home-index-body .content-body .left .wrap2.data-v-036b8cf8 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  /* 限制为两行 */
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  /* 隐藏超出部分 */
-  text-overflow: ellipsis;
-  /* 超出部分用省略号表示 */
-  white-space: normal;
-  /* 允许换行 */
-}
-.home-index-body .content-body .contact-button.data-v-036b8cf8 {
-  width: 168rpx;
-  height: 64rpx;
-  font-size: 28rpx;
-  font-weight: 600;
-  border-radius: 64rpx;
-  color: #ffffff;
-  text-align: center;
-  line-height: 64rpx;
-  background-color: #D8336D;
-}
-.home-index-body .new-house.data-v-036b8cf8 {
-  margin-bottom: 24rpx;
-}
-.home-index-body .new-house.hava-border.data-v-036b8cf8 {
-  border: 1rpx solid #ECECEC;
-  border-radius: 24rpx;
-  padding: 20rpx 28rpx;
-}
-.home-index-body .new-house .house-image.data-v-036b8cf8 {
-  width: 100%;
-  height: 496rpx;
-  border-radius: 32rpx;
-  background-color: #eee;
-}
-.home-index-body .new-house .time-body.data-v-036b8cf8 {
-  display: flex;
-  align-items: center;
-  margin-top: 6rpx;
-  justify-content: space-between;
-}
-.home-index-body .new-house .time-body .address.data-v-036b8cf8 {
-  font-size: 32rpx;
-  font-weight: 600;
-}
-.home-index-body .new-house .time-body .time.data-v-036b8cf8 {
-  font-size: 28rpx;
-  font-weight: 400;
-}
-.home-index-body .new-house .contact.data-v-036b8cf8 {
-  font-size: 32rpx;
-  font-weight: 400;
-  margin-top: 6rpx;
+.btn-box .login-btn.data-v-036b8cf8 {
+  background: #D8336D;
+  color: #fff;
+  border-radius: 40rpx;
 }

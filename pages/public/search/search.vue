@@ -5,11 +5,11 @@
 				<image class="search-icon" src="../../../static/image/search.jpg" mode=""></image>
 				<uni-easyinput :styles="styles" type="text" placeholder="搜索目的地"></uni-easyinput>
 			</view>
-			<text class="search-tipes">搜索</text>
+			<text class="search-tipes" @click="search">搜索</text>
 		</view>
 		
 		<!-- 默认值 -->
-		<view class="search-value">
+		<view class="search-value" v-if="!showResult">
 			<view class="search-title">
 				推荐目的地
 			</view>
@@ -17,25 +17,75 @@
 				中国
 			</view>
 		</view>
-		
-		<template v-if="false">
-			<view class="no-data">
-				该地区暂时没有换宿房源，<br/>请修改或调整搜索区域
+		<view class="result-box" v-else>
+			<!-- 房源 -->
+			<view class="">
+				<HouseItem v-for="(item,i) in listData" :key="i" :item="item" @contactHost="contactHost" @itemClick="itemClick"/>
 			</view>
-		</template>
+			<template v-if="false">
+				<view class="no-data">
+					该地区暂时没有换宿房源，<br/>请修改或调整搜索区域
+				</view>
+			</template>
+		</view>
+		
 	</view>
 </template>
 
 <script setup> 
-import { reactive } from 'vue';
-const styles = reactive({
-	"borderColor": "#FFFFFF"
-});
+	import { reactive,ref } from 'vue';
+	import { getHouseList } from '@/common/api/common'
+	import  HouseItem from '@/components/HouseItem.vue'
+	
+	const showResult = ref(false)
+	//加载更多状态
+	const loadStatus = ref('contentdown')	
+	const listData = ref([
+		{
+			countryName:'中国'
+		}
+	])
+	const pages = reactive({
+		pageIndex:1,
+		totalPage: 0   //总共有多少页数据
+	})
+	const getHouseListFun = async ()=>{
+		loadStatus.value ='loading'
+		try{
+			const res = await getHouseList({
+				pageIndex: pages.pageIndex,
+			})
+			if(res.code == 200){
+				listData.value = listData.value.concat(res.data.data)
+				pages.totalPage = res.data.pageCount
+			}
+			// 已请求完所有数据
+			if(pages.pageIndex >= res.data.pageCount){
+				loadStatus.value = 'noMore'
+			}
+		}catch(e){
+			//TODO handle the exception
+			console.log('列表错误==',e)
+		}
+	}
+	
+	const search = ()=>{
+		showResult.value = true
+		getHouseListFun()
+	}
+	
+	const styles = reactive({
+		"borderColor": "#FFFFFF"
+	});
+
 </script>
 
 <style lang="scss" scoped>
 .search {
 	padding: 48rpx;
+	.result-box{
+		padding: 20upx 0;
+	}
 	.search-input-body {
 		display: flex;
 		align-items: center;
