@@ -1,6 +1,11 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
 const common_api_common = require("../../../common/api/common.js");
+require("../../../common/js/request.js");
+require("../../../common/config/index.js");
+require("../../../common/js/cache.js");
+require("../../../store/index.js");
+require("../../../common/js/util.js");
 if (!Array) {
   const _easycom_uni_easyinput2 = common_vendor.resolveComponent("uni-easyinput");
   _easycom_uni_easyinput2();
@@ -74,5 +79,5 @@ const _sfc_main = {
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-5f29c737"], ["__file", "D:/WTT/job/shestays-uniapp/pages/public/search/search.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-5f29c737"], ["__file", "D:/wtt/prictice/shestays-uniapp/pages/public/search/search.vue"]]);
 wx.createPage(MiniProgramPage);

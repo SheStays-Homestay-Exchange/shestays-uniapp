@@ -68,5 +68,5 @@ const _sfc_main = {
     };
   }
 };
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-b364594e"], ["__file", "D:/WTT/job/shestays-uniapp/components/DetailPopup.vue"]]);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-b364594e"], ["__file", "D:/wtt/prictice/shestays-uniapp/components/DetailPopup.vue"]]);
 wx.createComponent(Component);

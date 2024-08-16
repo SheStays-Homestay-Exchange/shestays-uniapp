@@ -4,6 +4,9 @@ const common_assets = require("../../common/assets.js");
 const common_api_common = require("../../common/api/common.js");
 const common_js_cache = require("../../common/js/cache.js");
 const store_index = require("../../store/index.js");
+require("../../common/js/request.js");
+require("../../common/config/index.js");
+require("../../common/js/util.js");
 const _sfc_main = {
   __name: "login",
   setup(__props) {
@@ -71,5 +74,5 @@ const _sfc_main = {
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-e4e4508d"], ["__file", "D:/WTT/job/shestays-uniapp/pages/login/login.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-e4e4508d"], ["__file", "D:/wtt/prictice/shestays-uniapp/pages/login/login.vue"]]);
 wx.createPage(MiniProgramPage);
