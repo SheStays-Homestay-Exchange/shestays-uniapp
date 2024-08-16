@@ -5,19 +5,20 @@
 			<image src="@/static/image/logo-text.png" class="logo-text"></image>
 		</view>
 		<view class="login-btn-box">
-			<button class="login-btn" @click="wxLogin">
+			<button class="login-btn" @click="wxLogin" v-if="!checked">
 				<image src="@/static/image/union.svg" class="btn-img"></image>
-				跳转首页
+				手机号快捷登录
 			</button>
-			<button class="login-btn" open-type="getPhoneNumber" @getphonenumber="getphonenumber" style="margin-top: 20px;">
+			<button class="login-btn" open-type="getPhoneNumber" @getphonenumber="getphonenumber" style="margin-top: 20px;" v-else>
 				<image src="@/static/image/union.svg" class="btn-img"></image>
 				手机号快捷登录
 			</button>
 			<view class="argument" @click="handleClickChecked">
-				<!-- <text class="disagree" v-if="!checked"></text> -->
-				<label class="radio">
-					<radio :value="1" :checked="checked" color="#d8336d" />
-				</label>
+				<radio-group>
+					<label class="radio">
+						<radio :checked="checked" color="#d8336d" @click="checked=!checked"/>
+					</label>
+				</radio-group>
 				<view class="argument-text">
 					<text>我确认已年满18周岁，且已认真阅读并同意</text><text class="policy" @click="goRule">《SheStays换宿小程序隐私政策》</text>
 				</view>
@@ -55,17 +56,12 @@
 	}
 	
 	const wxLogin = ()=>{
-		// if(!checked.value){
-		// 	uni.showToast({
-		// 		title:'请阅读并勾选《SheStays换宿小程序隐私政策》',
-		// 		icon:'none'
-		// 	})
-		// }
-		
-		uni.switchTab({
-			url:'/pages/tabBar/index/index'
-		})
-
+		if(!checked.value){
+			uni.showToast({
+				title:'请阅读并勾选《SheStays换宿小程序隐私政策》',
+				icon:'none'
+			})
+		}
 	}
 	
 	const getphonenumber=(e)=>{
@@ -114,7 +110,6 @@
 		})
 	}
 	onLoad(()=>{
-		console.log('===',store)
 	})
 
 </script>

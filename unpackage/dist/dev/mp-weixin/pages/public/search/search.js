@@ -20,11 +20,8 @@ const _sfc_main = {
   setup(__props) {
     const showResult = common_vendor.ref(false);
     const loadStatus = common_vendor.ref("contentdown");
-    const listData = common_vendor.ref([
-      {
-        countryName: "中国"
-      }
-    ]);
+    const listData = common_vendor.ref([]);
+    const region = common_vendor.ref("");
     const pages = common_vendor.reactive({
       pageIndex: 1,
       totalPage: 0
@@ -32,9 +29,10 @@ const _sfc_main = {
     });
     const getHouseListFun = async () => {
       loadStatus.value = "loading";
+      console.log("请求==", region.value);
       try {
-        const res = await common_api_common.getHouseList({
-          pageIndex: pages.pageIndex
+        const res = await common_api_common.getHouseByRegion({
+          region: "中国"
         });
         if (res.code == 200) {
           listData.value = listData.value.concat(res.data.data);
@@ -44,27 +42,69 @@ const _sfc_main = {
           loadStatus.value = "noMore";
         }
       } catch (e) {
-        console.log("列表错误==", e);
+        common_vendor.index.showToast({
+          title: e.msg,
+          icon: "none"
+        });
       }
     };
     const search = () => {
       showResult.value = true;
       getHouseListFun();
     };
+    const citys = common_vendor.ref([
+      {
+        name: "中国"
+      },
+      {
+        name: "美国"
+      },
+      {
+        name: "日本"
+      }
+    ]);
+    const cityClick = (item) => {
+      region.value = item.name;
+      listData.value = [];
+      search();
+    };
+    const inputChange = (e) => {
+      if (!e) {
+        showResult.value = false;
+      }
+    };
     const styles = common_vendor.reactive({
-      "borderColor": "#FFFFFF"
+      "borderColor": "#FFFFFF",
+      "outLine": "none"
     });
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.p({
+        a: common_vendor.o(search),
+        b: common_vendor.o(inputChange),
+        c: common_vendor.o(($event) => region.value = $event),
+        d: common_vendor.p({
           styles,
+          inputBorder: false,
           type: "text",
-          placeholder: "搜索目的地"
+          trim: "both",
+          primaryColor: "#D8336D",
+          placeholder: "搜索目的地",
+          confirmType: "search",
+          modelValue: region.value
         }),
-        b: common_vendor.o(search),
-        c: !showResult.value
-      }, !showResult.value ? {} : common_vendor.e({
-        d: common_vendor.f(listData.value, (item, i, i0) => {
+        e: !showResult.value
+      }, !showResult.value ? {
+        f: common_vendor.f(citys.value, (item, i, i0) => {
+          return {
+            a: common_vendor.t(item.name),
+            b: i,
+            c: common_vendor.o(($event) => cityClick(item), i)
+          };
+        })
+      } : common_vendor.e({
+        g: listData.value.length > 0
+      }, listData.value.length > 0 ? {
+        h: common_vendor.f(listData.value, (item, i, i0) => {
           return {
             a: i,
             b: common_vendor.o(_ctx.contactHost, i),
@@ -75,7 +115,7 @@ const _sfc_main = {
             })
           };
         })
-      }, {}));
+      } : {}));
     };
   }
 };

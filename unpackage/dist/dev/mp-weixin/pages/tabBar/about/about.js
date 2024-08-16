@@ -18,11 +18,15 @@ function _sfc_render(_ctx, _cache) {
       ["show-animation"]: true
     }),
     b: common_vendor.p({
-      title: "如何上传房源？",
+      title: "我该如何确保旅程的安全？",
       ["show-animation"]: true
     }),
     c: common_vendor.p({
-      title: "我该如何确保旅行安全？",
+      title: "我该如何确保旅程的安全？",
+      ["show-animation"]: true
+    }),
+    d: common_vendor.p({
+      title: "借换宿是收费的吗？",
       ["show-animation"]: true
     })
   };

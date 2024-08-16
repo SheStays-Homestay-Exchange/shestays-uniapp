@@ -3,7 +3,7 @@ const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
 const common_api_common = require("../../common/api/common.js");
 const common_js_cache = require("../../common/js/cache.js");
-const store_index = require("../../store/index.js");
+require("../../store/index.js");
 require("../../common/js/request.js");
 require("../../common/config/index.js");
 require("../../common/js/util.js");
@@ -17,9 +17,12 @@ const _sfc_main = {
       });
     };
     const wxLogin = () => {
-      common_vendor.index.switchTab({
-        url: "/pages/tabBar/index/index"
-      });
+      if (!checked.value) {
+        common_vendor.index.showToast({
+          title: "请阅读并勾选《SheStays换宿小程序隐私政策》",
+          icon: "none"
+        });
+      }
     };
     const getphonenumber = (e) => {
       console.log("手机号返回", e);
@@ -57,20 +60,24 @@ const _sfc_main = {
       });
     };
     common_vendor.onLoad(() => {
-      console.log("===", store_index.store);
     });
     return (_ctx, _cache) => {
-      return {
+      return common_vendor.e({
         a: common_assets._imports_0,
         b: common_assets._imports_1,
-        c: common_assets._imports_2,
-        d: common_vendor.o(wxLogin),
-        e: common_assets._imports_2,
-        f: common_vendor.o(getphonenumber),
-        g: checked.value,
-        h: common_vendor.o(goRule),
-        i: common_vendor.o((...args) => _ctx.handleClickChecked && _ctx.handleClickChecked(...args))
-      };
+        c: !checked.value
+      }, !checked.value ? {
+        d: common_assets._imports_2,
+        e: common_vendor.o(wxLogin)
+      } : {
+        f: common_assets._imports_2,
+        g: common_vendor.o(getphonenumber)
+      }, {
+        h: checked.value,
+        i: common_vendor.o(($event) => checked.value = !checked.value),
+        j: common_vendor.o(goRule),
+        k: common_vendor.o((...args) => _ctx.handleClickChecked && _ctx.handleClickChecked(...args))
+      });
     };
   }
 };

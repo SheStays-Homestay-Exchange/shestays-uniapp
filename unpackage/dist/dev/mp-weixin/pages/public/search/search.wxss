@@ -68,7 +68,8 @@
   padding: 6rpx 24rpx;
   text-align: center;
   border: 1rpx solid #000B3B;
-  border-radius: 999rpx;
+  border-radius: 40rpx;
+  margin-right: 28rpx;
 }
 .search .no-data.data-v-5f29c737 {
   width: 462rpx;
@@ -78,4 +79,5 @@
   color: #000B3B;
   margin: 0 auto;
   text-align: center;
+  margin-top: 140rpx;
 }

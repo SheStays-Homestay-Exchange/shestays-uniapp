@@ -53,3 +53,7 @@ export function getHouseList(params: any) {
 }
 
 
+//接口名称：搜索
+export function getHouseByRegion(params: any) {
+	return get('getHouseByRegion', params)
+}

@@ -3,9 +3,10 @@
 		<view class="search-input-body">
 			<view class="search-input">
 				<image class="search-icon" src="../../../static/image/search.jpg" mode=""></image>
-				<uni-easyinput :styles="styles" type="text" placeholder="搜索目的地"></uni-easyinput>
+				<uni-easyinput :styles="styles" :inputBorder="false" type="text" trim="both" primaryColor="#D8336D" placeholder="搜索目的地"
+				 confirmType="search" v-model="region" @confirm="search" @input="inputChange"></uni-easyinput>
 			</view>
-			<text class="search-tipes" @click="search">搜索</text>
+			<!-- <text class="search-tipes" @click="search">搜索</text> -->
 		</view>
 		
 		<!-- 默认值 -->
@@ -13,16 +14,16 @@
 			<view class="search-title">
 				推荐目的地
 			</view>
-			<view class="search-fn">
-				中国
+			<view class="search-fn" v-for="(item,i) in citys" :key="i" @click="cityClick(item)">
+				{{item.name}}
 			</view>
 		</view>
 		<view class="result-box" v-else>
 			<!-- 房源 -->
-			<view class="">
+			<view class="" v-if="listData.length > 0">
 				<HouseItem v-for="(item,i) in listData" :key="i" :item="item" @contactHost="contactHost" @itemClick="itemClick"/>
 			</view>
-			<template v-if="false">
+			<template v-else>
 				<view class="no-data">
 					该地区暂时没有换宿房源，<br/>请修改或调整搜索区域
 				</view>
@@ -34,26 +35,24 @@
 
 <script setup> 
 	import { reactive,ref } from 'vue';
-	import { getHouseList } from '@/common/api/common'
+	import { getHouseList, getHouseByRegion } from '@/common/api/common'
 	import  HouseItem from '@/components/HouseItem.vue'
 	
 	const showResult = ref(false)
 	//加载更多状态
 	const loadStatus = ref('contentdown')	
-	const listData = ref([
-		{
-			countryName:'中国'
-		}
-	])
+	const listData = ref([])
+	const region = ref('')
 	const pages = reactive({
 		pageIndex:1,
 		totalPage: 0   //总共有多少页数据
 	})
 	const getHouseListFun = async ()=>{
 		loadStatus.value ='loading'
+		console.log('请求==',region.value)
 		try{
-			const res = await getHouseList({
-				pageIndex: pages.pageIndex,
+			const res = await getHouseByRegion({
+				region: '中国'
 			})
 			if(res.code == 200){
 				listData.value = listData.value.concat(res.data.data)
@@ -65,7 +64,10 @@
 			}
 		}catch(e){
 			//TODO handle the exception
-			console.log('列表错误==',e)
+			uni.showToast({
+				title:e.msg,
+				icon:'none'
+			})
 		}
 	}
 	
@@ -73,9 +75,32 @@
 		showResult.value = true
 		getHouseListFun()
 	}
+	const citys = ref([
+		{
+			name:'中国'
+		},
+		{
+			name:'美国'
+		},
+		{
+			name:'日本'
+		}
+	])
+	const cityClick = (item)=>{
+		region.value = item.name
+		listData.value = []
+		search()
+	}
+	
+	const inputChange = (e)=>{
+		if(!e){
+			showResult.value = false
+		}
+	}
 	
 	const styles = reactive({
-		"borderColor": "#FFFFFF"
+		"borderColor": "#FFFFFF",
+		"outLine":"none"
 	});
 
 </script>
@@ -125,7 +150,8 @@
 			padding: 6rpx 24rpx;
 			text-align: center;
 			border: 1rpx solid #000B3B;
-			border-radius: 999rpx;
+			border-radius: 40rpx;
+			margin-right: 28upx;
 		}
 	}
 	.no-data {
@@ -136,6 +162,7 @@
 		color: #000B3B;
 		margin: 0 auto;
 		text-align: center;
+		margin-top: 140upx;
 	}
 }
 </style>

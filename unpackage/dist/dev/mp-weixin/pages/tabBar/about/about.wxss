@@ -50,6 +50,7 @@
   color: #D8336D;
   font-size: 64rpx;
   font-weight: 600;
+  margin-bottom: 20rpx;
 }
 .about .about-info .about-content.data-v-41ea3e9b {
   font-size: 32rpx;
@@ -69,4 +70,16 @@
   font-size: 32rpx;
   color: #000B3B;
   font-weight: 500;
+}
+.about .about-faq .content.data-v-41ea3e9b {
+  font-size: 28rpx;
+  color: #696A6D;
+  padding-bottom: 60rpx;
+}
+.about .about-faq .content .text.data-v-41ea3e9b {
+  display: block;
+  margin-bottom: 8rpx;
+}
+.about .about-faq .content .margin-t-10.data-v-41ea3e9b {
+  margin-top: 20rpx;
 }
