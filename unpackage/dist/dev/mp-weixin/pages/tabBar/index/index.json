@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "首页",
+  "navigationBarTitleText": "SheStays借换宿",
   "enablePullDownRefresh": true,
   "onReachBottomDistance": 100,
   "usingComponents": {

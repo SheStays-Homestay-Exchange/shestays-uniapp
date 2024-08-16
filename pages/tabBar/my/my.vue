@@ -74,8 +74,8 @@
 			<view class="title">
 				支持
 			</view>
-			<view class="fn-li">
-				<view class="left">
+			<view class="fn-li" @click="concact">
+				<view class="left" >
 					<image class="fn-icon" src="../../../static/image/mail-01.png" mode=""></image>
 					<text class="fn-li-title">联系我们</text>
 				</view>
@@ -93,12 +93,24 @@
 </template>
 
 <script setup>
-function handleGoPage (url) {
-	console.log(url);
-	uni.navigateTo({
-		url: url
-	})
-}
+	
+	const concact = ()=>{
+		uni.showModal({
+			title: '联系我们',
+			content: '邮箱：SheStays@163.com',
+			showCancel: false,
+			confirmText:'知道啦',
+			success: function (res) {
+
+			}
+		});
+	}
+	function handleGoPage (url) {
+		console.log(url);
+		uni.navigateTo({
+			url: url
+		})
+	}
 </script>
 
 <style lang="scss" scoped>

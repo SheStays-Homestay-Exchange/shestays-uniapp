@@ -74,10 +74,7 @@ const _sfc_main = {
           listData.value = listData.value.concat(res.data.data);
           pages.totalPage = res.data.pageCount;
           if (type == "refresh") {
-            common_vendor.index.showToast({
-              title: "刷新成功",
-              icon: "none"
-            });
+            common_vendor.index.stopPullDownRefresh();
           }
         }
         if (pages.pageIndex >= res.data.pageCount) {
@@ -116,8 +113,9 @@ const _sfc_main = {
     return (_ctx, _cache) => {
       var _a, _b;
       return common_vendor.e({
-        a: common_vendor.o(handleSearch),
-        b: common_vendor.f(listData.value, (item, i, i0) => {
+        a: common_assets._imports_0,
+        b: common_vendor.o(handleSearch),
+        c: common_vendor.f(listData.value, (item, i, i0) => {
           return {
             a: i,
             b: common_vendor.o(contactHost, i),
@@ -128,21 +126,21 @@ const _sfc_main = {
             })
           };
         }),
-        c: listData.value.length > 0
+        d: listData.value.length > 0
       }, listData.value.length > 0 ? {
-        d: common_vendor.p({
+        e: common_vendor.p({
           status: loadStatus.value,
           contentText
         })
       } : {}, {
-        e: common_vendor.o(($event) => popShow.value = false),
-        f: common_vendor.p({
+        f: common_vendor.o(($event) => popShow.value = false),
+        g: common_vendor.p({
           show: popShow.value
         }),
-        g: !((_a = userInfo.value) == null ? void 0 : _a.openId)
+        h: !((_a = userInfo.value) == null ? void 0 : _a.openId)
       }, !((_b = userInfo.value) == null ? void 0 : _b.openId) ? {
-        h: common_assets._imports_2,
-        i: common_vendor.o(isLogin)
+        i: common_assets._imports_2,
+        j: common_vendor.o(isLogin)
       } : {});
     };
   }

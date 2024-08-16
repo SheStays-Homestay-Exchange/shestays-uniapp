@@ -9,6 +9,10 @@ function getHouseList(params) {
 function getHouseByRegion(params) {
   return common_js_request.get("getHouseByRegion", params);
 }
+function getName() {
+  return common_js_request.get("getRecommendCountryName");
+}
 exports.getHouseByRegion = getHouseByRegion;
 exports.getHouseList = getHouseList;
+exports.getName = getName;
 exports.userAuthor = userAuthor;

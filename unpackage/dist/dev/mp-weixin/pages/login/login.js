@@ -45,6 +45,7 @@ const _sfc_main = {
         iv: param.iv,
         code: loginCode
       }).then((res) => {
+        console.log("auth接口", res);
         if (res.code == 200) {
           common_js_cache.cache.put("userInfo", res.data);
           common_vendor.index.switchTab({
@@ -63,7 +64,7 @@ const _sfc_main = {
     });
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_assets._imports_0$1,
+        a: common_assets._imports_0$2,
         b: common_assets._imports_1,
         c: !checked.value
       }, !checked.value ? {

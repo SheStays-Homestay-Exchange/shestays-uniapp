@@ -3,6 +3,16 @@ const common_vendor = require("../../../common/vendor.js");
 const _sfc_main = {
   __name: "my",
   setup(__props) {
+    const concact = () => {
+      common_vendor.index.showModal({
+        title: "联系我们",
+        content: "邮箱：SheStays@163.com",
+        showCancel: false,
+        confirmText: "知道啦",
+        success: function(res) {
+        }
+      });
+    };
     function handleGoPage(url) {
       console.log(url);
       common_vendor.index.navigateTo({
@@ -17,7 +27,8 @@ const _sfc_main = {
         d: common_vendor.o(($event) => handleGoPage("/pages/tabBar/my/uploadHousing")),
         e: common_vendor.o(($event) => handleGoPage("/pages/tabBar/my/housingList/housingList")),
         f: common_vendor.o(($event) => handleGoPage("/pages/rules/rules")),
-        g: common_vendor.o(($event) => handleGoPage("/pages/rules/rules"))
+        g: common_vendor.o(concact),
+        h: common_vendor.o(($event) => handleGoPage("/pages/rules/rules"))
       };
     };
   }

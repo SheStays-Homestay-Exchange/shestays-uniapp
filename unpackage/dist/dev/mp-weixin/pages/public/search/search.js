@@ -19,6 +19,9 @@ const DetailPopup = () => "../../../components/DetailPopup.js";
 const _sfc_main = {
   __name: "search",
   setup(__props) {
+    common_vendor.onLoad(() => {
+      recommend();
+    });
     const showResult = common_vendor.ref(false);
     common_vendor.ref("contentdown");
     const listData = common_vendor.ref([]);
@@ -37,7 +40,7 @@ const _sfc_main = {
       });
       try {
         const res = await common_api_common.getHouseByRegion({
-          region: "中国"
+          region: region.value
         });
         if (res.code == 200) {
           listData.value = res.data || [];
@@ -67,19 +70,17 @@ const _sfc_main = {
       getHouseListFun();
       showResult.value = true;
     };
-    const citys = common_vendor.ref([
-      {
-        name: "中国"
-      },
-      {
-        name: "美国"
-      },
-      {
-        name: "日本"
-      }
-    ]);
+    const citys = common_vendor.ref([]);
+    const recommend = () => {
+      common_api_common.getName().then((res) => {
+        if (res.code == 200) {
+          citys.value = res.data || [];
+        }
+      }).catch((err) => {
+      });
+    };
     const cityClick = (item) => {
-      region.value = item.name;
+      region.value = item.countryName;
       listData.value = [];
       search();
     };
@@ -111,7 +112,7 @@ const _sfc_main = {
       }, !showResult.value ? {
         f: common_vendor.f(citys.value, (item, i, i0) => {
           return {
-            a: common_vendor.t(item.name),
+            a: common_vendor.t(item.countryName),
             b: i,
             c: common_vendor.o(($event) => cityClick(item), i)
           };

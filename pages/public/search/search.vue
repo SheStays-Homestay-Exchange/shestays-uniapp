@@ -15,7 +15,7 @@
 				推荐目的地
 			</view>
 			<view class="search-fn" v-for="(item,i) in citys" :key="i" @click="cityClick(item)">
-				{{item.name}}
+				{{item.countryName}}
 			</view>
 		</view>
 		<view class="result-box" v-else>
@@ -37,10 +37,14 @@
 
 <script setup> 
 	import { reactive,ref } from 'vue';
-	import { getHouseList, getHouseByRegion } from '@/common/api/common'
+	import { onLoad } from '@dcloudio/uni-app'
+	import { getHouseList, getHouseByRegion, getName } from '@/common/api/common'
 	import  HouseItem from '@/components/HouseItem.vue'
 	import  DetailPopup from '@/components/DetailPopup.vue'
 	
+	onLoad(()=>{
+		recommend()  //获取推荐
+	})
 	const showResult = ref(false)
 	//加载更多状态
 	const loadStatus = ref('contentdown')	
@@ -58,7 +62,7 @@
 		});
 		try{
 			const res = await getHouseByRegion({
-				region: '中国'
+				region: region.value
 			})
 			if(res.code == 200){
 				listData.value = res.data || []
@@ -93,19 +97,19 @@
 		getHouseListFun()
 		showResult.value = true
 	}
-	const citys = ref([
-		{
-			name:'中国'
-		},
-		{
-			name:'美国'
-		},
-		{
-			name:'日本'
-		}
-	])
+	const citys = ref([])
+	//推荐
+	const recommend = ()=>{
+		getName().then(res=>{
+			if(res.code == 200){
+				citys.value = res.data || []
+			}
+		}).catch(err=>{
+			
+		})
+	}
 	const cityClick = (item)=>{
-		region.value = item.name
+		region.value = item.countryName
 		listData.value = []
 		search()
 	}

@@ -1,16 +1,19 @@
 <template>
+	<view class="baner-box">
+		<image src="@/static/image/index-top.png" mode=""></image>
+	</view>
 	<view class="home-index-body">
-		<view class="title">
+		<!-- <view class="title">
 			<text>欢迎姐妹住我家</text>
 			<image class="title-arrow" src="../../../static/image/arrow.png" mode=""></image>
-		</view>
+		</view> -->
 		<!-- 搜索 -->
 		<view class="search-body" @click="handleSearch">
 			<image src="../../../static/image/search.jpg" class="search-image" mode=""></image>
 			<text class="search-text">搜索目的地</text>
 		</view>
 		<!-- 房源 -->
-		<view class="">
+		<view class="list-box">
 			<HouseItem v-for="(item,i) in listData" :key="i" :item="item" @contactHost="contactHost" @itemClick="itemClick"/>
 		</view>
 		<!-- 加载更多 -->
@@ -101,10 +104,11 @@
 				listData.value = listData.value.concat(res.data.data)
 				pages.totalPage = res.data.pageCount
 				if(type == 'refresh'){
-					uni.showToast({
-						title:'刷新成功',
-						icon:'none'
-					})
+					// uni.showToast({
+					// 	title:'刷新成功',
+					// 	icon:'none'
+					// })
+					uni.stopPullDownRefresh()
 				}
 			}
 			// 已请求完所有数据
@@ -164,6 +168,9 @@
 			margin-left: 16rpx;
 		}
 	}
+	.list-box{
+		padding-top: 60rpx;
+	}
 	.search-body {
 		background-color: #ffffff;
 		height: 80rpx;
@@ -174,7 +181,7 @@
 		align-items: center;
 		padding: 0 24rpx;
 		box-shadow: rgba(0, 11, 59, 0.1) 10rpx 20rpx 70rpx;
-		margin-bottom: 60rpx;
+		margin-top: -40upx;
 		.search-image {
 			width: 48rpx;
 			height: 48rpx;
@@ -201,6 +208,13 @@
 			background: #D8336D;
 			color: #fff;
 			border-radius: 40upx;
+		}
+	}
+	.baner-box{
+		height: 160upx;
+		image{
+			width: 100%;
+			height: 100%;
 		}
 	}
 </style>

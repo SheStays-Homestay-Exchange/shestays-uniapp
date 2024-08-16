@@ -94,6 +94,7 @@
 			iv: param.iv,
 			code: loginCode
 		}).then(res=>{
+			console.log('auth接口',res)
 			if(res.code == 200){
 				//保存登录信息
 				cache.put('userInfo',res.data)
