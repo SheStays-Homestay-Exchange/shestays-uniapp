@@ -61,3 +61,18 @@ export function getHouseByRegion(params: any) {
 export function getName() {
 	return get('getRecommendCountryName')
 }
+
+//接口名称：国家查询接口
+export function getNation() {
+	return get('getNation')
+}
+
+//接口名称：地区查询接口
+export function getRegion(params) {
+	return get('getRegion',params)
+}
+
+//接口名称：地区查询接口
+export function getCity(params) {
+	return get('getCity',params)
+}

@@ -8,8 +8,9 @@ if (!Array) {
 const _easycom_uni_number_box = () => "../../../uni_modules/uni-number-box/components/uni-number-box/uni-number-box.js";
 const _easycom_uni_easyinput = () => "../../../uni_modules/uni-easyinput/components/uni-easyinput/uni-easyinput.js";
 if (!Math) {
-  (_easycom_uni_number_box + _easycom_uni_easyinput)();
+  (_easycom_uni_number_box + _easycom_uni_easyinput + common_vendor.unref(Location))();
 }
+const Location = () => "../../../components/location.js";
 const _sfc_main = {
   __name: "uploadHousing",
   setup(__props) {

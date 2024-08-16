@@ -86,10 +86,14 @@
 			提交房源
 		</view>
 	</view>
+	
+	<Location></Location>
 </template>
 
 <script setup>
 	import { reactive } from 'vue';
+	import Location from '@/components/location'
+	
 	const styles = reactive({
 		"borderColor": "#ffffff"
 	})

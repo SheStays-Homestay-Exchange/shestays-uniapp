@@ -1,6 +1,6 @@
 <template>
 	<view class="update-info">
-		<view class="user-icon">
+		<view class="user-icon" @click="uploadHead">
 			<image class="user-icon-image" src="" mode=""></image>
 			<view class="user-update-icon">
 				<image class="update-icon" src="../../../../static/image/camera-01.png" mode=""></image>
@@ -65,7 +65,40 @@
 </template>
 
 <script setup>
+	import { ref, reactive } from 'vue'
 	
+	const info = ref({
+		avatar:''
+	})
+	
+	const uploadHead = ()=>{
+		uni.chooseImage({
+			count: 1,
+			crop: {
+				width: 100,
+				height: 100
+			},
+			success(e) {
+				//判断文件后缀名
+				if (e.tempFilePaths[0].split('.')[e.tempFilePaths[0].split('.').length - 1].includes('gif')) {
+					uni.showToast({
+						title: '暂不支持上传gif图片，请重新选择后上传',
+						icon: 'none'
+					})
+					return false
+				}
+				
+				uploadFile(e.tempFilePaths).then(res => {
+					form.avatar = res[0]
+				}).catch(e => {
+					console.log('图片上传错误', e)
+				})
+			},
+			fail(e) {
+				console.log('选择图片错误', e)
+			}
+		})
+	}
 </script>
 
 <style lang="scss" scoped>
