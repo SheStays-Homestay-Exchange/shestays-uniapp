@@ -1,11 +1,12 @@
 <template>
-	<view class="about">
-		<view class="about-title">
-			欢迎姐妹住我家
-		</view>
-		<view class="about-fn">
+	<view class="bg-box">
+		<image src="@/static/image/about.png" mode=""></image>
+		<view class="about-fn" @click="goPage">
 			发布房源
+			<uni-icons type="arrow-right" size="26" color="#fff" style="margin-left: 16rpx;"></uni-icons>
 		</view>
+	</view>
+	<view class="about">
 		<view class="about-info">
 			<view class="about-title">
 				关于SheStays
@@ -57,30 +58,43 @@
 
 <script setup>
 	
+	const goPage = ()=>{
+		uni.switchTab({
+			url:'/pages/tabBar/my/my'
+		})
+	}
 </script>
 
 <style lang="scss" scoped>
+	// 顶部图片
+	.bg-box{
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		&>image{
+			width: 100%;
+			height: 650upx;
+		}
+		.about-fn {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 322rpx;
+			height: 88rpx;
+			color: #ffffff;
+			border-radius: 88rpx;
+			text-align: center;
+			// line-height: 88rpx;
+			background-color: #D8336D;
+			margin-top: 26rpx;
+			box-shadow: 8rpx 8rpx 16rpx rgba(212, 212, 212, 0.60);
+			margin-top: -50upx;
+		}
+	}
 .about {
 	padding: 48rpx;
-	.about-title {
-		color: #000;
-		font-weight: 600;
-		font-size: 40rpx;
-		margin-top: 150rpx;
-	}
-	.about-fn {
-		width: 322rpx;
-		height: 88rpx;
-		color: #ffffff;
-		border-radius: 88rpx;
-		text-align: center;
-		line-height: 88rpx;
-		background-color: #D8336D;
-		margin-top: 26rpx;
-		box-shadow: 8rpx 8rpx 16rpx rgba(212, 212, 212, 0.60);
-	}
 	.about-info {
-		margin-top: 168rpx;
 		.about-title {
 			color: #D8336D;
 			font-size: 64rpx;

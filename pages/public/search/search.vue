@@ -23,7 +23,7 @@
 			<view class="" v-if="listData.length > 0">
 				<HouseItem v-for="(item,i) in listData" :key="i" :item="item" @contactHost="contactHost" @itemClick="itemClick"/>
 			</view>
-			<template v-else>
+			<template v-if="noData">
 				<view class="no-data">
 					该地区暂时没有换宿房源，<br/>请修改或调整搜索区域
 				</view>
@@ -31,12 +31,15 @@
 		</view>
 		
 	</view>
+	<!-- 联系弹窗 -->
+	<DetailPopup :show="popShow" @tapClose="popShow=false"/>
 </template>
 
 <script setup> 
 	import { reactive,ref } from 'vue';
 	import { getHouseList, getHouseByRegion } from '@/common/api/common'
 	import  HouseItem from '@/components/HouseItem.vue'
+	import  DetailPopup from '@/components/DetailPopup.vue'
 	
 	const showResult = ref(false)
 	//加载更多状态
@@ -47,33 +50,48 @@
 		pageIndex:1,
 		totalPage: 0   //总共有多少页数据
 	})
+	const noData = ref(false)   //没有搜索到数据
 	const getHouseListFun = async ()=>{
-		loadStatus.value ='loading'
-		console.log('请求==',region.value)
+		noData.value = false
+		uni.showLoading({
+			title: '加载中'
+		});
 		try{
 			const res = await getHouseByRegion({
 				region: '中国'
 			})
 			if(res.code == 200){
-				listData.value = listData.value.concat(res.data.data)
-				pages.totalPage = res.data.pageCount
+				listData.value = res.data || []
+				if(res.data?.length == 0){
+					noData.value = true
+				}
 			}
-			// 已请求完所有数据
-			if(pages.pageIndex >= res.data.pageCount){
-				loadStatus.value = 'noMore'
-			}
+			uni.hideLoading()
 		}catch(e){
 			//TODO handle the exception
 			uni.showToast({
 				title:e.msg,
 				icon:'none'
 			})
+			uni.hideLoading()
 		}
 	}
 	
+	//打开联系房主弹窗
+	const popShow = ref(false)
+	const contactHost = (item)=>{
+		popShow.value = true
+	}
+	
+	const itemClick=(item)=>{
+		uni.navigateTo({
+			url:'/pages/houseDetail/houseDetail'
+		})
+	}
+	
 	const search = ()=>{
-		showResult.value = true
 		getHouseListFun()
+		showResult.value = true
 	}
 	const citys = ref([
 		{

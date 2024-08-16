@@ -12,45 +12,60 @@ if (!Array) {
 }
 const _easycom_uni_easyinput = () => "../../../uni_modules/uni-easyinput/components/uni-easyinput/uni-easyinput.js";
 if (!Math) {
-  (_easycom_uni_easyinput + HouseItem)();
+  (_easycom_uni_easyinput + HouseItem + DetailPopup)();
 }
 const HouseItem = () => "../../../components/HouseItem.js";
+const DetailPopup = () => "../../../components/DetailPopup.js";
 const _sfc_main = {
   __name: "search",
   setup(__props) {
     const showResult = common_vendor.ref(false);
-    const loadStatus = common_vendor.ref("contentdown");
+    common_vendor.ref("contentdown");
     const listData = common_vendor.ref([]);
     const region = common_vendor.ref("");
-    const pages = common_vendor.reactive({
+    common_vendor.reactive({
       pageIndex: 1,
       totalPage: 0
       //总共有多少页数据
     });
+    const noData = common_vendor.ref(false);
     const getHouseListFun = async () => {
-      loadStatus.value = "loading";
-      console.log("请求==", region.value);
+      var _a;
+      noData.value = false;
+      common_vendor.index.showLoading({
+        title: "加载中"
+      });
       try {
         const res = await common_api_common.getHouseByRegion({
           region: "中国"
         });
         if (res.code == 200) {
-          listData.value = listData.value.concat(res.data.data);
-          pages.totalPage = res.data.pageCount;
+          listData.value = res.data || [];
+          if (((_a = res.data) == null ? void 0 : _a.length) == 0) {
+            noData.value = true;
+          }
         }
-        if (pages.pageIndex >= res.data.pageCount) {
-          loadStatus.value = "noMore";
-        }
+        common_vendor.index.hideLoading();
       } catch (e) {
         common_vendor.index.showToast({
           title: e.msg,
           icon: "none"
         });
+        common_vendor.index.hideLoading();
       }
     };
+    const popShow = common_vendor.ref(false);
+    const contactHost = (item) => {
+      popShow.value = true;
+    };
+    const itemClick = (item) => {
+      common_vendor.index.navigateTo({
+        url: "/pages/houseDetail/houseDetail"
+      });
+    };
     const search = () => {
-      showResult.value = true;
       getHouseListFun();
+      showResult.value = true;
     };
     const citys = common_vendor.ref([
       {
@@ -107,15 +122,22 @@ const _sfc_main = {
         h: common_vendor.f(listData.value, (item, i, i0) => {
           return {
             a: i,
-            b: common_vendor.o(_ctx.contactHost, i),
-            c: common_vendor.o(_ctx.itemClick, i),
+            b: common_vendor.o(contactHost, i),
+            c: common_vendor.o(itemClick, i),
             d: "5f29c737-1-" + i0,
             e: common_vendor.p({
               item
             })
           };
         })
-      } : {}));
+      } : {}, {
+        i: noData.value
+      }, noData.value ? {} : {}), {
+        j: common_vendor.o(($event) => popShow.value = false),
+        k: common_vendor.p({
+          show: popShow.value
+        })
+      });
     };
   }
 };
