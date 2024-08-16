@@ -26,6 +26,9 @@
 .search.data-v-5f29c737 {
   padding: 48rpx;
 }
+.search .result-box.data-v-5f29c737 {
+  padding: 20rpx 0;
+}
 .search .search-input-body.data-v-5f29c737 {
   display: flex;
   align-items: center;

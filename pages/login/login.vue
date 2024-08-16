@@ -100,7 +100,7 @@
 		}).then(res=>{
 			if(res.code == 200){
 				//保存登录信息
-				cache.put('token',res.data)
+				cache.put('userInfo',res.data)
 				uni.switchTab({
 					url:'/pages/tabBar/index/index'
 				})

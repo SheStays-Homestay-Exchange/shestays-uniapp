@@ -1,12 +1,12 @@
 {
 	"pages": [
-		{
-			"path" : "pages/login/login",
-			"style" : 
-			{
-				"navigationBarTitleText" : ""
-			}
-		},
+		// {
+		// 	"path" : "pages/login/login",
+		// 	"style" : 
+		// 	{
+		// 		"navigationBarTitleText" : ""
+		// 	}
+		// },
 		// pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
 			"path" : "pages/tabBar/index/index",
@@ -37,13 +37,13 @@
 				"navigationBarTitleText": "我的房源"
 			}
 		},
-		// {
-		// 	"path" : "pages/login/login",
-		// 	"style" : 
-		// 	{
-		// 		"navigationBarTitleText" : ""
-		// 	}
-		// },
+		{
+			"path" : "pages/login/login",
+			"style" : 
+			{
+				"navigationBarTitleText" : ""
+			}
+		},
 		{
 			"path": "pages/tabBar/my/uploadHousing",
 			"style": {

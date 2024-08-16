@@ -4,6 +4,7 @@
   "onReachBottomDistance": 100,
   "usingComponents": {
     "uni-load-more": "../../../uni_modules/uni-load-more/components/uni-load-more/uni-load-more",
-    "detail-popup": "../../../components/DetailPopup"
+    "detail-popup": "../../../components/DetailPopup",
+    "house-item": "../../../components/HouseItem"
   }
 }

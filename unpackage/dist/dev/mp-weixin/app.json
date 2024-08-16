@@ -1,10 +1,10 @@
 {
   "pages": [
-    "pages/login/login",
     "pages/tabBar/index/index",
     "pages/tabBar/about/about",
     "pages/tabBar/my/my",
     "pages/tabBar/my/myHousing",
+    "pages/login/login",
     "pages/tabBar/my/uploadHousing",
     "pages/public/search/search",
     "pages/public/searchAddress/searchAddress",
