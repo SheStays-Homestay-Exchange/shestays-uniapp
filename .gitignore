@@ -1,0 +1,9 @@
+
+unpackage/debug/
+unpackage/cache/
+unpackage/dist/
+unpackage/release/
+dist/
+*.idea
+*.hbuilderx
+package-lock.json
