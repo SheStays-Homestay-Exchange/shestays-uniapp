@@ -1,6 +1,6 @@
 <template>
 	<!-- 无图片房源来源于小红书,有图片是小程序自己上传的房源 -->
-	<view :class="['new-house',(item.houseImgs?.length > 0)?'':'hava-border']" @click="emits('itemClick',item)">
+	<view :class="['new-house',(item.houseImgs?.length > 0)?'':'hava-border']" @click="houseClick">
 		<swiper class="swiper" circular :indicator-dots="true" :autoplay="false" indicator-active-color="#D8336D" v-if="item?.houseImgs?.length > 0">
 			<swiper-item v-for="(el,index) in item.houseImgs">
 				<image src="../../../static/image/Frame 48096034.png" class="house-image" mode=""></image>
@@ -40,6 +40,13 @@
 			type: Object
 		},
 	})
+	
+	const houseClick = ()=>{
+		//有图片才去详情
+		if(props.item.houseImgs?.length > 0){
+			emits('itemClick',item)
+		}
+	}
 	
 </script>
 

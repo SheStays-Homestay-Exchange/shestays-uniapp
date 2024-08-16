@@ -35,7 +35,7 @@ const _sfc_main = {
           ["show-animation"]: true
         }),
         e: common_vendor.p({
-          title: "我该如何确保旅程的安全？",
+          title: "如何上传房源？",
           ["show-animation"]: true
         }),
         f: common_vendor.p({
@@ -50,5 +50,5 @@ const _sfc_main = {
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-41ea3e9b"], ["__file", "D:/wtt/prictice/shestays-uniapp/pages/tabBar/about/about.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-41ea3e9b"], ["__file", "D:/WTT/job/shestays-uniapp/pages/tabBar/about/about.vue"]]);
 wx.createPage(MiniProgramPage);

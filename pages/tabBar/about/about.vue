@@ -28,7 +28,7 @@
 						<text class="text">不是的！我们支持提供双方互换住宿、单向借宿。只要你有需求，就可以寻找愿意提供房源的姐妹借宿。当然，如果你有空闲的资源，也非常欢迎你为其他姐妹提供帮助!</text>
 					</view>
 				</uni-collapse-item>
-				<uni-collapse-item title="我该如何确保旅程的安全？" :show-animation="true">
+				<uni-collapse-item title="如何上传房源？" :show-animation="true">
 					<view class="content">
 						<text class="text">你可以在「个人主页-发布房源」中发布你的房源，提交房源后，SheStays 管理员将审核你的房源，通过后将开启你的互换旅程！</text>
 					</view>

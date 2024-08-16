@@ -16,6 +16,16 @@ const _sfc_main = {
     show: {
       default: false,
       type: Boolean
+    },
+    //小红书id
+    id: {
+      type: String,
+      default: ""
+    },
+    //小红书昵称
+    name: {
+      type: String,
+      default: ""
     }
   },
   emits: ["tapClose"],
@@ -37,7 +47,7 @@ const _sfc_main = {
     };
     const btnClick = () => {
       common_vendor.index.setClipboardData({
-        data: "hello",
+        data: props.id,
         success: function() {
           close();
           common_vendor.index.showToast({
@@ -48,25 +58,30 @@ const _sfc_main = {
       });
     };
     return (_ctx, _cache) => {
-      return {
+      return common_vendor.e({
         a: common_vendor.o(close),
         b: common_vendor.p({
           type: "closeempty",
           size: "24"
         }),
-        c: common_vendor.o(btnClick),
-        d: common_vendor.sr(detialpop, "b364594e-0", {
+        c: common_vendor.t(__props.name),
+        d: common_vendor.t(__props.id),
+        e: __props.id
+      }, __props.id ? {
+        f: common_vendor.o(btnClick)
+      } : {}, {
+        g: common_vendor.sr(detialpop, "b364594e-0", {
           "k": "detialpop"
         }),
-        e: common_vendor.o(close),
-        f: common_vendor.o(close),
-        g: common_vendor.p({
+        h: common_vendor.o(close),
+        i: common_vendor.o(close),
+        j: common_vendor.p({
           type: "center",
           ["is-mask-click"]: true
         })
-      };
+      });
     };
   }
 };
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-b364594e"], ["__file", "D:/wtt/prictice/shestays-uniapp/components/DetailPopup.vue"]]);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-b364594e"], ["__file", "D:/WTT/job/shestays-uniapp/components/DetailPopup.vue"]]);
 wx.createComponent(Component);

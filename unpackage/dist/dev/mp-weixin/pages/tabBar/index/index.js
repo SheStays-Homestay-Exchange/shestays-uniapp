@@ -3,10 +3,6 @@ const common_vendor = require("../../../common/vendor.js");
 const common_assets = require("../../../common/assets.js");
 const common_api_common = require("../../../common/api/common.js");
 const common_js_cache = require("../../../common/js/cache.js");
-require("../../../common/js/request.js");
-require("../../../common/config/index.js");
-require("../../../store/index.js");
-require("../../../common/js/util.js");
 if (!Array) {
   const _easycom_uni_load_more2 = common_vendor.resolveComponent("uni-load-more");
   _easycom_uni_load_more2();
@@ -39,10 +35,6 @@ const _sfc_main = {
       listData.value = [];
       getHouseListFun("refresh");
     });
-    common_vendor.computed((value) => {
-      console.log("computer", value);
-      return "星星";
-    });
     const contentText = {
       contentdown: "上拉显示更多",
       contentrefresh: "正在加载...",
@@ -54,11 +46,7 @@ const _sfc_main = {
       }
     }
     const loadStatus = common_vendor.ref("contentdown");
-    const listData = common_vendor.ref([
-      {
-        countryName: "中国"
-      }
-    ]);
+    const listData = common_vendor.ref([]);
     const pages = common_vendor.reactive({
       pageIndex: 1,
       totalPage: 0
@@ -85,8 +73,14 @@ const _sfc_main = {
       }
     };
     const popShow = common_vendor.ref(false);
+    const itemInfo = common_vendor.reactive({
+      id: "",
+      name: ""
+    });
     const contactHost = (item) => {
       if (isLogin()) {
+        itemInfo.id = item.xiaohongshuId || "-";
+        itemInfo.name = item.xiaohongshuUsername || "-";
         popShow.value = true;
       }
     };
@@ -134,17 +128,20 @@ const _sfc_main = {
         })
       } : {}, {
         f: common_vendor.o(($event) => popShow.value = false),
-        g: common_vendor.p({
-          show: popShow.value
+        g: itemInfo.id,
+        h: common_vendor.p({
+          show: popShow.value,
+          name: itemInfo.name,
+          id: itemInfo.id
         }),
-        h: !((_a = userInfo.value) == null ? void 0 : _a.openId)
+        i: !((_a = userInfo.value) == null ? void 0 : _a.openId)
       }, !((_b = userInfo.value) == null ? void 0 : _b.openId) ? {
-        i: common_assets._imports_2,
-        j: common_vendor.o(isLogin)
+        j: common_assets._imports_2,
+        k: common_vendor.o(isLogin)
       } : {});
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-036b8cf8"], ["__file", "D:/wtt/prictice/shestays-uniapp/pages/tabBar/index/index.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-036b8cf8"], ["__file", "D:/WTT/job/shestays-uniapp/pages/tabBar/index/index.vue"]]);
 _sfc_main.__runtimeHooks = 2;
 wx.createPage(MiniProgramPage);

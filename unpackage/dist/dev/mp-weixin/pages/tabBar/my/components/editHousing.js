@@ -37,5 +37,5 @@ const _sfc_main = {
     };
   }
 };
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-4b1b2bdd"], ["__file", "D:/wtt/prictice/shestays-uniapp/pages/tabBar/my/components/editHousing.vue"]]);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-4b1b2bdd"], ["__file", "D:/WTT/job/shestays-uniapp/pages/tabBar/my/components/editHousing.vue"]]);
 wx.createComponent(Component);
