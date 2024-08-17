@@ -24,13 +24,23 @@
 /* 透明度 */
 /* 文章场景相关 */
 .popup-content.data-v-b364594e {
-  max-width: 70%;
+  max-width: 80%;
   background: #fff;
   box-sizing: border-box;
   padding: 20rpx 32rpx 40rpx 32rpx;
   box-shadow: 0rpx 0rpx 10rpx 1rpx rgba(179, 179, 179, 0.3);
   border-radius: 24rpx;
   margin: auto;
+}
+.popup-content .text-ellipis.data-v-b364594e {
+  white-space: nowrap;
+  /* 不换行 */
+  overflow: hidden;
+  /* 隐藏超出的内容 */
+  text-overflow: ellipsis;
+  /* 用省略号表示被隐藏的部分 */
+  max-width: 200px;
+  /* 设置最大宽度以限制文本的显示长度 */
 }
 .popup-content .ptc-icon.data-v-b364594e {
   text-align: right;
@@ -61,6 +71,10 @@
 .popup-content .tips-box.data-v-b364594e {
   font-size: 28rpx;
   color: #5E5E5E;
+}
+.popup-content .tips-box .margin-top-10.data-v-b364594e {
+  margin-top: 16rpx;
+  display: block;
 }
 .popup-content .btn-box.data-v-b364594e {
   display: flex;

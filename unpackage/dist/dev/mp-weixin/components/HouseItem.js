@@ -12,6 +12,13 @@ const _sfc_main = {
   emits: ["itemClick", "contactHost"],
   setup(__props, { emit: __emit }) {
     const emits = __emit;
+    const props = __props;
+    const houseClick = () => {
+      var _a;
+      if (((_a = props.item.houseImgs) == null ? void 0 : _a.length) > 0) {
+        emits("itemClick", item);
+      }
+    };
     return (_ctx, _cache) => {
       var _a, _b, _c, _d, _e, _f, _g, _h, _i;
       return common_vendor.e({
@@ -32,10 +39,10 @@ const _sfc_main = {
         h: common_vendor.t(__props.item.describle),
         i: common_vendor.o(($event) => emits("contactHost", __props.item)),
         j: common_vendor.n(((_i = __props.item.houseImgs) == null ? void 0 : _i.length) > 0 ? "" : "hava-border"),
-        k: common_vendor.o(($event) => emits("itemClick", __props.item))
+        k: common_vendor.o(houseClick)
       });
     };
   }
 };
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-b7591948"], ["__file", "D:/wtt/prictice/shestays-uniapp/components/HouseItem.vue"]]);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-b7591948"], ["__file", "D:/WTT/job/shestays-uniapp/components/HouseItem.vue"]]);
 wx.createComponent(Component);

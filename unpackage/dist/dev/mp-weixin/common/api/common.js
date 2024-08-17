@@ -12,7 +12,11 @@ function getHouseByRegion(params) {
 function getName() {
   return common_js_request.get("getRecommendCountryName");
 }
+function getNation() {
+  return common_js_request.get("getNation");
+}
 exports.getHouseByRegion = getHouseByRegion;
 exports.getHouseList = getHouseList;
 exports.getName = getName;
+exports.getNation = getNation;
 exports.userAuthor = userAuthor;

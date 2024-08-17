@@ -9,14 +9,15 @@
 				<view class="img">
 				</view>
 				<view class="name-box">
-					<view class="name">用户名：花花</view>
-					<view>小红书ID：花花</view>
+					<view class="name text-ellipis">用户名：{{name}}</view>
+					<view class="name text-ellipis">小红书ID：{{id}}</view>
 				</view>
 			</view>
 			<view class="tips-box">
-				Tips✨：主动自我介绍说明目的的成功率更高哦~ 例如：嗨，你好！我从SheStays看到了您的房源。期待能够获得借宿的机会，一起分享有趣的经历。
+				<text>Tips✨：主动自我介绍说明目的的成功率更高哦~</text>
+				<text class="margin-top-10">例如：嗨，你好！我从SheStays看到了您的房源。期待能够获得借宿的机会，一起分享有趣的经历。</text>
 			</view>
-			<view class="btn-box">
+			<view class="btn-box" v-if="id">
 				<view class="btn" @click="btnClick">
 					复制ID
 				</view>
@@ -34,6 +35,16 @@
 			default: false,
 			type: Boolean
 		},
+		//小红书id
+		id:{
+			type: String,
+			default:''
+		},
+		//小红书昵称
+		name:{
+			type : String,
+			default:''
+		}
 	})
 	const detialpop = ref(null)
 	watch(()=>props.show,(v,ov)=>{
@@ -52,7 +63,7 @@
 	
 	const btnClick =()=>{
 		uni.setClipboardData({
-			data: 'hello',
+			data: props.id,
 			success: function () {
 				close()
 				uni.showToast({
@@ -66,13 +77,19 @@
 
 <style lang="scss" scoped>
 	.popup-content{
-		max-width: 70%;
+		max-width: 80%;
 		background: #fff;
 		box-sizing: border-box;
 		padding: 20rpx 32rpx 40rpx 32rpx;
 		box-shadow: 0rpx 0rpx 10rpx 1rpx rgba(179,179,179,0.3);
 		border-radius: 24rpx;
 		margin: auto;
+		.text-ellipis{
+		  white-space: nowrap; /* 不换行 */
+		  overflow: hidden; /* 隐藏超出的内容 */
+		  text-overflow: ellipsis; /* 用省略号表示被隐藏的部分 */
+		  max-width: 200px; /* 设置最大宽度以限制文本的显示长度 */
+		}
 		.ptc-icon{
 			text-align: right;
 		}
@@ -102,6 +119,10 @@
 		.tips-box{
 			font-size: 28upx;
 			color: #5E5E5E;
+			.margin-top-10{
+				margin-top: 16upx;
+				display: block;
+			}
 		}
 		.btn-box{
 			display: flex;
