@@ -167,9 +167,9 @@
 				phone: form.phone,
 				personalProfile: form.des,
 				avatar: form.avatarimg[0],
-			    bdYear: dateArr[0],
-				bdMonth: dateArr[1],
-				bdDay: dateArr[2],
+			    bdYear:  Number(dateArr[0]),
+				bdMonth: Number(dateArr[1]),
+				bdDay: Number(dateArr[2]),
 				userId: userInfo.userId,
 				nationId:'1', //国家id
 				regionId:'1', //区域id
