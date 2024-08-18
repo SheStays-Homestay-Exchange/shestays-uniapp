@@ -26,6 +26,9 @@
 .update-info.data-v-820c3591 {
   padding: 22rpx 48rpx 200rpx 48rpx;
 }
+.update-info .radio-box.data-v-820c3591 {
+  flex: 1;
+}
 .update-info .user-icon.data-v-820c3591 {
   width: 232rpx;
   height: 232rpx;

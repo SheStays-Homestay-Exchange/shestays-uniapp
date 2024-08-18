@@ -1,7 +1,7 @@
 <template>
 	<view class="update-info">
 		<view class="user-icon" @click="uploadHead">
-			<image class="user-icon-image" src="" mode=""></image>
+			<image class="user-icon-image" :src="form.avatarimg" mode=""></image>
 			<view class="user-update-icon">
 				<image class="update-icon" src="../../../../static/image/camera-01.png" mode=""></image>
 			</view>
@@ -10,34 +10,48 @@
 			<view class="user-title">
 				用户名
 			</view>
-			<uni-easyinput type="text" placeholder="未设置"></uni-easyinput>
+			<uni-easyinput type="text" placeholder="未设置" maxlength="16" v-model="form.userName"></uni-easyinput>
 		</view>
 		<view class="user-cli">
 			<view class="user-title">
 				性别
 			</view>
-			<uni-easyinput type="text"></uni-easyinput>
+			<view class="radio-box">
+				<radio-group @change="radioChange">
+					<label class="radio" style="margin-right: 40rpx;">
+						<radio color="#d8336d" value="1"/>女
+					</label>
+					<label class="radio">
+						<radio color="#d8336d" value="1"/>男
+					</label>
+				</radio-group>
+			</view>
 		</view>
-		<view class="user-cli">
+		<!-- <view class="user-cli">
 			<view class="user-title">
 				微信号
 			</view>
-			<uni-easyinput type="text" placeholder="未设置"></uni-easyinput>
-		</view>
+			<uni-easyinput type="text" placeholder="未设置" v-model="form.wechatId"></uni-easyinput>
+		</view> -->
 		<view class="user-cli">
 			<view class="user-title">
 				手机号
 			</view>
-			<uni-easyinput type="text" placeholder="未设置"></uni-easyinput>
+			<uni-easyinput type="text" placeholder="未设置" v-model="form.phone" maxlength="11"></uni-easyinput>
 		</view>
 		<view class="user-cli">
 			<view class="user-title">
 				生日
 			</view>
 			<view class="user-info">
-				<view class="user-info-title">
-					2000-9-10
-				</view>
+				<uni-datetime-picker
+					type="date"
+					:value="form.date"
+					:border="none"
+					:end="dateEnd"
+					@change="dateChange">
+					{{form.date}}
+				</uni-datetime-picker>
 				<image class="user-info-right-icon" src="../../../../static/image/chevron-right.jpg" mode=""></image>
 			</view>
 		</view>
@@ -56,9 +70,9 @@
 			<view class="user-title">
 				个人简介
 			</view>
-			<uni-easyinput type="textarea"></uni-easyinput>
+			<uni-easyinput type="textarea" v-model="form.des" maxlength="300"></uni-easyinput>
 		</view>
-		<view class="submit-button">
+		<view class="submit-button" @click="submit">
 			保存个人信息
 		</view>
 	</view>
@@ -66,6 +80,105 @@
 
 <script setup>
 	import { ref, reactive } from 'vue'
+	import { onLoad } from '@dcloudio/uni-app'
+	import  {date, msg}  from '@/common/js/util.js'
+	import { editUserData } from '@/common/api/common'
+	import cache from "@/common/js/cache.js";
+	
+	// 用户信息
+	var userInfo = {}
+	onLoad(()=>{
+		userInfo = typeof(cache.get('userInfo')) == 'string' ? JSON.parse( cache.get('userInfo') ) : cache.get('userInfo')
+	})
+	const form = reactive({
+		date:'请选择生日',
+		sex:'',
+		phone:'',
+		wechatId:'',
+		des:''
+	})
+	
+	const dateChange = e=>{
+		form.date = e
+	}
+	
+	// 截止日期
+	const dateEnd = date(new Date(), 'Y-m-d')
+	const radioChange = e=>{
+		form.sex = e.detail.value
+	}
+	onLoad(()=>{
+		// console.log('date===',dateEnd)
+		// uni.getFuzzyLocation({
+		//  type: 'wgs84',
+		//  success (res) {
+		// 	 console.log('成功==',res)
+		//    const latitude = res.latitude
+		//    const longitude = res.longitude
+		//  },
+		//  fail(err){
+		// 	 console.log('失败',err)
+		//  }
+		// })
+	})
+	
+	
+	const validateFun = ()=>{
+		if(!form.userName){
+			msg('请输入用户名')
+			return false
+		}else if(!form.sex){
+			msg('请选择性别')
+			return false
+		}else if(!form.date){
+			msg('请选择生日')
+			return false
+		}else if(!form.des){
+			msg('请输入简介')
+			return false
+		}
+		let reg = /^1[3-9][0-9]{9}$/;
+		if (!form.phone) {
+			msg('请输入手机号')
+			return false
+		}else if (!reg.test(form.phone)) {
+			msg('手机号码格式有误，请重新输入')
+			return false
+		} 
+		return true
+	}
+	
+	const editUserDataFun = (param)=>{
+		editUserData(param).then(res=>{
+			
+		}).catch(e=>{
+			console.log('错误==',e)
+		})
+	}
+	
+	const submit = ()=>{
+		let ifPass = validateFun()
+		if(ifPass){
+			let dateArr = form.date.split('-');
+			console.log('生日',dateArr)
+			editUserDataFun({
+				userName : form.userName,
+				genderDictCode: form.sex,
+				phone: form.phone,
+				personalProfile: form.des,
+				avatar: form.avatarimg[0],
+			    bdYear: dateArr[0],
+				bdMonth: dateArr[1],
+				bdDay: dateArr[2],
+				userId: userInfo.userId,
+				nationId:'1', //国家id
+				regionId:'1', //区域id
+				cityId:'1', //城市id
+				// wechatId: '1',
+			})
+		}
+			console.log(ifPass,form)
+	}
 	
 	const info = ref({
 		avatar:''
@@ -80,19 +193,18 @@
 			},
 			success(e) {
 				//判断文件后缀名
+				console.log('图片上传',e)
 				if (e.tempFilePaths[0].split('.')[e.tempFilePaths[0].split('.').length - 1].includes('gif')) {
-					uni.showToast({
-						title: '暂不支持上传gif图片，请重新选择后上传',
-						icon: 'none'
-					})
+					msg('暂不支持上传gif图片，请重新选择后上传')
 					return false
 				}
-				
-				uploadFile(e.tempFilePaths).then(res => {
-					form.avatar = res[0]
-				}).catch(e => {
-					console.log('图片上传错误', e)
-				})
+				form.avatarimg = e.tempFilePaths
+				form.avatar = e.tempFiles[0]
+				// uploadFile(e.tempFilePaths).then(res => {
+				// 	form.avatar = res[0]
+				// }).catch(e => {
+				// 	console.log('图片上传错误', e)
+				// })
 			},
 			fail(e) {
 				console.log('选择图片错误', e)
@@ -104,6 +216,9 @@
 <style lang="scss" scoped>
 .update-info {
 	padding: 22rpx 48rpx 200rpx 48rpx;
+	.radio-box{
+		flex: 1;
+	}
 	.user-icon {
 		width: 232rpx;
 		height: 232rpx;

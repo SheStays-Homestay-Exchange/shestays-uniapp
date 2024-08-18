@@ -18,6 +18,10 @@ function getNation() {
 function getHouseDetail(params) {
   return common_js_request.get("getHouseById", params);
 }
+function editUserData(param) {
+  return common_js_request.post("editUserData", param);
+}
+exports.editUserData = editUserData;
 exports.getHouseByRegion = getHouseByRegion;
 exports.getHouseDetail = getHouseDetail;
 exports.getHouseList = getHouseList;

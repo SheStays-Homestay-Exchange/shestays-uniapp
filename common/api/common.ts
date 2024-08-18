@@ -76,7 +76,16 @@ export function getRegion(params) {
 export function getCity(params) {
 	return get('getCity',params)
 }
+
 //接口名称：房源详情接口
 export function getHouseDetail(params) {
 	return get('getHouseById',params)
 }
+
+/**
+ * 接口名称：编辑个人信息接口
+ */
+export function editUserData(param) {
+	return post('editUserData', param)
+}
+
