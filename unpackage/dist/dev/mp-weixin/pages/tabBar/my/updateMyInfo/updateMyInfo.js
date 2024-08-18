@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
+const common_assets = require("../../../../common/assets.js");
 if (!Array) {
   const _easycom_uni_easyinput2 = common_vendor.resolveComponent("uni-easyinput");
   _easycom_uni_easyinput2();
@@ -42,28 +43,31 @@ const _sfc_main = {
     };
     return (_ctx, _cache) => {
       return {
-        a: common_vendor.o(uploadHead),
-        b: common_vendor.p({
+        a: common_assets._imports_0$8,
+        b: common_vendor.o(uploadHead),
+        c: common_vendor.p({
           type: "text",
           placeholder: "未设置"
-        }),
-        c: common_vendor.p({
-          type: "text"
         }),
         d: common_vendor.p({
-          type: "text",
-          placeholder: "未设置"
+          type: "text"
         }),
         e: common_vendor.p({
           type: "text",
           placeholder: "未设置"
         }),
         f: common_vendor.p({
+          type: "text",
+          placeholder: "未设置"
+        }),
+        g: common_assets._imports_1$1,
+        h: common_assets._imports_1$1,
+        i: common_vendor.p({
           type: "textarea"
         })
       };
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-820c3591"], ["__file", "D:/WTT/job/shestays-uniapp/pages/tabBar/my/updateMyInfo/updateMyInfo.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-820c3591"]]);
 wx.createPage(MiniProgramPage);

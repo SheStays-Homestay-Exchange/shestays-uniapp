@@ -3,7 +3,7 @@
 	<view :class="['new-house',(item.houseImgs?.length > 0)?'':'hava-border']" @click="houseClick">
 		<swiper class="swiper" circular :indicator-dots="true" :autoplay="false" indicator-active-color="#D8336D" v-if="item?.houseImgs?.length > 0">
 			<swiper-item v-for="(el,index) in item.houseImgs">
-				<image src="../../../static/image/Frame 48096034.png" class="house-image" mode=""></image>
+				<!-- <image src="../../../static/image/Frame 48096034.png" class="house-image" mode=""></image> -->
 			</swiper-item>
 		</swiper>
 		<view class="time-body">

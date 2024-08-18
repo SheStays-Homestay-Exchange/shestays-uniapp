@@ -1,116 +1,122 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const common_api_common = require("../../common/api/common.js");
 if (!Array) {
   const _easycom_uni_swiper_dot2 = common_vendor.resolveComponent("uni-swiper-dot");
-  const _easycom_uni_icons2 = common_vendor.resolveComponent("uni-icons");
-  const _easycom_uni_popup2 = common_vendor.resolveComponent("uni-popup");
-  (_easycom_uni_swiper_dot2 + _easycom_uni_icons2 + _easycom_uni_popup2)();
+  _easycom_uni_swiper_dot2();
 }
 const _easycom_uni_swiper_dot = () => "../../uni_modules/uni-swiper-dot/components/uni-swiper-dot/uni-swiper-dot.js";
-const _easycom_uni_icons = () => "../../uni_modules/uni-icons/components/uni-icons/uni-icons.js";
-const _easycom_uni_popup = () => "../../uni_modules/uni-popup/components/uni-popup/uni-popup.js";
 if (!Math) {
-  (_easycom_uni_swiper_dot + _easycom_uni_icons + _easycom_uni_popup)();
+  (_easycom_uni_swiper_dot + DetailPopup)();
 }
+const DetailPopup = () => "../../components/DetailPopup.js";
 const _sfc_main = {
   __name: "houseDetail",
   setup(__props) {
-    const popup = common_vendor.ref(null);
+    const current = common_vendor.ref(0);
+    const popShow = common_vendor.ref(false);
+    const contactHost = (item) => {
+      popShow.value = true;
+    };
+    const dotsStyles = {
+      backgroundColor: "#D9D9D9",
+      border: "1px rgb(217, 217, 217) soild",
+      selectedBackgroundColor: "#D8336D",
+      selectedBorder: "1px rgba(256, 256, 256, 1) solid",
+      bottom: 50,
+      width: 7,
+      height: 7
+    };
     const state = common_vendor.reactive({
-      accommodationCondition: "舒适温馨",
-      guestCapacity: "2人",
-      openDate: "2024年6月-8月",
-      messages: ["爱干净", "遵守规定", "保持安静"],
-      facilities: "齐全的厨房设备，高速网络，舒适的床铺",
+      houseAmount: 1,
+      countryName: "-",
+      cityName: "-",
+      startTime: "2024-06-02 00:00:00",
+      endTime: "2024-06-04 00:00:00",
+      describle: "1.爱干净\n2.保持安静\n3.爱干净",
       hostImageSrc: "https://lf-flow-web-cdn.doubao.com/obj/flow-doubao/doubao_ext/static/image/avatar-transparent.ea272b11.png",
-      hostName: "张三",
-      successfulReceptionCount: "10 次",
-      position: "加拿大 - 温哥华",
-      icon: "star",
-      bannerList: [
-        { url: "https://res.klook.com/image/upload/q_85/activities/ori7zgidaf70ildeaazw.jpg", key: 1 },
-        { url: "https://res.klook.com/image/upload/c_fill,w_1265,h_712/q_80/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/mn4cemkgx5r6fy6rgie6.webp", key: 2 },
-        { url: "https://res.klook.com/image/upload/q_85/activities/ori7zgidaf70ildeaazw.jpg", key: 3 }
+      houseImgs: [
+        {
+          imgUrl: "https://res.klook.com/image/upload/q_85/activities/ori7zgidaf70ildeaazw.jpg",
+          houseImgId: 1
+        },
+        {
+          imgUrl: "https://res.klook.com/image/upload/c_fill,w_1265,h_712/q_80/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/mn4cemkgx5r6fy6rgie6.webp",
+          houseImgId: 2
+        },
+        {
+          imgUrl: "https://res.klook.com/image/upload/q_85/activities/ori7zgidaf70ildeaazw.jpg",
+          houseImgId: 3
+        }
       ]
     });
+    const formatDate = (time) => {
+      return time ? time.split(" ")[0] : "";
+    };
     const houseInfo = [
-      { label: "房源开放日期", value: state.openDate },
-      { label: "对房客姐妹说的话", value: state.messages.join(", ") },
-      { label: "房子设施", value: state.facilities }
+      {
+        label: "房源开放日期",
+        value: `${formatDate(state.startTime)}~${formatDate(state.endTime)}`
+      },
+      {
+        label: "对房客姐妹说的话",
+        value: state.describle
+      }
     ];
-    const handleCollect = () => {
-      state.icon = state.icon === "star" ? "star-filled" : "star";
-      console.log("collect");
+    const onSwiperChange = (e) => {
+      current.value = e.detail.current;
     };
-    const onContact = () => {
-      console.log("联系房东");
-      popup.value.open();
-    };
-    const handleCopy = () => {
-      common_vendor.index.setClipboardData({
-        data: "123456",
-        success: () => {
-          console.log("success");
-          popup.value.close();
-        },
-        fail: () => {
-          console.log("fail");
-          popup.value.close();
+    common_vendor.onLoad((options) => {
+      common_api_common.getHouseDetail({ houseId: options == null ? void 0 : options.id }).then((res) => {
+        const { code, data = {} } = res || {};
+        if (code === 200) {
+          state = {
+            ...state,
+            ...data
+          };
+          console.log(state, "************");
         }
+      }).catch((error) => {
+        console.log(error, "rrrr");
       });
-    };
-    common_vendor.onLoad(() => {
-      console.log("进入详情，调用接口");
     });
     return (_ctx, _cache) => {
       return {
-        a: common_vendor.f(state.bannerList, (item, index, i0) => {
+        a: common_vendor.f(state.houseImgs, (item, k0, i0) => {
           return {
-            a: item.url,
-            b: index
+            a: item.imgUrl,
+            b: item.houseImgId
           };
         }),
-        b: common_vendor.o((...args) => _ctx.change && _ctx.change(...args)),
-        c: _ctx.swiperDotIndex,
-        d: common_vendor.o(_ctx.clickItem),
-        e: common_vendor.p({
-          info: _ctx.info,
-          current: _ctx.current,
-          mode: _ctx.mode,
-          field: "content"
+        b: current.value,
+        c: common_vendor.o(onSwiperChange),
+        d: common_vendor.p({
+          current: current.value,
+          total: state.houseImgs.length,
+          ["dots-styles"]: dotsStyles,
+          info: state.houseImgs,
+          mode: "dot"
         }),
-        f: common_vendor.t(state.position),
-        g: common_vendor.t(state.accommodationCondition),
-        h: common_vendor.t(state.guestCapacity),
-        i: common_vendor.p({
-          type: state.icon,
-          size: "28"
-        }),
-        j: common_vendor.o(handleCollect),
-        k: common_vendor.f(houseInfo, (item, index, i0) => {
+        e: common_vendor.t(state.countryName),
+        f: common_vendor.t(state.cityName),
+        g: common_vendor.t(state.houseAmount),
+        h: common_vendor.f(houseInfo, (item, index, i0) => {
           return {
             a: common_vendor.t(item.label),
             b: common_vendor.t(item.value),
             c: index
           };
         }),
-        l: state.hostImageSrc,
-        m: common_vendor.t(state.hostName),
-        n: common_vendor.t(state.successfulReceptionCount),
-        o: common_vendor.o(onContact),
-        p: state.hostImageSrc,
-        q: common_vendor.t(state.hostName),
-        r: common_vendor.o(handleCopy),
-        s: common_vendor.sr(popup, "a8f5680b-2", {
-          "k": "popup"
-        }),
-        t: common_vendor.p({
-          type: "center",
-          ["border-radius"]: "10px 10px 0 0"
+        i: state.hostImageSrc,
+        j: common_vendor.t(state.hostName),
+        k: common_vendor.o(contactHost),
+        l: common_vendor.o(($event) => popShow.value = false),
+        m: common_vendor.p({
+          show: popShow.value
         })
       };
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-a8f5680b"], ["__file", "D:/WTT/job/shestays-uniapp/pages/houseDetail/houseDetail.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-a8f5680b"]]);
 wx.createPage(MiniProgramPage);

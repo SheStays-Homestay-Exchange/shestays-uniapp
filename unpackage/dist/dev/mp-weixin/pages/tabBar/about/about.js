@@ -23,7 +23,7 @@ const _sfc_main = {
     };
     return (_ctx, _cache) => {
       return {
-        a: common_assets._imports_0$1,
+        a: common_assets._imports_0$2,
         b: common_vendor.p({
           type: "arrow-right",
           size: "26",
@@ -50,5 +50,5 @@ const _sfc_main = {
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-41ea3e9b"], ["__file", "D:/WTT/job/shestays-uniapp/pages/tabBar/about/about.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-41ea3e9b"]]);
 wx.createPage(MiniProgramPage);

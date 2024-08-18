@@ -76,3 +76,7 @@ export function getRegion(params) {
 export function getCity(params) {
 	return get('getCity',params)
 }
+//接口名称：房源详情接口
+export function getHouseDetail(params) {
+	return get('getHouseById',params)
+}
