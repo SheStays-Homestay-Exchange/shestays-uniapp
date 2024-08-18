@@ -34,8 +34,9 @@ const _sfc_main = {
     ...common_vendor.mapMutations(["setUniverifyErrorMsg", "setUniverifyLogin"])
   }
 };
+const App = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__file", "D:/WTT/job/shestays-uniapp/App.vue"]]);
 function createApp() {
-  const app = common_vendor.createSSRApp(_sfc_main);
+  const app = common_vendor.createSSRApp(App);
   app.use(store_index.store);
   app.config.globalProperties.$adpid = "1111111111";
   app.config.globalProperties.$backgroundAudioData = {

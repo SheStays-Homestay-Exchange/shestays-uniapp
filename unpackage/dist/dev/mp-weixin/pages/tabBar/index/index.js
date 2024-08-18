@@ -108,9 +108,8 @@ const _sfc_main = {
       var _a, _b;
       return common_vendor.e({
         a: common_assets._imports_0,
-        b: common_assets._imports_0$1,
-        c: common_vendor.o(handleSearch),
-        d: common_vendor.f(listData.value, (item, i, i0) => {
+        b: common_vendor.o(handleSearch),
+        c: common_vendor.f(listData.value, (item, i, i0) => {
           return {
             a: i,
             b: common_vendor.o(contactHost, i),
@@ -121,28 +120,28 @@ const _sfc_main = {
             })
           };
         }),
-        e: listData.value.length > 0
+        d: listData.value.length > 0
       }, listData.value.length > 0 ? {
-        f: common_vendor.p({
+        e: common_vendor.p({
           status: loadStatus.value,
           contentText
         })
       } : {}, {
-        g: common_vendor.o(($event) => popShow.value = false),
-        h: itemInfo.id,
-        i: common_vendor.p({
+        f: common_vendor.o(($event) => popShow.value = false),
+        g: itemInfo.id,
+        h: common_vendor.p({
           show: popShow.value,
           name: itemInfo.name,
           id: itemInfo.id
         }),
-        j: !((_a = userInfo.value) == null ? void 0 : _a.openId)
+        i: !((_a = userInfo.value) == null ? void 0 : _a.openId)
       }, !((_b = userInfo.value) == null ? void 0 : _b.openId) ? {
-        k: common_assets._imports_2,
-        l: common_vendor.o(isLogin)
+        j: common_assets._imports_2,
+        k: common_vendor.o(isLogin)
       } : {});
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-036b8cf8"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-036b8cf8"], ["__file", "D:/WTT/job/shestays-uniapp/pages/tabBar/index/index.vue"]]);
 _sfc_main.__runtimeHooks = 2;
 wx.createPage(MiniProgramPage);

@@ -1,6 +1,5 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
-const common_assets = require("../../../common/assets.js");
 const common_api_common = require("../../../common/api/common.js");
 if (!Array) {
   const _easycom_uni_easyinput2 = common_vendor.resolveComponent("uni-easyinput");
@@ -91,11 +90,10 @@ const _sfc_main = {
     });
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_assets._imports_0$1,
-        b: common_vendor.o(search),
-        c: common_vendor.o(inputChange),
-        d: common_vendor.o(($event) => region.value = $event),
-        e: common_vendor.p({
+        a: common_vendor.o(search),
+        b: common_vendor.o(inputChange),
+        c: common_vendor.o(($event) => region.value = $event),
+        d: common_vendor.p({
           styles,
           inputBorder: false,
           type: "text",
@@ -105,9 +103,9 @@ const _sfc_main = {
           confirmType: "search",
           modelValue: region.value
         }),
-        f: !showResult.value
+        e: !showResult.value
       }, !showResult.value ? {
-        g: common_vendor.f(citys.value, (item, i, i0) => {
+        f: common_vendor.f(citys.value, (item, i, i0) => {
           return {
             a: common_vendor.t(item.countryName),
             b: i,
@@ -115,9 +113,9 @@ const _sfc_main = {
           };
         })
       } : common_vendor.e({
-        h: listData.value.length > 0
+        g: listData.value.length > 0
       }, listData.value.length > 0 ? {
-        i: common_vendor.f(listData.value, (item, i, i0) => {
+        h: common_vendor.f(listData.value, (item, i, i0) => {
           return {
             a: i,
             b: common_vendor.o(contactHost, i),
@@ -129,15 +127,15 @@ const _sfc_main = {
           };
         })
       } : {}, {
-        j: noData.value
+        i: noData.value
       }, noData.value ? {} : {}), {
-        k: common_vendor.o(($event) => popShow.value = false),
-        l: common_vendor.p({
+        j: common_vendor.o(($event) => popShow.value = false),
+        k: common_vendor.p({
           show: popShow.value
         })
       });
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-5f29c737"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-5f29c737"], ["__file", "D:/WTT/job/shestays-uniapp/pages/public/search/search.vue"]]);
 wx.createPage(MiniProgramPage);

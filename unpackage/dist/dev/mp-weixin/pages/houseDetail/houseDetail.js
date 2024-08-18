@@ -118,5 +118,5 @@ const _sfc_main = {
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-a8f5680b"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-a8f5680b"], ["__file", "D:/WTT/job/shestays-uniapp/pages/houseDetail/houseDetail.vue"]]);
 wx.createPage(MiniProgramPage);
