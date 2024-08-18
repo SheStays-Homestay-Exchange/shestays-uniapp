@@ -26,6 +26,11 @@ const _sfc_main = {
     name: {
       type: String,
       default: ""
+    },
+    // 名字类型
+    userNameType: {
+      type: String,
+      default: "小红书ID"
     }
   },
   emits: ["tapClose"],
@@ -33,15 +38,19 @@ const _sfc_main = {
     const emits = __emit;
     const props = __props;
     const detialpop = common_vendor.ref(null);
-    common_vendor.watch(() => props.show, (v, ov) => {
-      common_vendor.nextTick$1(() => {
-        if (v) {
-          detialpop.value.open();
-        } else {
-          detialpop && detialpop.value.close();
-        }
-      });
-    }, { deep: true });
+    common_vendor.watch(
+      () => props.show,
+      (v, ov) => {
+        common_vendor.nextTick$1(() => {
+          if (v) {
+            detialpop.value.open();
+          } else {
+            detialpop && detialpop.value.close();
+          }
+        });
+      },
+      { deep: true }
+    );
     const close = () => {
       emits("tapClose");
     };
@@ -51,7 +60,7 @@ const _sfc_main = {
         success: function() {
           close();
           common_vendor.index.showToast({
-            title: "已复制房主小红书ID到剪贴板",
+            title: `已复制房主${userNameType}到剪贴板`,
             icon: "none"
           });
         }
@@ -65,17 +74,18 @@ const _sfc_main = {
           size: "24"
         }),
         c: common_vendor.t(__props.name),
-        d: common_vendor.t(__props.id),
-        e: __props.id
+        d: common_vendor.t(__props.userNameType),
+        e: common_vendor.t(__props.id),
+        f: __props.id
       }, __props.id ? {
-        f: common_vendor.o(btnClick)
+        g: common_vendor.o(btnClick)
       } : {}, {
-        g: common_vendor.sr(detialpop, "b364594e-0", {
+        h: common_vendor.sr(detialpop, "b364594e-0", {
           "k": "detialpop"
         }),
-        h: common_vendor.o(close),
         i: common_vendor.o(close),
-        j: common_vendor.p({
+        j: common_vendor.o(close),
+        k: common_vendor.p({
           type: "center",
           ["is-mask-click"]: true
         })
@@ -83,5 +93,5 @@ const _sfc_main = {
     };
   }
 };
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-b364594e"], ["__file", "D:/WTT/job/shestays-uniapp/components/DetailPopup.vue"]]);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-b364594e"]]);
 wx.createComponent(Component);

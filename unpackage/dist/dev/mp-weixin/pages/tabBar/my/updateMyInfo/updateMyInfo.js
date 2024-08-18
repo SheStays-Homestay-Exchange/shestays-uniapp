@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
+const common_assets = require("../../../../common/assets.js");
 const common_js_util = require("../../../../common/js/util.js");
 const common_api_common = require("../../../../common/api/common.js");
 const common_js_cache = require("../../../../common/js/cache.js");
@@ -119,40 +120,43 @@ const _sfc_main = {
     return (_ctx, _cache) => {
       return {
         a: form.avatarimg,
-        b: common_vendor.o(uploadHead),
-        c: common_vendor.o(($event) => form.userName = $event),
-        d: common_vendor.p({
+        b: common_assets._imports_0$7,
+        c: common_vendor.o(uploadHead),
+        d: common_vendor.o(($event) => form.userName = $event),
+        e: common_vendor.p({
           type: "text",
           placeholder: "未设置",
           maxlength: "16",
           modelValue: form.userName
         }),
-        e: common_vendor.o(radioChange),
-        f: common_vendor.o(($event) => form.phone = $event),
-        g: common_vendor.p({
+        f: common_vendor.o(radioChange),
+        g: common_vendor.o(($event) => form.phone = $event),
+        h: common_vendor.p({
           type: "text",
           placeholder: "未设置",
           maxlength: "11",
           modelValue: form.phone
         }),
-        h: common_vendor.t(form.date),
-        i: common_vendor.o(dateChange),
-        j: common_vendor.p({
+        i: common_vendor.t(form.date),
+        j: common_vendor.o(dateChange),
+        k: common_vendor.p({
           type: "date",
           value: form.date,
           border: _ctx.none,
           end: common_vendor.unref(dateEnd)
         }),
-        k: common_vendor.o(($event) => form.des = $event),
-        l: common_vendor.p({
+        l: common_assets._imports_1$1,
+        m: common_assets._imports_1$1,
+        n: common_vendor.o(($event) => form.des = $event),
+        o: common_vendor.p({
           type: "textarea",
           maxlength: "300",
           modelValue: form.des
         }),
-        m: common_vendor.o(submit)
+        p: common_vendor.o(submit)
       };
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-820c3591"], ["__file", "D:/WTT/job/shestays-uniapp/pages/tabBar/my/updateMyInfo/updateMyInfo.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-820c3591"]]);
 wx.createPage(MiniProgramPage);
