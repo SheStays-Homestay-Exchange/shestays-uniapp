@@ -76,3 +76,10 @@ export function getRegion(params) {
 export function getCity(params) {
 	return get('getCity',params)
 }
+
+/**
+ * 接口名称：编辑个人信息接口
+ */
+export function editUserData(param) {
+	return post('editUserData', param)
+}

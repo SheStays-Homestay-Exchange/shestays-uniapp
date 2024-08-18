@@ -51,9 +51,12 @@
     ]
   },
   "permission": {
-    "scope.userLocation": {
+    "scope.userFuzzyLocation": {
       "desc": "演示定位能力"
     }
   },
+  "requiredPrivateInfos": [
+    "getFuzzyLocation"
+  ],
   "usingComponents": {}
 }

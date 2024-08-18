@@ -15,6 +15,10 @@ function getName() {
 function getNation() {
   return common_js_request.get("getNation");
 }
+function editUserData(param) {
+  return common_js_request.post("editUserData", param);
+}
+exports.editUserData = editUserData;
 exports.getHouseByRegion = getHouseByRegion;
 exports.getHouseList = getHouseList;
 exports.getName = getName;
