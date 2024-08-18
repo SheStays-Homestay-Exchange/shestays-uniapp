@@ -32,7 +32,7 @@
 
     <view class="householder">
       <view class="image">
-        <img :src="state.hostImageSrc" alt="" />
+        <img class="user-image" :src="state.hostImageSrc" alt="" />
       </view>
       <view class="info">
         <view>房主：{{ state.hostName }}</view>
@@ -80,7 +80,8 @@ const state = reactive({
     { url: 'https://res.klook.com/image/upload/q_85/activities/ori7zgidaf70ildeaazw.jpg', key: 1 },
     { url: 'https://res.klook.com/image/upload/c_fill,w_1265,h_712/q_80/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/mn4cemkgx5r6fy6rgie6.webp', key: 2 },
     { url: 'https://res.klook.com/image/upload/q_85/activities/ori7zgidaf70ildeaazw.jpg', key: 3 }
-  ]
+  ],
+  showUser:false
 });
 
 const houseInfo = [
@@ -97,7 +98,8 @@ const handleCollect = () => {
 
 const onContact = () => {
   console.log('联系房东');
-  popup.value.open();
+  // popup.value.open();
+  state.showUser = true;
 };
 
 const handleCopy = () => {
@@ -127,14 +129,14 @@ onLoad(() => {
 }
 
 .swiper-box {
-  height: 380px;
+  height: 760rpx;
 }
 
-.image-wrapper img {
+.image-wrapper .house-image {
   width: 100%;
-  height: 380px;
-  border-bottom-left-radius: 40px;
-  border-bottom-right-radius: 40px;
+  height: 760rpx;
+  border-bottom-left-radius: 80rpx;
+  border-bottom-right-radius: 80rpx;
 }
 
 .house-position {
@@ -142,77 +144,80 @@ onLoad(() => {
   align-items: flex-start;
   justify-content: space-between;
   background-color: $uni-bg-color;
-  border-radius: 20px;
+  border-radius: 40rpx;
   width: 70%;
-  padding: 16px;
+  padding: 32rpx;
   position: absolute;
-  top: 320px;
+  top: 665rpx;
   left: 50%;
   transform: translateX(-50%);
   .right{
-	  cursor: pointer;
+    cursor: pointer;
+  }
+  .title{
+    
   }
 }
 
 .house-content {
-  padding: 24px;
-  margin-top: 30px;
+  padding: 48rpx;
+  margin-top: 90rpx;
 }
 
 .house-info {
-  margin: 5px 0;
+  margin: 14rpx 0;
 
   .label {
     font-weight: 700;
-    font-size: 16px;
+    font-size: 32rpx;
   }
 
   .value {
-    font-size: 14px;
+    font-size: 28rpx;
     font-weight: 400;
   }
 }
 
 .householder {
   width: 80%;
-  padding: 14px;
+  padding: 28rpx;
   position: fixed;
-  bottom: 20px;
+  bottom: 40rpx;
   left: 50%;
   transform: translateX(-50%);
   background-color: $uni-bg-color;
-  border-radius: 40px;
+  border-radius: 80rpx;
   display: flex;
   justify-content: space-between;
   align-items: center;
   color: #000;
 
   .info {
-    font-size: 12px;
+    font-size: 24rpx;
   }
 
-  .image img {
-    width: 50px;
-    height: 50px;
+  .image .user-image{
+    width: 100rpx;
+    height: 100rpx;
     border-radius: 50%;
     margin-right: 10upx;
   }
 
   .contact-btn {
-    width: 100px;
-    height: 36px;
-    font-size: 14px;
+    width: 200rpx;
+    height: 72rpx;
+    font-size: 28rpx;
     background: #D8336D;
     color: #fff;
-    border-radius: 20px;
+    border-radius: 40rpx;
   }
 }
 
 .popup-content {
   background-color: #fff;
-  width: 287px;
-  padding: 20px;
-  border-radius: 10px;
+  width: 574rpx;
+  padding: 40rpx;
+  border-radius: 20rpx;
   color: #5E5E5E;
 
   .user-info {
@@ -238,12 +243,13 @@ onLoad(() => {
 }
 
 .copy-btn {
-  width: 128px;
-  height: 34px;
-  line-height: 34px;
+  width: 256rpx;
+  height: 68rpx;
+  line-height: 68rpx;
   background-color: #D8336D;
   color: #fff;
-  margin: 10px auto;
+  margin: 20rpx auto;
   font-weight: 600;
 }
 </style>
+

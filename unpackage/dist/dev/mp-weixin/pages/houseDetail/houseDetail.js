@@ -31,7 +31,8 @@ const _sfc_main = {
         { url: "https://res.klook.com/image/upload/q_85/activities/ori7zgidaf70ildeaazw.jpg", key: 1 },
         { url: "https://res.klook.com/image/upload/c_fill,w_1265,h_712/q_80/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/mn4cemkgx5r6fy6rgie6.webp", key: 2 },
         { url: "https://res.klook.com/image/upload/q_85/activities/ori7zgidaf70ildeaazw.jpg", key: 3 }
-      ]
+      ],
+      showUser: false
     });
     const houseInfo = [
       { label: "房源开放日期", value: state.openDate },
@@ -44,7 +45,7 @@ const _sfc_main = {
     };
     const onContact = () => {
       console.log("联系房东");
-      popup.value.open();
+      state.showUser = true;
     };
     const handleCopy = () => {
       common_vendor.index.setClipboardData({

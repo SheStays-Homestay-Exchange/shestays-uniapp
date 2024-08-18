@@ -17,14 +17,10 @@ const _sfc_main = {
     const styles = common_vendor.reactive({
       "borderColor": "#ffffff"
     });
-    function hanldeSelectAddress() {
-      common_vendor.index.navigateTo({
-        url: "/pages/public/searchAddress/searchAddress"
-      });
-    }
+    const locationVisible = common_vendor.ref(false);
     return (_ctx, _cache) => {
       return {
-        a: common_vendor.o(hanldeSelectAddress),
+        a: common_vendor.o(($event) => locationVisible.value = true),
         b: common_vendor.p({
           min: 1
         }),
@@ -33,6 +29,9 @@ const _sfc_main = {
           type: "textarea",
           autoHeight: false,
           placeholder: "请输入内容"
+        }),
+        d: common_vendor.p({
+          visible: locationVisible.value
         })
       };
     };

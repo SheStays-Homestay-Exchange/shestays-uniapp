@@ -29,24 +29,24 @@
   padding-bottom: 100px;
 }
 .swiper-box.data-v-a8f5680b {
-  height: 380px;
+  height: 760rpx;
 }
-.image-wrapper img.data-v-a8f5680b {
+.image-wrapper .house-image.data-v-a8f5680b {
   width: 100%;
-  height: 380px;
-  border-bottom-left-radius: 40px;
-  border-bottom-right-radius: 40px;
+  height: 760rpx;
+  border-bottom-left-radius: 80rpx;
+  border-bottom-right-radius: 80rpx;
 }
 .house-position.data-v-a8f5680b {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   background-color: #ffffff;
-  border-radius: 20px;
+  border-radius: 40rpx;
   width: 70%;
-  padding: 16px;
+  padding: 32rpx;
   position: absolute;
-  top: 320px;
+  top: 665rpx;
   left: 50%;
   transform: translateX(-50%);
 }
@@ -54,56 +54,56 @@
   cursor: pointer;
 }
 .house-content.data-v-a8f5680b {
-  padding: 24px;
-  margin-top: 30px;
+  padding: 48rpx;
+  margin-top: 90rpx;
 }
 .house-info.data-v-a8f5680b {
-  margin: 5px 0;
+  margin: 14rpx 0;
 }
 .house-info .label.data-v-a8f5680b {
   font-weight: 700;
-  font-size: 16px;
+  font-size: 32rpx;
 }
 .house-info .value.data-v-a8f5680b {
-  font-size: 14px;
+  font-size: 28rpx;
   font-weight: 400;
 }
 .householder.data-v-a8f5680b {
   width: 80%;
-  padding: 14px;
+  padding: 28rpx;
   position: fixed;
-  bottom: 20px;
+  bottom: 40rpx;
   left: 50%;
   transform: translateX(-50%);
   background-color: #ffffff;
-  border-radius: 40px;
+  border-radius: 80rpx;
   display: flex;
   justify-content: space-between;
   align-items: center;
   color: #000;
 }
 .householder .info.data-v-a8f5680b {
-  font-size: 12px;
+  font-size: 24rpx;
 }
-.householder .image img.data-v-a8f5680b {
-  width: 50px;
-  height: 50px;
+.householder .image .user-image.data-v-a8f5680b {
+  width: 100rpx;
+  height: 100rpx;
   border-radius: 50%;
   margin-right: 10rpx;
 }
 .householder .contact-btn.data-v-a8f5680b {
-  width: 100px;
-  height: 36px;
-  font-size: 14px;
+  width: 200rpx;
+  height: 72rpx;
+  font-size: 28rpx;
   background: #D8336D;
   color: #fff;
-  border-radius: 20px;
+  border-radius: 40rpx;
 }
 .popup-content.data-v-a8f5680b {
   background-color: #fff;
-  width: 287px;
-  padding: 20px;
-  border-radius: 10px;
+  width: 574rpx;
+  padding: 40rpx;
+  border-radius: 20rpx;
   color: #5E5E5E;
 }
 .popup-content .user-info.data-v-a8f5680b {
@@ -124,11 +124,11 @@
   font-size: 32rpx;
 }
 .copy-btn.data-v-a8f5680b {
-  width: 128px;
-  height: 34px;
-  line-height: 34px;
+  width: 256rpx;
+  height: 68rpx;
+  line-height: 68rpx;
   background-color: #D8336D;
   color: #fff;
-  margin: 10px auto;
+  margin: 20rpx auto;
   font-weight: 600;
 }

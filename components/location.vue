@@ -31,7 +31,7 @@
 						</view> -->
 					</view>
 					<view class="address-item" v-for="(item,i) in addressList" @click="itemClick(item)" >
-						{{item.areaName}}
+						{{item.nationName}}
 					</view>
 				</view>
 			</view>
@@ -40,18 +40,25 @@
 </template>
 
 <script lang="ts" setup>
-	import { ref,reactive,onMounted, computed } from "vue";
+	import { ref,reactive,onMounted, computed, watch } from "vue";
 	import PopupBottom from '@/components/popup-bottom.vue'
 	import { getNation, getRegion, getCity } from '@/common/api/common'
 
-	const isShowLocationPopup = ref(false)
-	const tapPhoneOver = (e) => {
-		isShowLocationPopup.value = false
-		if( e == 'confirm' ){
-			openAddress()
-		}
-	}
-	
+	const props = defineProps({
+		//显示隐藏
+		visible: {
+			default: false,
+			type: Boolean
+		},
+	})
+
+	onMounted(()=>{
+		getAreaList('000000')
+	})
+	watch(()=>props.visible,(val)=>{
+		show.value = val
+	})
+
 	//省市区弹窗
 	const show = ref(false)
 	const authCity = ref(true)  //是否定位授权
@@ -77,9 +84,7 @@
 	//000000代表查询所有的省
 	const getAreaList = (code='000000')=>{
 		authCity.value = true
-		getNation({
-			parentCode: code
-		}).then(res=>{
+		getNation().then(res=>{
 			if(res.code == 200){
 				addressList.value = res.data || []
 			}
