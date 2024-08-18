@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const common_api_common = require("../../common/api/common.js");
+const common_assets = require("../../common/assets.js");
 if (!Array) {
   const _easycom_uni_swiper_dot2 = common_vendor.resolveComponent("uni-swiper-dot");
   _easycom_uni_swiper_dot2();
@@ -28,27 +29,21 @@ const _sfc_main = {
       height: 7
     };
     const state = common_vendor.reactive({
-      houseAmount: 1,
-      countryName: "-",
-      cityName: "-",
+      houseAmount: 0,
+      countryName: "",
+      cityName: "",
       startTime: "2024-06-02 00:00:00",
       endTime: "2024-06-04 00:00:00",
-      describle: "1.爱干净\n2.保持安静\n3.爱干净",
-      hostImageSrc: "https://lf-flow-web-cdn.doubao.com/obj/flow-doubao/doubao_ext/static/image/avatar-transparent.ea272b11.png",
+      describle: "",
       houseImgs: [
         {
-          imgUrl: "https://res.klook.com/image/upload/q_85/activities/ori7zgidaf70ildeaazw.jpg",
+          imgUrl: common_assets.holdBannerImage,
           houseImgId: 1
-        },
-        {
-          imgUrl: "https://res.klook.com/image/upload/c_fill,w_1265,h_712/q_80/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/mn4cemkgx5r6fy6rgie6.webp",
-          houseImgId: 2
-        },
-        {
-          imgUrl: "https://res.klook.com/image/upload/q_85/activities/ori7zgidaf70ildeaazw.jpg",
-          houseImgId: 3
         }
-      ]
+      ],
+      avatarUrl: common_assets.holdImage,
+      phone: "",
+      xiaohongshuUsername: ""
     });
     const formatDate = (time) => {
       return time ? time.split(" ")[0] : "";
@@ -74,7 +69,6 @@ const _sfc_main = {
             ...state,
             ...data
           };
-          console.log(state, "************");
         }
       }).catch((error) => {
         console.log(error, "rrrr");
@@ -107,16 +101,20 @@ const _sfc_main = {
             c: index
           };
         }),
-        i: state.hostImageSrc,
-        j: common_vendor.t(state.hostName),
+        i: state.avatarUrl,
+        j: common_vendor.t(state.xiaohongshuUsername),
         k: common_vendor.o(contactHost),
         l: common_vendor.o(($event) => popShow.value = false),
-        m: common_vendor.p({
-          show: popShow.value
+        m: state.phone,
+        n: common_vendor.p({
+          show: popShow.value,
+          id: state.phone,
+          name: state.xiaohongshuUsername,
+          userNameType: "手机号"
         })
       };
     };
   }
 };
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-a8f5680b"], ["__file", "D:/WTT/job/shestays-uniapp/pages/houseDetail/houseDetail.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-a8f5680b"]]);
 wx.createPage(MiniProgramPage);

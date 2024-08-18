@@ -44,14 +44,20 @@
 
     <view class="householder">
       <view class="userInfo">
-        <img class="user-image" :src="state.hostImageSrc" alt="" />
-        <view class="info">房主：{{ state.hostName }}</view>
+        <img class="user-image" :src="state.avatarUrl" alt="" />
+        <view class="info">房主：{{ state.xiaohongshuUsername }}</view>
       </view>
       <view>
         <button class="contact-btn" @click="contactHost">联系房主</button>
       </view>
     </view>
-    <DetailPopup :show="popShow" @tapClose="popShow = false" />
+    <DetailPopup
+      :show="popShow"
+      @tapClose="popShow = false"
+      :id="state.phone"
+      :name="state.xiaohongshuUsername"
+      userNameType="手机号"
+    />
   </div>
 </template>
 
@@ -60,6 +66,8 @@ import { reactive, ref, onMounted } from "vue";
 import { onLoad, useRoute } from "@dcloudio/uni-app";
 import { getHouseDetail } from "@/common/api/common";
 import DetailPopup from "@/components/DetailPopup.vue";
+import holdImage from "@/static/60x60.png";
+import holdBannerImage from "@/static/image/about.png";
 
 const current = ref(0);
 
@@ -111,41 +119,23 @@ const dotsStyles = {
     "xiaohongshuUsername": null
   }
 }
-
-houseImgs:[
-	{
-		houseImgId
-		imgUrl
-	}
-]
-
  */
 const state = reactive({
-  houseAmount: 1,
-  countryName: "-",
-  cityName: "-",
+  houseAmount: 0,
+  countryName: "",
+  cityName: "",
   startTime: "2024-06-02 00:00:00",
   endTime: "2024-06-04 00:00:00",
-  describle: "1.爱干净\n2.保持安静\n3.爱干净",
-  hostImageSrc:
-    "https://lf-flow-web-cdn.doubao.com/obj/flow-doubao/doubao_ext/static/image/avatar-transparent.ea272b11.png",
+  describle: "",
   houseImgs: [
     {
-      imgUrl:
-        "https://res.klook.com/image/upload/q_85/activities/ori7zgidaf70ildeaazw.jpg",
+      imgUrl: holdBannerImage,
       houseImgId: 1,
     },
-    {
-      imgUrl:
-        "https://res.klook.com/image/upload/c_fill,w_1265,h_712/q_80/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/mn4cemkgx5r6fy6rgie6.webp",
-      houseImgId: 2,
-    },
-    {
-      imgUrl:
-        "https://res.klook.com/image/upload/q_85/activities/ori7zgidaf70ildeaazw.jpg",
-      houseImgId: 3,
-    },
   ],
+  avatarUrl: holdImage,
+  phone: "",
+  xiaohongshuUsername: "",
 });
 
 const formatDate = (time) => {
@@ -176,8 +166,6 @@ onLoad((options) => {
           ...state,
           ...data,
         };
-
-		console.log(state,'************')
       }
     })
     .catch((error) => {
@@ -306,44 +294,5 @@ onLoad((options) => {
     border-radius: 38rpx;
     box-shadow: 8rpx 8rpx 8rpx 0rpx rgba(212, 212, 212, 0.6);
   }
-}
-
-.popup-content {
-  background-color: #fff;
-  width: 574rpx;
-  padding: 40rpx;
-  border-radius: 20rpx;
-  color: #5e5e5e;
-
-  .user-info {
-    display: flex;
-    align-items: center;
-
-    .left {
-      width: 120rpx;
-    }
-
-    img {
-      width: 104rpx;
-      height: 104rpx;
-      border-radius: 50%;
-    }
-
-    .right {
-      color: #000b3b;
-      font-weight: 600;
-      font-size: 32rpx;
-    }
-  }
-}
-
-.copy-btn {
-  width: 256rpx;
-  height: 68rpx;
-  line-height: 68rpx;
-  background-color: #d8336d;
-  color: #fff;
-  margin: 20rpx auto;
-  font-weight: 600;
 }
 </style>

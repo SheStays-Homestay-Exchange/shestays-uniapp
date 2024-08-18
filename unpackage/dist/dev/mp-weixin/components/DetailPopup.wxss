@@ -56,21 +56,21 @@
 .popup-content .info-box .img.data-v-b364594e {
   width: 104rpx;
   height: 104rpx;
-  background-color: #C4C4C4;
+  background-color: #c4c4c4;
   border-radius: 50%;
   margin-right: 32rpx;
 }
 .popup-content .info-box .name-box.data-v-b364594e {
   font-size: 32rpx;
   font-weight: bold;
-  color: #000B3B;
+  color: #000b3b;
 }
 .popup-content .info-box .name-box .name.data-v-b364594e {
   margin-bottom: 8rpx;
 }
 .popup-content .tips-box.data-v-b364594e {
   font-size: 28rpx;
-  color: #5E5E5E;
+  color: #5e5e5e;
 }
 .popup-content .tips-box .margin-top-10.data-v-b364594e {
   margin-top: 16rpx;
@@ -87,7 +87,7 @@
   font-size: 32rpx;
   font-weight: bold;
   color: #fff;
-  background: #D8336D;
+  background: #d8336d;
   text-align: center;
   border-radius: 32rpx;
   margin-top: 60rpx;
