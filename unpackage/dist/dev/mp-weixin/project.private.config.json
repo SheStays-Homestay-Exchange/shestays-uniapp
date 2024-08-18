@@ -62,6 +62,13 @@
                     "query": "",
                     "launchMode": "default",
                     "scene": null
+                },
+                {
+                    "name": "房源上传",
+                    "pathName": "pages/tabBar/my/uploadHousing",
+                    "query": "",
+                    "launchMode": "default",
+                    "scene": null
                 }
             ]
         }
