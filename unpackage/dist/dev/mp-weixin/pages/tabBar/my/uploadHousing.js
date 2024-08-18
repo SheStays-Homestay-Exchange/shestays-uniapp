@@ -18,16 +18,12 @@ const _sfc_main = {
     const styles = common_vendor.reactive({
       "borderColor": "#ffffff"
     });
-    function hanldeSelectAddress() {
-      common_vendor.index.navigateTo({
-        url: "/pages/public/searchAddress/searchAddress"
-      });
-    }
+    const locationVisible = common_vendor.ref(false);
     return (_ctx, _cache) => {
       return {
         a: common_assets._imports_0$6,
         b: common_assets._imports_1$4,
-        c: common_vendor.o(hanldeSelectAddress),
+        c: common_vendor.o(($event) => locationVisible.value = true),
         d: common_vendor.p({
           min: 1
         }),

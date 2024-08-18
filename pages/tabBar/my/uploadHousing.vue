@@ -32,7 +32,7 @@
 			</scroll-view>
 		</view>
 		
-		<view class="uploade-col" @click="hanldeSelectAddress">
+		<view class="uploade-col" @click="locationVisible=true">
 			<view class="uploade-title">
 				房源所在地址
 			</view>
@@ -87,11 +87,11 @@
 		</view>
 	</view>
 	
-	<Location></Location>
+	<Location :visible="locationVisible"></Location>
 </template>
 
 <script setup>
-	import { reactive } from 'vue';
+	import { reactive,ref } from 'vue';
 	import Location from '@/components/location'
 	
 	const styles = reactive({
@@ -104,6 +104,8 @@
 			url: '/pages/public/searchAddress/searchAddress'
 		})
 	}
+	
+	const locationVisible = ref(false)
 </script>
 
 <style lang="scss" scoped>
