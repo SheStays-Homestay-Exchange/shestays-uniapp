@@ -128,7 +128,7 @@
 			height: 124upx;
 		}
 		.logo-text{
-			width: 380upx;
+			width: 268upx;
 			height: 130rpx;
 		}
 	}

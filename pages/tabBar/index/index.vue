@@ -20,7 +20,7 @@
 		<uni-load-more :status="loadStatus" :contentText="contentText" v-if="listData.length > 0"></uni-load-more>
 		
 		<!-- 联系弹窗 -->
-		<DetailPopup :show="popShow" @tapClose="popShow=false"/>
+		<DetailPopup :show="popShow" @tapClose="popShow=false" :name="itemInfo.name" :id="itemInfo.id"/>
 	</view>
 	<view class="btn-box" v-if="!userInfo?.openId">
 		<button class="login-btn" style="margin-top: 20px;" @click="isLogin">
@@ -64,11 +64,6 @@
 		getHouseListFun('refresh')
 	})
 	
-	const dateFilter = computed((value)=>{
-		console.log('computer',value)
-		return  '星星'
-	})
-	
 	const contentText = {
 			contentdown: '上拉显示更多',
 			contentrefresh: '正在加载...',
@@ -85,11 +80,7 @@
 	//测试接口
 	//加载更多状态
 	const loadStatus = ref('contentdown')	
-	const listData = ref([
-		{
-			countryName:'中国'
-		}
-	])
+	const listData = ref([])
 	const pages = reactive({
 		pageIndex:1,
 		totalPage: 0   //总共有多少页数据
@@ -123,8 +114,14 @@
 	
 	//打开联系房主弹窗
 	const popShow = ref(false)
+	const itemInfo = reactive({
+		id: '',
+		name:''
+	})
 	const contactHost = (item)=>{
 		if(isLogin()){
+			itemInfo.id = item.xiaohongshuId || '-'
+			itemInfo.name = item.xiaohongshuUsername || '-'
 			popShow.value = true
 		}
 	}

@@ -111,10 +111,11 @@
         },
         "usingComponents" : true,
         "permission" : {
-            "scope.userLocation" : {
-                "desc" : "演示定位能力"
-            }
+			"scope.userFuzzyLocation" : {
+			    "desc" : "演示定位能力"
+			}
         },
+		 "requiredPrivateInfos" : ["getFuzzyLocation" ],
         "uniStatistics" : {
             "enable" : false
         }

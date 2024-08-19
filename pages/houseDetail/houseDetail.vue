@@ -1,24 +1,34 @@
 <template>
-  <view class="house-detail">
+  <div class="house-detail">
     <view class="house-banner">
-      <uni-swiper-dot class="uni-swiper-dot-box" @clickItem="clickItem" :info="info" :current="current" :mode="mode" field="content">
-        <swiper class="swiper-box" @change="change" :current="swiperDotIndex">
-          <swiper-item v-for="(item, index) in state.bannerList" :key="index">
+      <uni-swiper-dot
+        :current="current"
+        :total="state.houseImgs.length"
+        :dots-styles="dotsStyles"
+        :info="state.houseImgs"
+        mode="dot"
+      >
+        <swiper
+          :duration="500"
+          :interval="3000"
+          :autoplay="true"
+          class="swiper-box"
+          :current="current"
+          @change="onSwiperChange"
+        >
+          <swiper-item v-for="item in state.houseImgs" :key="item.houseImgId">
             <view class="swiper-item image-wrapper">
-              <img class="house-image" :src="item.url" alt="" />
+              <img class="house-image" :src="item.imgUrl" alt="" />
             </view>
           </swiper-item>
         </swiper>
       </uni-swiper-dot>
-
       <view class="house-position">
         <view class="left">
-          <view class="title">{{ state.position }}</view>
-          <view class="desc">住宿条件：{{ state.accommodationCondition }}</view>
-          <view class="desc">可接待人数：{{ state.guestCapacity }}</view>
-        </view>
-        <view class="right" @click="handleCollect">
-          <uni-icons :type="state.icon" size="28" />
+          <view class="title"
+            >{{ state.countryName }} - {{ state.cityName }}</view
+          >
+          <view class="desc">可接待人数：{{ state.houseAmount }}人</view>
         </view>
       </view>
     </view>
@@ -26,115 +36,167 @@
     <view class="house-content">
       <view class="house-info" v-for="(item, index) in houseInfo" :key="index">
         <view class="label">{{ item.label }}</view>
-        <view class="value">{{ item.value }}</view>
+        <view class="value"
+          ><text>{{ item.value }}</text></view
+        >
       </view>
     </view>
 
     <view class="householder">
-      <view class="image">
-        <img :src="state.hostImageSrc" alt="" />
+      <view class="userInfo">
+        <img class="user-image" :src="state.avatarUrl" alt="" />
+        <view class="info">房主：{{ state.xiaohongshuUsername }}</view>
       </view>
-      <view class="info">
-        <view>房主：{{ state.hostName }}</view>
-        <view>成功接待次数：{{ state.successfulReceptionCount }}</view>
+      <view>
+        <button class="contact-btn" @click="contactHost">联系房主</button>
       </view>
-      <button class="contact-btn" @click="onContact">联系房主</button>
     </view>
-
-    <uni-popup ref="popup" type="center" border-radius="10px 10px 0 0">
-      <view class="popup-content">
-        <view class="user-info">
-          <view class="image left">
-            <img :src="state.hostImageSrc" alt="" />
-          </view>
-          <view class="right">
-            <view><span class="label">房主：</span><span class="content">{{ state.hostName }}</span></view>
-            <view><span class="label">微信号：</span><span class="content">123456</span></view>
-          </view>
-        </view>
-        <view>Tips✨：主动自我介绍说明目的的成功率更高哦~</view>
-        <view @click="handleCopy"><button class="copy-btn">复制名片</button></view>
-      </view>
-    </uni-popup>
-  </view>
+    <DetailPopup
+      :show="popShow"
+      @tapClose="popShow = false"
+      :id="state.phone"
+      :name="state.xiaohongshuUsername"
+      userNameType="手机号"
+    />
+  </div>
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue';
-import { onLoad } from '@dcloudio/uni-app';
+import { reactive, ref, onMounted } from "vue";
+import { onLoad, useRoute } from "@dcloudio/uni-app";
+import { getHouseDetail } from "@/common/api/common";
+import DetailPopup from "@/components/DetailPopup.vue";
+import holdImage from "@/static/60x60.png";
+import holdBannerImage from "@/static/image/about.png";
 
-const popup = ref(null);
+const current = ref(0);
 
+//打开联系房主弹窗
+const popShow = ref(false);
+const contactHost = (item) => {
+  popShow.value = true;
+};
+
+const dotsStyles = {
+  backgroundColor: "#D9D9D9",
+  border: "1px rgb(217, 217, 217) soild",
+  selectedBackgroundColor: "#D8336D",
+  selectedBorder: "1px rgba(256, 256, 256, 1) solid",
+  bottom: 50,
+  width: 7,
+  height: 7,
+};
+/**
+ * {
+  "code": "200",
+  "msg": "请求成功",
+  "data": {
+    "createTime": "2024-07-04 23:06:00",
+    "updateTime": "2024-08-14 00:47:43",
+    "isDelete": 0,
+    "houseId": 23,
+    "houseTitle": null,
+    "homePageImgUrl": null,
+    "houseAmount": null,
+    "describle": null,
+    "statusCode": "online",
+    "statusValue": "已上线",
+    "startTime": "2024-06-02 00:00:00",
+    "endTime": null,
+    "countryId": 1,
+    "countryName": "中国",
+    "cityId": 10,
+    "cityName": "石家庄",
+    "regionId": 9,
+    "regionName": "河北",
+    "detailAddress": "",
+    "unpassReason": "",
+    "userId": 21,
+    "continentId": 1,
+    "houseImgs": [],
+    "continentName": "亚洲",
+    "xiaohongshuId": null,
+    "xiaohongshuUsername": null
+  }
+}
+ */
 const state = reactive({
-  accommodationCondition: '舒适温馨',
-  guestCapacity: '2人',
-  openDate: '2024年6月-8月',
-  messages: ['爱干净', '遵守规定', '保持安静'],
-  facilities: '齐全的厨房设备，高速网络，舒适的床铺',
-  hostImageSrc: 'https://lf-flow-web-cdn.doubao.com/obj/flow-doubao/doubao_ext/static/image/avatar-transparent.ea272b11.png',
-  hostName: '张三',
-  successfulReceptionCount: '10 次',
-  position: '加拿大 - 温哥华',
-  icon: 'star',
-  bannerList: [
-    { url: 'https://res.klook.com/image/upload/q_85/activities/ori7zgidaf70ildeaazw.jpg', key: 1 },
-    { url: 'https://res.klook.com/image/upload/c_fill,w_1265,h_712/q_80/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/mn4cemkgx5r6fy6rgie6.webp', key: 2 },
-    { url: 'https://res.klook.com/image/upload/q_85/activities/ori7zgidaf70ildeaazw.jpg', key: 3 }
-  ]
+  houseAmount: 0,
+  countryName: "",
+  cityName: "",
+  startTime: "2024-06-02 00:00:00",
+  endTime: "2024-06-04 00:00:00",
+  describle: "",
+  houseImgs: [
+    {
+      imgUrl: holdBannerImage,
+      houseImgId: 1,
+    },
+  ],
+  avatarUrl: holdImage,
+  phone: "",
+  xiaohongshuUsername: "",
 });
 
+const formatDate = (time) => {
+  return time ? time.split(" ")[0] : "";
+};
+
 const houseInfo = [
-  { label: '房源开放日期', value: state.openDate },
-  { label: '对房客姐妹说的话', value: state.messages.join(', ') },
-  { label: '房子设施', value: state.facilities }
+  {
+    label: "房源开放日期",
+    value: `${formatDate(state.startTime)}~${formatDate(state.endTime)}`,
+  },
+  {
+    label: "对房客姐妹说的话",
+    value: state.describle,
+  },
 ];
 
-const handleCollect = () => {
-// add ajax 
-  state.icon = state.icon === 'star' ? 'star-filled' : 'star';
-  console.log('collect');
+const onSwiperChange = (e) => {
+  current.value = e.detail.current;
 };
 
-const onContact = () => {
-  console.log('联系房东');
-  popup.value.open();
-};
-
-const handleCopy = () => {
-  uni.setClipboardData({
-    data: '123456',
-    success: () => {
-      console.log('success');
-      popup.value.close();
-    },
-    fail: () => {
-      console.log('fail');
-      popup.value.close();
-    }
-  });
-};
-
-onLoad(() => {
-  console.log('进入详情，调用接口');
+onLoad((options) => {
+  getHouseDetail({ houseId: options?.id })
+    .then((res) => {
+      const { code, data = {} } = res || {};
+      if (code === 200) {
+        state = {
+          ...state,
+          ...data,
+        };
+      }
+    })
+    .catch((error) => {
+      console.log(error, "rrrr");
+    });
 });
 </script>
 
 <style lang="scss" scoped>
 .house-detail {
-  background-color: $uni-bg-color-grey;
+  background-color: #fff;
   position: relative;
-  padding-bottom: 100px;
+  padding-bottom: 50rpx;
 }
 
 .swiper-box {
-  height: 380px;
+  height: 600rpx;
 }
 
-.image-wrapper img {
+.image-wrapper .house-image {
   width: 100%;
-  height: 380px;
-  border-bottom-left-radius: 40px;
-  border-bottom-right-radius: 40px;
+  height: 600rpx;
+  border-bottom-left-radius: 80rpx;
+  border-bottom-right-radius: 80rpx;
+}
+
+.uni-swiper-dot-box {
+  background-color: "pink";
+  width: "8rpx";
+  height: "8rpx";
+  border-radius: "50%";
 }
 
 .house-position {
@@ -142,108 +204,95 @@ onLoad(() => {
   align-items: flex-start;
   justify-content: space-between;
   background-color: $uni-bg-color;
-  border-radius: 20px;
+  border-radius: 40rpx;
   width: 70%;
-  padding: 16px;
+  padding: 32rpx 40rpx;
   position: absolute;
-  top: 320px;
+  top: 520rpx;
   left: 50%;
   transform: translateX(-50%);
-  .right{
-	  cursor: pointer;
+  box-shadow: 0 10rpx 20rpx rgba(0, 0, 0, 0.1);
+
+  .left {
+    .title {
+      font-size: 40rpx;
+      color: #000b3b;
+      font-weight: 600;
+
+      height: 58rpx;
+      line-height: 58rpx;
+      margin-bottom: 12rpx;
+    }
+    .desc {
+      color: #000b3b;
+      font-size: 28rpx;
+      font-weight: 400;
+      height: 36rpx;
+      line-height: 36rpx;
+    }
   }
 }
 
 .house-content {
-  padding: 24px;
-  margin-top: 30px;
+  padding: 48rpx;
+  margin-top: 60rpx;
 }
 
 .house-info {
-  margin: 5px 0;
+  margin: 32rpx 0;
 
   .label {
     font-weight: 700;
-    font-size: 16px;
+    font-size: 32rpx;
   }
 
   .value {
-    font-size: 14px;
+    font-size: 28rpx;
     font-weight: 400;
   }
 }
 
 .householder {
+  border: 1px solid #f3f3f3;
+  box-shadow: 0px 8rpx 30rpx 0px rgba(212, 212, 212, 0.6);
   width: 80%;
-  padding: 14px;
   position: fixed;
-  bottom: 20px;
+  bottom: 40rpx;
   left: 50%;
   transform: translateX(-50%);
   background-color: $uni-bg-color;
-  border-radius: 40px;
+  border-radius: 80rpx;
   display: flex;
   justify-content: space-between;
   align-items: center;
   color: #000;
+  padding: 12rpx 18rpx;
+  height: 126rpx;
 
-  .info {
-    font-size: 12px;
-  }
-
-  .image img {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    margin-right: 10upx;
+  .userInfo {
+    display: flex;
+    align-items: center;
+    .user-image {
+      width: 100rpx;
+      height: 100rpx;
+      border-radius: 50%;
+      margin-right: 24rpx;
+    }
+    .info {
+      font-size: 32rpx;
+      font-weight: 600;
+    }
   }
 
   .contact-btn {
-    width: 100px;
-    height: 36px;
-    font-size: 14px;
-    background: #D8336D;
+    width: 168rpx;
+    height: 68rpx;
+    line-height: 68rpx;
+    font-size: 28rpx;
+    background: #d8336d;
     color: #fff;
-    border-radius: 20px;
+    border-radius: 38rpx;
+    box-shadow: 8rpx 8rpx 8rpx 0rpx rgba(212, 212, 212, 0.6);
   }
-}
-
-.popup-content {
-  background-color: #fff;
-  width: 287px;
-  padding: 20px;
-  border-radius: 10px;
-  color: #5E5E5E;
-
-  .user-info {
-    display: flex;
-    align-items: center;
-
-    .left {
-      width: 120rpx;
-    }
-
-    img {
-      width: 104rpx;
-      height: 104rpx;
-      border-radius: 50%;
-    }
-
-    .right {
-      color: #000B3B;
-      font-weight: 600;
-      font-size: 32rpx;
-    }
-  }
-}
-
-.copy-btn {
-  width: 128px;
-  height: 34px;
-  line-height: 34px;
-  background-color: #D8336D;
-  color: #fff;
-  margin: 10px auto;
-  font-weight: 600;
 }
 </style>
