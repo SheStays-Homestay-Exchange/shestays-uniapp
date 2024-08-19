@@ -81,7 +81,7 @@ const btnClick = () => {
     success: function () {
       close();
       uni.showToast({
-        title: `已复制房主${userNameType}到剪贴板`,
+        title: `已复制房主${props.userNameType}到剪贴板`,
         icon: "none",
       });
     },

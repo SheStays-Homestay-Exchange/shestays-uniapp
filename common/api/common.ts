@@ -89,3 +89,8 @@ export function editUserData(param) {
 	return post('editUserData', param)
 }
 
+
+//接口名称：根据id查询用户详情接口
+export function getUserInfoByOpenId(params) {
+	return get('getUserInfoByOpenId',params)
+}

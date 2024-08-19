@@ -110,7 +110,8 @@
 			})
 		})
 	}
-	onLoad(()=>{
+	onLoad((option)=>{
+		console.log('登录页option',option)
 	})
 
 </script>

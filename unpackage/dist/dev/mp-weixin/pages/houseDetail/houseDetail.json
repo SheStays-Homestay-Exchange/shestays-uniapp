@@ -1,7 +1,0 @@
-{
-  "navigationBarTitleText": "房源详情",
-  "usingComponents": {
-    "uni-swiper-dot": "../../uni_modules/uni-swiper-dot/components/uni-swiper-dot/uni-swiper-dot",
-    "detail-popup": "../../components/DetailPopup"
-  }
-}

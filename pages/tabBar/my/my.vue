@@ -3,10 +3,13 @@
 		<!-- 头像 -->
 		<view class="user">
 			<view class="user-icon">
-				<image src="" class="user-image" mode=""></image>
+				<image :src="myInfo.avatarUrl" class="user-image" mode="" v-if="myInfo.avatarUrl" @click="handleGoPage('/pages/tabBar/my/updateMyInfo/updateMyInfo')"></image>
+				<view class="init-head" v-else @click="handleGoPage('/pages/tabBar/my/updateMyInfo/updateMyInfo')">
+					<uni-icons type="person-filled" size="40" color="#999"></uni-icons>
+				</view>
 				<view class="user-name">
-					<view class="user-title">
-						Lily
+					<view class="user-title" @click="handleGoPage('/pages/tabBar/my/updateMyInfo/updateMyInfo')">
+						{{myInfo.userName ? myInfo.userName : myInfo.phone}}
 					</view>
 					<view class="user-home" @click="handleGoPage('/pages/tabBar/my/myHome/myHome')">
 						个人主页
@@ -93,6 +96,33 @@
 </template>
 
 <script setup>
+	import { reactive, ref, onMounted,computed  } from 'vue'
+	import { onLoad } from '@dcloudio/uni-app'
+	import { getUserInfoByOpenId } from '@/common/api/common'
+	import  {msg}  from '@/common/js/util.js'
+	import cache from "@/common/js/cache.js";
+	
+	
+	onLoad(()=>{
+		getUserInfo()
+	})
+	
+	const myInfo = ref({})
+	const getUserInfo= async (type)=>{
+		let userInfo = typeof(cache.get('userInfo')) == 'string' ? JSON.parse( cache.get('userInfo') ) : cache.get('userInfo') 
+		try{
+			const res = await getUserInfoByOpenId({
+				openId: userInfo.openId
+			})
+			if(res.code == 200){
+				myInfo.value = res.data || {}
+			}
+
+		}catch(e){
+			msg(e.msg || '系统繁忙，请稍后重试')
+		}
+	}
+	
 	
 	const concact = ()=>{
 		uni.showModal({
@@ -114,6 +144,15 @@
 </script>
 
 <style lang="scss" scoped>
+	.init-head{
+		width: 128rpx;
+		height: 128rpx;
+		background: #eee;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+	}
 .my-body {
 	padding: 40rpx 48rpx;
 	.user {
@@ -132,6 +171,9 @@
 				.user-title {
 					font-size: 48rpx;
 					font-weight: 600;
+					white-space: nowrap; /* 保持文本在一行显示 */
+					overflow: hidden;    /* 隐藏超出部分 */
+					text-overflow: ellipsis; /* 显示省略号 */
 				}
 				.user-home {
 					color: #D8336D;

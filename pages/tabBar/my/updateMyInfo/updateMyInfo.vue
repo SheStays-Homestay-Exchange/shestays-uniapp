@@ -2,6 +2,7 @@
 	<view class="update-info">
 		<view class="user-icon" @click="uploadHead">
 			<image class="user-icon-image" :src="form.avatarimg" mode=""></image>
+			<uni-icons type="person-filled" size="60" color="#999" class="init-head" v-if="!form.avatarimg"></uni-icons>
 			<view class="user-update-icon">
 				<image class="update-icon" src="../../../../static/image/camera-01.png" mode=""></image>
 			</view>
@@ -10,7 +11,7 @@
 			<view class="user-title">
 				用户名
 			</view>
-			<uni-easyinput type="text" placeholder="未设置" maxlength="16" v-model="form.userName"></uni-easyinput>
+			<uni-easyinput type="text" placeholder="未设置" maxlength="16" v-model="form.userName" primaryColor="#D8336D"></uni-easyinput>
 		</view>
 		<view class="user-cli">
 			<view class="user-title">
@@ -37,7 +38,7 @@
 			<view class="user-title">
 				手机号
 			</view>
-			<uni-easyinput type="text" placeholder="未设置" v-model="form.phone" maxlength="11"></uni-easyinput>
+			<uni-easyinput type="text" placeholder="未设置" v-model="form.phone" maxlength="11" primaryColor="#D8336D"></uni-easyinput>
 		</view>
 		<view class="user-cli">
 			<view class="user-title">
@@ -45,6 +46,7 @@
 			</view>
 			<view class="user-info">
 				<uni-datetime-picker
+					class="my-date"
 					type="date"
 					:value="form.date"
 					:border="none"
@@ -150,9 +152,12 @@
 	
 	const editUserDataFun = (param)=>{
 		editUserData(param).then(res=>{
-			
+			if(res.code == 200){
+				msg('编辑个人信息成功')
+				uni.navigateBack()
+			}
 		}).catch(e=>{
-			console.log('错误==',e)
+			msg(e.msg)
 		})
 	}
 	
@@ -166,7 +171,7 @@
 				genderDictCode: form.sex,
 				phone: form.phone,
 				personalProfile: form.des,
-				avatar: form.avatarimg[0],
+				// avatar: form.avatarimg[0],
 			    bdYear:  Number(dateArr[0]),
 				bdMonth: Number(dateArr[1]),
 				bdDay: Number(dateArr[2]),
@@ -225,6 +230,11 @@
 		margin: 0 auto;
 		margin-bottom: 30rpx;
 		position: relative;
+		.init-head{
+			position: absolute;
+			top: 50rpx;
+			right: 50rpx;
+		}
 		.user-icon-image {
 			width: 232rpx;
 			height: 232rpx;
