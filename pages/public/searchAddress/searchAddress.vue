@@ -2,7 +2,7 @@
 	<view class="search">
 		<view class="search-input-body">
 			<view class="search-input">
-				<image class="search-icon" src="../../../static/image/search.jpg" mode=""></image>
+				<image class="search-icon" src="../../../static/image/search.png" mode=""></image>
 				<uni-easyinput :styles="styles" type="text" placeholder="选择房源地址"></uni-easyinput>
 			</view>
 			<text class="search-tipes">搜索</text>

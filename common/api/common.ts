@@ -94,3 +94,8 @@ export function editUserData(param) {
 export function getUserInfoByOpenId(params) {
 	return get('getUserInfoByOpenId',params)
 }
+
+//接口名称：头像上传
+export function uploadAvatar(params) {
+	return post('uploadAvatar',params)
+}

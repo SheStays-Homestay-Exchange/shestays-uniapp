@@ -2,7 +2,7 @@
 	<view class="search">
 		<view class="search-input-body">
 			<view class="search-input">
-				<image class="search-icon" src="../../../static/image/search.jpg" mode=""></image>
+				<image class="search-icon" src="../../../static/image/search.png" mode=""></image>
 				<uni-easyinput :styles="styles" :inputBorder="false" type="text" trim="both" primaryColor="#D8336D" placeholder="搜索目的地"
 				 confirmType="search" v-model="region" @confirm="search" @input="inputChange"></uni-easyinput>
 			</view>

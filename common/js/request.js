@@ -97,15 +97,19 @@ export function post(url, data = {}, options = {}) {
 
 // 上传文件
 export function uploadFile(fileList) {
-	const token =cache.get('token')
+	const userId =cache.get('userInfo').userId
 	const uploadTasks = fileList.map((file, index) => {
 		return new Promise((resolve, reject) => {
 			uni.uploadFile({
-				url: requestUrl + 'common/upload',
+				url: requestUrl + 'uploadAvatar',
 				filePath: file,
 				fileType: 'image',
-				header: {
-					'Authorization': token
+				// header: {
+				// 	'Authorization': token
+				// },
+				formData:{
+					userId: userId,
+					avatar: file
 				},
 				name: 'file',
 				success: function(res) {

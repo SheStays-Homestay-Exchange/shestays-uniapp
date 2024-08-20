@@ -9,7 +9,7 @@
 		</view> -->
 		<!-- 搜索 -->
 		<view class="search-body" @click="handleSearch">
-			<image src="../../../static/image/search.jpg" class="search-image" mode=""></image>
+			<image src="../../../static/image/search.png" class="search-image" mode=""></image>
 			<text class="search-text">搜索目的地</text>
 		</view>
 		<!-- 房源 -->
@@ -59,6 +59,7 @@
 	
 	//下拉刷新
 	onPullDownRefresh(()=>{
+		// uni.startPullDownRefresh()
 		pages.pageIndex = 1
 		listData.value = []
 		getHouseListFun('refresh')
@@ -94,13 +95,9 @@
 			if(res.code == 200){
 				listData.value = listData.value.concat(res.data.data)
 				pages.totalPage = res.data.pageCount
-				if(type == 'refresh'){
-					// uni.showToast({
-					// 	title:'刷新成功',
-					// 	icon:'none'
-					// })
-					uni.stopPullDownRefresh()
-				}
+			}
+			if(type == 'refresh'){
+				uni.stopPullDownRefresh()
 			}
 			// 已请求完所有数据
 			if(pages.pageIndex >= res.data.pageCount){
@@ -108,7 +105,11 @@
 			}
 		}catch(e){
 			//TODO handle the exception
-			console.log('列表错误==',e)
+			uni.showToast({
+				title:e.msg,
+				icon:'none'
+			})
+			uni.stopPullDownRefresh()
 		}
 	}
 	
