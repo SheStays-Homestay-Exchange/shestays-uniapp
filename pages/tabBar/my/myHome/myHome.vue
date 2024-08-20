@@ -11,19 +11,16 @@
 			<view class="my-head-content">
 				<view class="my-head-name">
 					<view class="name">
-						Lily
+						{{userInfo.userName}}
 					</view>
 					<view class="address">
 						<image class="address-icon" src="../../../../static/image/location.png" mode=""></image>
-						<text>深圳-中国</text>
+						<text>{{userInfo.cityName}}-{{userInfo.nationName}}</text>
 					</view>
 				</view>
 				<view class="my-info">
 					<view class="phone">
-						<text>手机号：123456</text>
-					</view>
-					<view class="wechat">
-						<text>微信号：123456</text>
+						<text>手机号：{{userInfo.phone}}</text>
 					</view>
 				</view>
 			</view>
@@ -34,7 +31,7 @@
 				个人简介
 			</view>
 			<view class="my-info-contert">
-				大家好，我是一位在深圳生活、曾在洛杉矶居住过的女生。我喜欢设计与创新，热爱探索不同文化与城市，希望结识更多有趣的人。
+				{{userInfo.personalProfile || '暂无个人简介~'}}
 			</view>
 		</view>
 		<!-- 我的房源 -->
@@ -42,23 +39,11 @@
 			<view class="my-houseing-title">
 				我的房源
 			</view>
-			<view class="houseing-col">
-				<view class="houseing">
-					<image class="houseing-image" src="" mode=""></image>
+			<view class="houseing-col" v-if="houseList.length > 0">
+				<view class="houseing" v-for="(item,i) in houseList" :key="i">
+					<image class="houseing-image" :src="item.homePageImgUrl" mode=""></image>
 					<view class="houseing-title">
-						深圳-中国
-					</view>
-				</view>
-				<view class="houseing">
-					<image class="houseing-image" src="" mode=""></image>
-					<view class="houseing-title">
-						深圳-中国
-					</view>
-				</view>
-				<view class="houseing">
-					<image class="houseing-image" src="" mode=""></image>
-					<view class="houseing-title">
-						深圳-中国
+						{{item.cityName}}-{{item.countryName}}
 					</view>
 				</view>
 			</view>
@@ -67,7 +52,51 @@
 </template>
 
 <script setup>
-
+	import { reactive, ref, onMounted,computed  } from 'vue'
+	import { onLoad } from '@dcloudio/uni-app'
+	import { getUserInfoByOpenId, getHouseByUserId } from '@/common/api/common'
+	import {msg} from '@/common/js/util.js'
+	
+	const userId = ref()
+	const openId = ref()
+	onLoad((option)=>{
+		console.log('----',option)
+		userId.value = option.userId || 280
+		openId.value = option.openId || 'oqmkh7bujr3pkHclTLhGUxwbmVqI'
+		getUserInfo()
+		getHouse()
+	})
+	
+	const userInfo = ref({})
+	const getUserInfo= async (type)=>{
+		try{
+			const res = await getUserInfoByOpenId({
+				openId: openId.value
+			})
+			if(res.code == 200){
+				userInfo.value = res.data || {}
+			}
+	
+		}catch(e){
+			msg(e.msg || '系统繁忙，请稍后重试')
+		}
+	}
+	
+	const houseList = ref([])    //房源
+	const getHouse = async (type)=>{
+		try{
+			const res = await getHouseByUserId({
+				userId: userId.value
+			})
+			if(res.code == 200){
+				houseList.value = res.data || []
+			}
+	
+		}catch(e){
+			msg(e.msg || '系统繁忙，请稍后重试')
+		}
+	}
+	
 </script>
 
 <style lang="scss" scoped>

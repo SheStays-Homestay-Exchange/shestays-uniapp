@@ -11,7 +11,7 @@
 					<view class="user-title" @click="handleGoPage('/pages/tabBar/my/updateMyInfo/updateMyInfo')">
 						{{myInfo.userName ? myInfo.userName : myInfo.phone}}
 					</view>
-					<view class="user-home" @click="handleGoPage('/pages/tabBar/my/myHome/myHome')">
+					<view class="user-home" @click="handleGoPage(`/pages/tabBar/my/myHome/myHome?openId=${userInfo.openId}&userId=${userInfo.userId}`)">
 						个人主页
 					</view>
 				</view>
@@ -58,7 +58,7 @@
 				设置
 			</view>
 			<view class="fn-li">
-				<view class="left">
+				<view class="left" @click="handleGoPage('/pages/tabBar/my/updateMyInfo/updateMyInfo')">
 					<image class="fn-icon" src="../../../static/image/user-square.png" mode=""></image>
 					<text class="fn-li-title">个人信息</text>
 				</view>
@@ -108,8 +108,9 @@
 	})
 	
 	const myInfo = ref({})
+	const userInfo = ref({})
 	const getUserInfo= async (type)=>{
-		let userInfo = typeof(cache.get('userInfo')) == 'string' ? JSON.parse( cache.get('userInfo') ) : cache.get('userInfo') 
+		userInfo.value = typeof(cache.get('userInfo')) == 'string' ? JSON.parse( cache.get('userInfo') ) : cache.get('userInfo') 
 		try{
 			const res = await getUserInfoByOpenId({
 				openId: userInfo.openId

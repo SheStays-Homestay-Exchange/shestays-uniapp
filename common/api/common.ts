@@ -94,3 +94,8 @@ export function editUserData(param) {
 export function getUserInfoByOpenId(params) {
 	return get('getUserInfoByOpenId',params)
 }
+
+//接口名称：个人房源管理查询接口
+export function getHouseByUserId(params) {
+	return get('getHouseByUserId',params)
+}

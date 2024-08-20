@@ -1,64 +1,69 @@
 <template>
 	<view class="my-housing">
-		<view class="lis" @click="handleEditHousing">
-			<view class="lis-title">
-				<image class="housing-image" src="" mode=""></image>
-				<view class="title">
-					<text>房源待发布</text>
-					<image class="title-icon" src="../../../static/image/released.jpg" mode=""></image>
+		<view class="house-wrap" v-for="(item,i) in houseList" :key="i" v-if="houseList.length > 0">
+			<!-- <view class="lis" @click="handleEditHousing" v-if="item.statusValue.includes('')">
+				<view class="lis-title">
+					<image class="housing-image" src="" mode=""></image>
+					<view class="title">
+						<text>房源待发布</text>
+						<image class="title-icon" src="../../../static/image/released.jpg" mode=""></image>
+					</view>
 				</view>
+				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
+			</view> -->
+			<view class="lis" @click="handleEditHousing" v-if="item.statusValue.includes('上传')">
+				<view class="lis-title">
+					<image class="housing-image" src="" mode=""></image>
+					<view class="title">
+						<text>房源上传中</text>
+						<image class="title-icon" src="../../../static/image/loading.jpg" mode=""></image>
+					</view>
+				</view>
+				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
 			</view>
-			<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
+			<view class="lis" @click="handleEditHousing" v-if="item.statusValue.includes('审核中')">
+				<view class="lis-title">
+					<image class="housing-image" src="" mode=""></image>
+					<view class="title">
+						<text>房源审核中</text>
+						<image class="title-icon" src="../../../static/image/search-icon.jpg" mode=""></image>
+					</view>
+				</view>
+				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
+			</view>
+			<view class="lis" @click="handleEditHousing" v-if="item.statusValue.includes('上线')">
+				<view class="lis-title">
+					<image class="housing-image" src="" mode=""></image>
+					<view class="title">
+						<text>房源已上线</text>
+						<image class="title-icon" src="../../../static/image/succon.jpg" mode=""></image>
+					</view>
+				</view>
+				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
+			</view>
+			<view class="lis" @click="handleEditHousing" v-if="item.statusValue.includes('未通过')">
+				<view class="lis-title error">
+					<image class="housing-image" src="" mode=""></image>
+					<view class="title">
+						<text>房源审核未通过</text>
+						<image class="title-icon" src="../../../static/image/error.jpg" mode=""></image>
+					</view>
+				</view>
+				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
+			</view>
+			<view class="lis" @click="handleEditHousing" v-if="item.statusValue.includes('下线')">
+				<view class="lis-title disabled">
+					<image class="housing-image" src="" mode=""></image>
+					<view class="title">
+						<text>房源已下线</text>
+						<image class="title-icon" src="../../../static/image/disabled.jpg" mode=""></image>
+					</view>
+				</view>
+				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
+			</view>
 		</view>
-		<view class="lis">
-			<view class="lis-title">
-				<image class="housing-image" src="" mode=""></image>
-				<view class="title">
-					<text>房源上传中</text>
-					<image class="title-icon" src="../../../static/image/loading.jpg" mode=""></image>
-				</view>
-			</view>
-			<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
-		</view>
-		<view class="lis">
-			<view class="lis-title">
-				<image class="housing-image" src="" mode=""></image>
-				<view class="title">
-					<text>房源审核中</text>
-					<image class="title-icon" src="../../../static/image/search-icon.jpg" mode=""></image>
-				</view>
-			</view>
-			<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
-		</view>
-		<view class="lis">
-			<view class="lis-title">
-				<image class="housing-image" src="" mode=""></image>
-				<view class="title">
-					<text>房源已上线</text>
-					<image class="title-icon" src="../../../static/image/succon.jpg" mode=""></image>
-				</view>
-			</view>
-			<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
-		</view>
-		<view class="lis">
-			<view class="lis-title error">
-				<image class="housing-image" src="" mode=""></image>
-				<view class="title">
-					<text>房源未审核通过</text>
-					<image class="title-icon" src="../../../static/image/error.jpg" mode=""></image>
-				</view>
-			</view>
-			<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
-		</view>
-		<view class="lis">
-			<view class="lis-title disabled">
-				<image class="housing-image" src="" mode=""></image>
-				<view class="title">
-					<text>房源已下线</text>
-					<image class="title-icon" src="../../../static/image/disabled.jpg" mode=""></image>
-				</view>
-			</view>
-			<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
+		<view class="no-text">
+			还没有发布房子哦~
 		</view>
 		<!-- 发布我的房子 -->
 		<view class="uploade-button" @click="handleGoPage('/pages/tabBar/my/uploadHousing')">
@@ -67,26 +72,81 @@
 		</view>
 		
 		<!-- 编辑房源弹框 -->
-		<editHousing ref="editRef"></editHousing>
+		<editHousing ref="editRef" @doAction="doAction"></editHousing>
+		<Modal :show="actionShow" @popTap="popTap">
+			<template #content>
+				<view class="action-content" v-if="actionType == 'down'">
+					<text>您确定要下架该房源吗？</text>
+					<text>下架之后您可以重新提交上线房源</text>
+				</view>
+				<view class="" v-if="actionType == 'del'">
+					<text>您确定要删除该房源吗？</text>
+					<text>删除后将无法恢复</text>
+				</view>
+			</template>
+		</Modal>
 	</view>
 	
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import editHousing from './components/editHousing.vue';
-
-function handleGoPage(url) {
-	uni.navigateTo({
-		url: url
+	import { ref } from 'vue';
+	import { onLoad } from '@dcloudio/uni-app'
+	import editHousing from './components/editHousing.vue';
+	import Modal from './components/modal' 
+	import { getHouseByUserId } from '@/common/api/common'
+	import cache from "@/common/js/cache.js";
+	
+	const userInfo = ref({})
+	onLoad(()=>{
+		userInfo.value = typeof(cache.get('userInfo')) == 'string' ? JSON.parse( cache.get('userInfo') ) : cache.get('userInfo')
+		getHouse()
 	})
-}
+	
+	function handleGoPage(url) {
+		uni.navigateTo({
+			url: url
+		})
+	}
 
-// 编辑房源
-const editRef = ref(null);
-function handleEditHousing() {
-	editRef.value.open();
-}
+	const actionShow = ref(false)
+	const actionType = ref('')   //房源操作类型，down:下架 ，del:删除
+	const doAction =(e)=>{
+		actionType.value = e
+		actionShow.value = true
+	
+	}
+	// 编辑房源
+	const editRef = ref(null);
+	function handleEditHousing() {
+		editRef.value.open();
+	}
+	
+	//弹窗操作
+	const popTap =(e)=>{
+		console.log('弹窗操作==',actionType.value,e)
+		if(e=='close'){
+			actionShow.value = false
+		}else{
+			//确定-请求接口
+			actionShow.value = false
+		}
+	}
+	
+	const houseList = ref([])    //房源
+	const getHouse = async (type)=>{
+		try{
+			const res = await getHouseByUserId({
+				userId: userInfo.value.userId
+			})
+			if(res.code == 200){
+				houseList.value = res.data || []
+			}
+	
+		}catch(e){
+			msg(e.msg || '系统繁忙，请稍后重试')
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
@@ -174,5 +234,11 @@ page {
 			margin-left: 30rpx;
 		}
 	}
+}
+.no-text{
+	padding-top: 20vh;
+	text-align: center;
+	font-size: 32upx;
+	color: #999;
 }
 </style>

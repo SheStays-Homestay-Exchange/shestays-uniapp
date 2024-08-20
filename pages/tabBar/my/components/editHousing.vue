@@ -8,12 +8,12 @@
 		<view class="edit-housing">
 			<view class="edit-title">
 				<text>管理房源</text>
-				<view class="close" @click="close()">
+				<view class="close" @click="close">
 					<image class="close-icon" src="../../../../static/image/x-close.png" mode=""></image>
 				</view>
 			</view>
 			<view class="edit-fn">
-				<view class="edit-fn-col">
+				<view class="edit-fn-col" @click="edit">
 					<view class="edit-fn-col-icon">
 						<image class="edit-fn-col-image" src="../../../../static/image/edit-05.png" mode=""></image>
 					</view>
@@ -21,7 +21,7 @@
 						编辑房源
 					</view>
 				</view>
-				<view class="edit-fn-col">
+				<view class="edit-fn-col" @click="downAction('down')">
 					<view class="edit-fn-col-icon">
 						<image class="edit-fn-col-image" src="../../../../static/image/slash-circle-01.png" mode=""></image>
 					</view>
@@ -29,7 +29,7 @@
 						下架房源
 					</view>
 				</view>
-				<view class="edit-fn-col">
+				<view class="edit-fn-col" @click="downAction('del')">
 					<view class="edit-fn-col-icon">
 						<image class="edit-fn-col-image" src="../../../../static/image/trash-01.png" mode=""></image>
 					</view>
@@ -45,7 +45,7 @@
 <script setup>
 	import { ref, defineExpose } from 'vue';
 	const editPopup = ref(null);
-	
+	const emits = defineEmits(['doAction'])
 	// 打开弹框
 	function open () {
 		editPopup.value.open();
@@ -53,6 +53,32 @@
 	// 关闭弹框
 	function close () {
 		editPopup.value.close();
+	}
+	
+	const edit = ()=>{
+		close()
+		uni.navigateTo({
+			url: '/pages/tabBar/my/uploadHousing'
+		})
+	}
+	
+	//下架
+	const  downAction =(type)=>{
+		close()
+		emits('doAction',type)   
+		// uni.showModal({
+		// 	title: '提示',
+		// 	content: '您确定要下架房源吗？下架之后您可以重新提交上线房源',
+		// 	cancelText:'否',
+		// 	confirmText:'是',
+		// 	success: function (res) {
+		// 		if (res.confirm) {
+		// 			console.log('用户点击确定');
+		// 		} else if (res.cancel) {
+		// 			console.log('用户点击取消');
+		// 		}
+		// 	}
+		// });
 	}
 	
 	// 暴露方法
