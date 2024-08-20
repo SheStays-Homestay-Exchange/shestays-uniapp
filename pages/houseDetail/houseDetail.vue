@@ -3,9 +3,9 @@
     <view class="house-banner">
       <uni-swiper-dot
         :current="current"
-        :total="state.houseImgs.length"
+        :total="userInfo.houseImgs.length"
         :dots-styles="dotsStyles"
-        :info="state.houseImgs"
+        :info="userInfo.houseImgs"
         mode="dot"
       >
         <swiper
@@ -16,7 +16,10 @@
           :current="current"
           @change="onSwiperChange"
         >
-          <swiper-item v-for="item in state.houseImgs" :key="item.houseImgId">
+          <swiper-item
+            v-for="item in userInfo.houseImgs"
+            :key="item.houseImgId"
+          >
             <view class="swiper-item image-wrapper">
               <img class="house-image" :src="item.imgUrl" alt="" />
             </view>
@@ -26,9 +29,9 @@
       <view class="house-position">
         <view class="left">
           <view class="title"
-            >{{ state.countryName }} - {{ state.cityName }}</view
+            >{{ userInfo.countryName }} - {{ userInfo.cityName }}</view
           >
-          <view class="desc">可接待人数：{{ state.houseAmount }}人</view>
+          <view class="desc">可接待人数：{{ userInfo.houseAmount }}人</view>
         </view>
       </view>
     </view>
@@ -44,8 +47,8 @@
 
     <view class="householder">
       <view class="userInfo">
-        <img class="user-image" :src="state.avatarUrl" alt="" />
-        <view class="info">房主：{{ state.xiaohongshuUsername }}</view>
+        <img class="user-image" :src="userInfo.avatarUrl" alt="" />
+        <view class="info">房主：{{ userInfo.xiaohongshuUsername }}</view>
       </view>
       <view>
         <button class="contact-btn" @click="contactHost">联系房主</button>
@@ -54,8 +57,8 @@
     <DetailPopup
       :show="popShow"
       @tapClose="popShow = false"
-      :id="state.phone"
-      :name="state.xiaohongshuUsername"
+      :id="userInfo.phone"
+      :name="userInfo.xiaohongshuUsername"
       userNameType="手机号"
     />
   </div>
@@ -86,46 +89,13 @@ const dotsStyles = {
   width: 7,
   height: 7,
 };
-/**
- * {
-  "code": "200",
-  "msg": "请求成功",
-  "data": {
-    "createTime": "2024-07-04 23:06:00",
-    "updateTime": "2024-08-14 00:47:43",
-    "isDelete": 0,
-    "houseId": 23,
-    "houseTitle": null,
-    "homePageImgUrl": null,
-    "houseAmount": null,
-    "describle": null,
-    "statusCode": "online",
-    "statusValue": "已上线",
-    "startTime": "2024-06-02 00:00:00",
-    "endTime": null,
-    "countryId": 1,
-    "countryName": "中国",
-    "cityId": 10,
-    "cityName": "石家庄",
-    "regionId": 9,
-    "regionName": "河北",
-    "detailAddress": "",
-    "unpassReason": "",
-    "userId": 21,
-    "continentId": 1,
-    "houseImgs": [],
-    "continentName": "亚洲",
-    "xiaohongshuId": null,
-    "xiaohongshuUsername": null
-  }
-}
- */
-const state = reactive({
+
+const userInfo = reactive({
   houseAmount: 0,
   countryName: "",
   cityName: "",
-  startTime: "2024-06-02 00:00:00",
-  endTime: "2024-06-04 00:00:00",
+  startTime: "",
+  endTime: "",
   describle: "",
   houseImgs: [
     {
@@ -145,11 +115,11 @@ const formatDate = (time) => {
 const houseInfo = [
   {
     label: "房源开放日期",
-    value: `${formatDate(state.startTime)}~${formatDate(state.endTime)}`,
+    value: userInfo.startTime ? `${formatDate(userInfo.startTime)} ~ ${formatDate(userInfo.endTime)}` : '-',
   },
   {
     label: "对房客姐妹说的话",
-    value: state.describle,
+    value: userInfo.describle,
   },
 ];
 
@@ -160,12 +130,20 @@ const onSwiperChange = (e) => {
 onLoad((options) => {
   getHouseDetail({ houseId: options?.id })
     .then((res) => {
-      const { code, data = {} } = res || {};
-      if (code === 200) {
-        state = {
-          ...state,
-          ...data,
-        };
+      const { code, data = {} } = res || {}
+      if (+code === 200) {
+        const keys = Object.keys(data);
+        if (keys.length) {
+          keys.forEach((key) => {
+            if (key === "houseImgs") {
+              if (data[key] && data[key].length) {
+                userInfo[key] = data[key] || userInfo[key];
+              }
+            } else {
+              userInfo[key] = data[key] || userInfo[key];
+            }
+          });
+        }
       }
     })
     .catch((error) => {
@@ -208,7 +186,7 @@ onLoad((options) => {
   width: 70%;
   padding: 32rpx 40rpx;
   position: absolute;
-  top: 520rpx;
+  top: 480rpx;
   left: 50%;
   transform: translateX(-50%);
   box-shadow: 0 10rpx 20rpx rgba(0, 0, 0, 0.1);
@@ -235,7 +213,7 @@ onLoad((options) => {
 
 .house-content {
   padding: 48rpx;
-  margin-top: 60rpx;
+  margin-top: 30rpx;
 }
 
 .house-info {
