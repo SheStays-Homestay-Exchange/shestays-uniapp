@@ -145,7 +145,7 @@
 	
 	const itemClick=(item)=>{
 		if(isLogin()){
-			goPage('/pages/houseDetail/houseDetail')
+			goPage('/pages/houseDetail/houseDetail?id='+item.houseId)
 		}
 	}
 </script>

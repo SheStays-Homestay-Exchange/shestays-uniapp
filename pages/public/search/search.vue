@@ -89,7 +89,7 @@
 	
 	const itemClick=(item)=>{
 		uni.navigateTo({
-			url:'/pages/houseDetail/houseDetail'
+			url:'/pages/houseDetail/houseDetail?id='+item.houseId
 		})
 	}
 	
