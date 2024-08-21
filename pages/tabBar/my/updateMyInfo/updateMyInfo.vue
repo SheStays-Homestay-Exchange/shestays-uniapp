@@ -1,8 +1,9 @@
 <template>
 	<view class="update-info">
 		<view class="user-icon" @click="uploadHead">
-			<image class="user-icon-image" :src="form.avatarimg" mode=""></image>
-			<uni-icons type="person-filled" size="60" color="#999" class="init-head" v-if="!form.avatarimg"></uni-icons>
+			<image class="user-icon-image" :src="form.avatar ? form.avatar : '../../../../static/image/avatar.png'" mode=""></image>
+			<!-- <uni-icons type="person-filled" size="60" color="#999" class="init-head" v-if="!form.avatarimg"></uni-icons> -->
+
 			<view class="user-update-icon">
 				<image class="update-icon" src="../../../../static/image/camera-01.png" mode=""></image>
 			</view>
@@ -11,7 +12,9 @@
 			<view class="user-title">
 				用户名
 			</view>
-			<uni-easyinput type="text" placeholder="未设置" maxlength="16" v-model="form.userName" primaryColor="#D8336D"></uni-easyinput>
+			<uni-easyinput type="text" placeholder="未设置" maxlength="16"
+			 v-model="form.userName" primaryColor="#D8336D" :style="style"
+			 placeholderStyle="color:#909193;font-size:16px;"></uni-easyinput>
 		</view>
 		<view class="user-cli">
 			<view class="user-title">
@@ -36,9 +39,12 @@
 		</view> -->
 		<view class="user-cli">
 			<view class="user-title">
-				手机号
+				联系方式
 			</view>
-			<uni-easyinput type="text" placeholder="未设置" v-model="form.phone" maxlength="11" primaryColor="#D8336D"></uni-easyinput>
+			<uni-easyinput type="text" placeholder="未设置" 
+			:style="style"
+			placeholderStyle="color:#909193;font-size:16px;"
+			v-model="form.phone" maxlength="20" primaryColor="#D8336D"></uni-easyinput>
 		</view>
 		<view class="user-cli">
 			<view class="user-title">
@@ -69,8 +75,9 @@
 			</view>
 		</view>
 		<view class="user-cli textarea-body">
-			<view class="user-title">
+			<view class="user-title des-title">
 				个人简介
+				<text class="gray">（选填）</text>
 			</view>
 			<uni-easyinput type="textarea" v-model="form.des" maxlength="300"></uni-easyinput>
 		</view>
@@ -83,10 +90,14 @@
 <script setup>
 	import { ref, reactive } from 'vue'
 	import { onLoad } from '@dcloudio/uni-app'
-	import  {date, msg}  from '@/common/js/util.js'
-	import { editUserData } from '@/common/api/common'
+	import  {date, msg, imgToBase64}  from '@/common/js/util.js'
+	import { editUserData, uploadAvatar } from '@/common/api/common'
 	import cache from "@/common/js/cache.js";
-	
+	import { uploadFile } from '@/common/js/request';
+
+	const style={
+		fontSize :'16px'
+	}
 	// 用户信息
 	var userInfo = {}
 	onLoad(()=>{
@@ -97,7 +108,8 @@
 		sex:'',
 		phone:'',
 		wechatId:'',
-		des:''
+		des:'',
+		avatar:''
 	})
 	
 	const dateChange = e=>{
@@ -135,18 +147,10 @@
 		}else if(!form.date){
 			msg('请选择生日')
 			return false
-		}else if(!form.des){
-			msg('请输入简介')
+		}else if(!form.phone) {
+			msg('请输入联系方式')
 			return false
 		}
-		let reg = /^1[3-9][0-9]{9}$/;
-		if (!form.phone) {
-			msg('请输入手机号')
-			return false
-		}else if (!reg.test(form.phone)) {
-			msg('手机号码格式有误，请重新输入')
-			return false
-		} 
 		return true
 	}
 	
@@ -171,7 +175,7 @@
 				genderDictCode: form.sex,
 				phone: form.phone,
 				personalProfile: form.des,
-				// avatar: form.avatarimg[0],
+				avatar: form.avatar,
 			    bdYear:  Number(dateArr[0]),
 				bdMonth: Number(dateArr[1]),
 				bdDay: Number(dateArr[2]),
@@ -189,23 +193,38 @@
 		avatar:''
 	})
 	
-	const uploadHead = ()=>{
+	
+	
+	const uploadHead = async()=>{
 		uni.chooseImage({
 			count: 1,
 			crop: {
 				width: 100,
 				height: 100
 			},
-			success(e) {
+			success: async(e)=>{
 				//判断文件后缀名
 				console.log('图片上传',e)
 				if (e.tempFilePaths[0].split('.')[e.tempFilePaths[0].split('.').length - 1].includes('gif')) {
 					msg('暂不支持上传gif图片，请重新选择后上传')
 					return false
 				}
-				form.avatarimg = e.tempFilePaths
-				form.avatar = e.tempFiles[0]
+				// form.avatar = e.tempFiles[0]
+				
+				const base = await imgToBase64(e.tempFiles[0].path)
+				try{
+					const avatarRes = uploadAvatar({
+						avatar: base,
+						userId:userInfo.userId
+					})
+					form.avatar = avatarRes.data || e.tempFiles[0]
+				}catch(e){
+					msg(e.msg)
+				}
+				
+				
 				// uploadFile(e.tempFilePaths).then(res => {
+				// 	console.log('图片上传成功',res)
 				// 	form.avatar = res[0]
 				// }).catch(e => {
 				// 	console.log('图片上传错误', e)
@@ -221,8 +240,16 @@
 <style lang="scss" scoped>
 .update-info {
 	padding: 22rpx 48rpx 200rpx 48rpx;
+	.gray{
+		color: #999;
+		font-weight: normal;
+		font-size: 24upx;
+	}
 	.radio-box{
 		flex: 1;
+		radio{
+			transform:scale(0.8);
+		}
 	}
 	.user-icon {
 		width: 232rpx;
@@ -271,6 +298,9 @@
 			font-weight: 600;
 			color: #000B3B;
 			width: 200rpx;
+			&.des-title{
+				width: 100%;
+			}
 		}
 		
 		.user-info {

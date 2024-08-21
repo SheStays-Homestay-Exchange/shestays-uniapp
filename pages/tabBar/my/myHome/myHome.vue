@@ -1,13 +1,13 @@
 <template>
 	<view class="my-home">
 		<view class="my-head">
-			<!-- <view class="my-icon">
-				<image class="my-icon-image" src="" mode=""></image>
-			</view> -->
-			<!-- 默认头像 -->
-			<view class="init-head">
-				<uni-icons type="person-filled" size="50" color="#999"></uni-icons>
+			<view class="my-icon">
+				<image class="my-icon-image" src="../../../static/image/avatar.png" mode=""></image>
 			</view>
+			<!-- 默认头像 -->
+		<!-- 	<view class="init-head">
+				<uni-icons type="person-filled" size="50" color="#999"></uni-icons>
+			</view> -->
 			<view class="my-head-content">
 				<view class="my-head-name">
 					<view class="name">

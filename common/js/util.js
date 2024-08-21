@@ -141,11 +141,24 @@ var dateUtils = {
 	});
 }
 
+//图片转base64
+ function imgToBase64(filePath) {
+	 console.log(filePath,'filePath====')
+	    return new Promise((resolve, reject) => {
+	      let baseFormat = 'data:image/png;base64,'
+	      let base64 = uni.getFileSystemManager().readFileSync(filePath, 'base64')
+	      resolve(baseFormat + base64)
+	    },(err)=>{
+			
+		})
+	  }
+
 export {
 	formatTime,
 	formatLocation,
 	dateUtils,
 	msg,
 	confirm,
-	date
+	date,
+	imgToBase64
 }

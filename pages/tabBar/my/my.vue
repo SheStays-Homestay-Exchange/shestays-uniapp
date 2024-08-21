@@ -3,10 +3,10 @@
 		<!-- 头像 -->
 		<view class="user">
 			<view class="user-icon">
-				<image :src="myInfo.avatarUrl" class="user-image" mode="" v-if="myInfo.avatarUrl" @click="handleGoPage('/pages/tabBar/my/updateMyInfo/updateMyInfo')"></image>
-				<view class="init-head" v-else @click="handleGoPage('/pages/tabBar/my/updateMyInfo/updateMyInfo')">
+				<image :src="myInfo.avatarUrl?myInfo.avatarUrl:'../../../static/image/avatar.png'" class="user-image" mode=""  @click="handleGoPage('/pages/tabBar/my/updateMyInfo/updateMyInfo')"></image>
+			<!-- 	<view class="init-head" v-else @click="handleGoPage('/pages/tabBar/my/updateMyInfo/updateMyInfo')">
 					<uni-icons type="person-filled" size="40" color="#999"></uni-icons>
-				</view>
+				</view> -->
 				<view class="user-name">
 					<view class="user-title" @click="handleGoPage('/pages/tabBar/my/updateMyInfo/updateMyInfo')">
 						{{myInfo.userName ? myInfo.userName : myInfo.phone}}
@@ -17,7 +17,7 @@
 				</view>
 			</view>
 			<view class="user-update" @click="handleGoPage('/pages/tabBar/my/updateMyInfo/updateMyInfo')">
-				<image class="edit-icon" src="../../../static/image/edit.jpg" mode=""></image>
+				<image class="edit-icon" src="../../../static/image/edit.png" mode=""></image>
 				个人信息
 			</view>
 		</view>
@@ -45,10 +45,11 @@
 			</view>
 			<view class="fn-li" @click="handleGoPage('/pages/tabBar/my/housingList/housingList')">
 				<view class="left">
-					<image class="fn-icon" src="../../../static/image/user-square.png" mode=""></image>
+					<image class="fn-icon" src="../../../static/image/check-done-02.png" mode=""></image>
 					<text class="fn-li-title">待审核房源</text><text>(3)</text>
 				</view>
-				<image class="fn-right" src="../../../static/image/chevron-right.jpg" mode=""></image>
+				<!-- <image class="fn-right" src="../../../static/image/chevron-right.jpg" mode=""></image> -->
+				<uni-icons type="right" size="20" color="#909193"></uni-icons>
 			</view>
 		</view>
 		
@@ -62,14 +63,16 @@
 					<image class="fn-icon" src="../../../static/image/user-square.png" mode=""></image>
 					<text class="fn-li-title">个人信息</text>
 				</view>
-				<image class="fn-right" src="../../../static/image/chevron-right.jpg" mode=""></image>
+				<!-- <image class="fn-right" src="../../../static/image/chevron-right.jpg" mode=""></image> -->
+				<uni-icons type="right" size="20" color="#909193"></uni-icons>
 			</view>
 			<view class="fn-li" @click="handleGoPage('/pages/rules/rules')">
 				<view class="left">
 					<image class="fn-icon" src="../../../static/image/tool-02.png" mode=""></image>
 					<text class="fn-li-title">隐私和共享</text>
 				</view>
-				<image class="fn-right" src="../../../static/image/chevron-right.jpg" mode=""></image>
+				<!-- <image class="fn-right" src="../../../static/image/chevron-right.jpg" mode=""></image> -->
+				<uni-icons type="right" size="20" color="#909193"></uni-icons>
 			</view>
 		</view>
 		<!-- 支持 -->
@@ -82,14 +85,16 @@
 					<image class="fn-icon" src="../../../static/image/mail-01.png" mode=""></image>
 					<text class="fn-li-title">联系我们</text>
 				</view>
-				<image class="fn-right" src="../../../static/image/chevron-right.jpg" mode=""></image>
+				<!-- <image class="fn-right" src="../../../static/image/chevron-right.jpg" mode=""></image> -->
+				<uni-icons type="right" size="20" color="#909193"></uni-icons>
 			</view>
 			<view class="fn-li" @click="handleGoPage('/pages/rules/rules')">
 				<view class="left">
 					<image class="fn-icon" src="../../../static/image/file-05.png" mode=""></image>
 					<text class="fn-li-title">法律条款</text>
 				</view>
-				<image class="fn-right" src="../../../static/image/chevron-right.jpg" mode=""></image>
+				<!-- <image class="fn-right" src="../../../static/image/chevron-right.jpg" mode=""></image> -->
+				<uni-icons type="right" size="20" color="#909193"></uni-icons>
 			</view>
 		</view>
 	</view>
@@ -227,7 +232,7 @@
 	.fn-body {
 		margin-top: 66rpx;
 		.title {
-			font-size: 48rpx;
+			font-size: 40rpx;
 			font-weight: 500;
 		}
 		.fn-li {

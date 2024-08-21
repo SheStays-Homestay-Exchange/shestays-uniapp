@@ -62,7 +62,7 @@
 				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
 			</view>
 		</view>
-		<view class="no-text">
+		<view class="no-text" v-else>
 			还没有发布房子哦~
 		</view>
 		<!-- 发布我的房子 -->
@@ -184,7 +184,6 @@ page {
 					width: 48rpx;
 					height: 48rpx;
 					margin-left: 8rpx;
-					background-color: #eeeeee;
 				}
 			}
 		}

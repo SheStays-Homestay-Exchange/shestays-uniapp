@@ -99,3 +99,8 @@ export function getUserInfoByOpenId(params) {
 export function getHouseByUserId(params) {
 	return get('getHouseByUserId',params)
 }
+
+//接口名称：头像上传
+export function uploadAvatar(params) {
+	return post('uploadAvatar',params)
+}

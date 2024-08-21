@@ -59,7 +59,7 @@
       @tapClose="popShow = false"
       :id="userInfo.phone"
       :name="userInfo.xiaohongshuUsername"
-      userNameType="手机号"
+      userNameType="联系方式"
     />
   </div>
 </template>

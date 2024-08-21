@@ -59,7 +59,12 @@
 
 <style lang="scss">
 	@import '@/uni_modules/uni-scss/index.scss';
-
+	// 设置整个项目样式
+	page {
+		font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+		font-size: 28rpx;
+		overflow: auto;
+	}
 
 
 
