@@ -12,7 +12,9 @@
 			<view class="user-title">
 				用户名
 			</view>
-			<uni-easyinput type="text" placeholder="未设置" maxlength="16" v-model="form.userName" primaryColor="#D8336D"></uni-easyinput>
+			<uni-easyinput type="text" placeholder="未设置" maxlength="16"
+			 v-model="form.userName" primaryColor="#D8336D" :style="style"
+			 placeholderStyle="color:#909193;font-size:16px;"></uni-easyinput>
 		</view>
 		<view class="user-cli">
 			<view class="user-title">
@@ -39,7 +41,10 @@
 			<view class="user-title">
 				联系方式
 			</view>
-			<uni-easyinput type="text" placeholder="未设置" v-model="form.phone" maxlength="20" primaryColor="#D8336D"></uni-easyinput>
+			<uni-easyinput type="text" placeholder="未设置" 
+			:style="style"
+			placeholderStyle="color:#909193;font-size:16px;"
+			v-model="form.phone" maxlength="20" primaryColor="#D8336D"></uni-easyinput>
 		</view>
 		<view class="user-cli">
 			<view class="user-title">
@@ -90,6 +95,9 @@
 	import cache from "@/common/js/cache.js";
 	import { uploadFile } from '@/common/js/request';
 
+	const style={
+		fontSize :'16px'
+	}
 	// 用户信息
 	var userInfo = {}
 	onLoad(()=>{
