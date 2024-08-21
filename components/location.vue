@@ -31,7 +31,7 @@
 						</view> -->
 					</view>
 					<view class="address-item" v-for="(item,i) in addressList" @click="itemClick(item)" >
-						{{item.nationName}}
+						{{item.countryName}}
 					</view>
 				</view>
 			</view>
@@ -95,6 +95,8 @@
 	
 	//地区列表
 	const addressList = ref([{areaName:'',id:'',areaLevel:'',areaCode:''}])
+	//当前展示的地区层级
+	const areaLevel = ref(1)  //1国家，2区省、3城市
 	//选中的省市区
 	const chooseArea = reactive({})
 	//选中城市回显
@@ -108,16 +110,16 @@
 	//省市区列表点击
 	const itemClick = (item)=>{
 		authCity.value = true
-		if(item.areaLevel === 1){   //省
+		if(areaLevel.value === 1){   //省
 			chooseArea.province = item
 			chooseArea.city = {}
 			chooseArea.area = {}
 			getAreaList(item.areaCode)
-		}else if(item.areaLevel === 2){
+		}else if(areaLevel.value === 2){
 			chooseArea.city = item
 			chooseArea.area = {}
 			getAreaList(item.areaCode)
-		}else{
+		}else if(areaLevel.value == 3){
 			chooseArea.area = item
 			show.value = false
 		}

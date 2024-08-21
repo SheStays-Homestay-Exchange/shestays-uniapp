@@ -23,10 +23,10 @@
 			<view class="radio-box">
 				<radio-group @change="radioChange">
 					<label class="radio" style="margin-right: 40rpx;">
-						<radio color="#d8336d" value="1"/>女
+						<radio color="#d8336d" value="1" :checked="form.sex == '1'"/>女
 					</label>
 					<label class="radio">
-						<radio color="#d8336d" value="1"/>男
+						<radio color="#d8336d" value="2" :checked="form.sex == '2'"/>男
 					</label>
 				</radio-group>
 			</view>
@@ -63,7 +63,7 @@
 				<image class="user-info-right-icon" src="../../../../static/image/chevron-right.jpg" mode=""></image>
 			</view>
 		</view>
-		<view class="user-cli">
+		<view class="user-cli" @click="locationVisible=true">
 			<view class="user-title">
 				地区
 			</view>
@@ -85,23 +85,27 @@
 			保存个人信息
 		</view>
 	</view>
+	<Location :visible="locationVisible"></Location>
 </template>
 
 <script setup>
 	import { ref, reactive } from 'vue'
 	import { onLoad } from '@dcloudio/uni-app'
 	import  {date, msg, imgToBase64}  from '@/common/js/util.js'
-	import { editUserData, uploadAvatar } from '@/common/api/common'
+	import { editUserData, uploadAvatar, getUserInfoByOpenId } from '@/common/api/common'
 	import cache from "@/common/js/cache.js";
 	import { uploadFile } from '@/common/js/request';
-
+	import Location from '@/components/location'
+	
+	
 	const style={
 		fontSize :'16px'
 	}
 	// 用户信息
-	var userInfo = {}
+	// var userInfo = {}
 	onLoad(()=>{
-		userInfo = typeof(cache.get('userInfo')) == 'string' ? JSON.parse( cache.get('userInfo') ) : cache.get('userInfo')
+		// userInfo = typeof(cache.get('userInfo')) == 'string' ? JSON.parse( cache.get('userInfo') ) : cache.get('userInfo')
+		getUserInfo()
 	})
 	const form = reactive({
 		date:'请选择生日',
@@ -121,6 +125,42 @@
 	const radioChange = e=>{
 		form.sex = e.detail.value
 	}
+	
+	const locationVisible = ref(false)
+	
+	const userInfo = ref({})
+	const getUserInfo= async (type)=>{
+		userInfo.value = typeof(cache.get('userInfo')) == 'string' ? JSON.parse( cache.get('userInfo') ) : cache.get('userInfo') 
+		if(!(userInfo.value?.openId)){
+			uni.reLaunch({
+				url:'/pages/login/login'
+			})
+			return
+		}
+		try{
+			const res = await getUserInfoByOpenId({
+				openId: userInfo.value.openId
+			})
+			if(res.code == 200){
+				if(!(res.data.openId)){
+					uni.reLaunch({
+						url:'/pages/login/login'
+					})
+				}
+				const {bdYear,bdMonth,bdDay} = res.data
+				form.des = res.data.personalProfile
+				form.phone = res.data.phone
+				form.avatarUrl = res.data.avatar
+				form.sex = res.data.genderDictCode
+				form.userName = res.data.userName
+				form.date = `${bdYear}-${bdMonth}-${bdDay}`
+			}
+	
+		}catch(e){
+			msg(e.msg || '系统繁忙，请稍后重试')
+		}
+	}
+	
 	onLoad(()=>{
 		// console.log('date===',dateEnd)
 		// uni.getFuzzyLocation({
@@ -179,7 +219,7 @@
 			    bdYear:  Number(dateArr[0]),
 				bdMonth: Number(dateArr[1]),
 				bdDay: Number(dateArr[2]),
-				userId: userInfo.userId,
+				userId: userInfo.value.userId,
 				nationId:'1', //国家id
 				regionId:'1', //区域id
 				cityId:'1', //城市id
@@ -211,9 +251,9 @@
 				}
 				// form.avatar = e.tempFiles[0]
 				
-				const base = await imgToBase64(e.tempFiles[0].path)
 				try{
-					const avatarRes = uploadAvatar({
+					const base = await imgToBase64(e.tempFiles[0].path)
+					const avatarRes = await uploadAvatar({
 						avatar: base,
 						userId:userInfo.userId
 					})

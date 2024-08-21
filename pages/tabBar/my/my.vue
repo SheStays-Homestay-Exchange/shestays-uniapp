@@ -116,13 +116,24 @@
 	const userInfo = ref({})
 	const getUserInfo= async (type)=>{
 		userInfo.value = typeof(cache.get('userInfo')) == 'string' ? JSON.parse( cache.get('userInfo') ) : cache.get('userInfo') 
+		if(!(userInfo.value?.openId)){
+			uni.reLaunch({
+				url:'/pages/login/login'
+			})
+			return
+		}
 		try{
 			const res = await getUserInfoByOpenId({
-				openId: userInfo.openId
+				openId: userInfo.value.openId
 			})
 			if(res.code == 200){
 				myInfo.value = res.data || {}
 				cache.put('userInfo',res.data)
+				if(!(res.data.openId)){
+					uni.reLaunch({
+						url:'/pages/login/login'
+					})
+				}
 			}
 
 		}catch(e){
