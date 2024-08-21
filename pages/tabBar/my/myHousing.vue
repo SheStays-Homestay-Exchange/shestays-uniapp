@@ -16,37 +16,37 @@
 					<image class="housing-image" src="" mode=""></image>
 					<view class="title">
 						<text>房源上传中</text>
-						<image class="title-icon" src="../../../static/image/loading.jpg" mode=""></image>
+						<image class="title-icon" src="../../../static/image/loading-01.png" mode=""></image>
 					</view>
 				</view>
-				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
+				<!-- <image class="right-icon" src="../../../../static/image/right-Icon.jpg" mode=""></image> -->
 			</view>
 			<view class="lis" @click="handleEditHousing" v-if="item.statusValue.includes('审核中')">
 				<view class="lis-title">
 					<image class="housing-image" src="" mode=""></image>
 					<view class="title">
 						<text>房源审核中</text>
-						<image class="title-icon" src="../../../static/image/search-icon.jpg" mode=""></image>
+						<image class="title-icon" src="../../../static/image/search-refraction.png" mode=""></image>
 					</view>
 				</view>
-				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
+				<!-- <image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image> -->
 			</view>
 			<view class="lis" @click="handleEditHousing" v-if="item.statusValue.includes('上线')">
 				<view class="lis-title">
 					<image class="housing-image" src="" mode=""></image>
 					<view class="title">
 						<text>房源已上线</text>
-						<image class="title-icon" src="../../../static/image/succon.jpg" mode=""></image>
+						<image class="title-icon" src="../../../static/image/success.png" mode=""></image>
 					</view>
 				</view>
-				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
+				<!-- <image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image> -->
 			</view>
 			<view class="lis" @click="handleEditHousing" v-if="item.statusValue.includes('未通过')">
 				<view class="lis-title error">
 					<image class="housing-image" src="" mode=""></image>
 					<view class="title">
 						<text>房源审核未通过</text>
-						<image class="title-icon" src="../../../static/image/error.jpg" mode=""></image>
+						<image class="title-icon" src="../../../static/image/error.png" mode=""></image>
 					</view>
 				</view>
 				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
@@ -59,7 +59,7 @@
 						<image class="title-icon" src="../../../static/image/disabled.jpg" mode=""></image>
 					</view>
 				</view>
-				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
+				<!-- <image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image> -->
 			</view>
 		</view>
 		<view class="no-text" v-else>
