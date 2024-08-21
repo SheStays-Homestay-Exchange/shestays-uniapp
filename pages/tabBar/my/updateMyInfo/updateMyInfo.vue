@@ -63,13 +63,13 @@
 				<image class="user-info-right-icon" src="../../../../static/image/chevron-right.jpg" mode=""></image>
 			</view>
 		</view>
-		<view class="user-cli" @click="locationVisible=true">
+		<view class="user-cli" @click="provinceShow=true">
 			<view class="user-title">
 				地区
 			</view>
 			<view class="user-info">
 				<view class="user-info-title">
-					中国-深圳
+					{{ form.address}}
 				</view>
 				<image class="user-info-right-icon" src="../../../../static/image/chevron-right.jpg" mode=""></image>
 			</view>
@@ -85,7 +85,8 @@
 			保存个人信息
 		</view>
 	</view>
-	<Location :visible="locationVisible"></Location>
+	<!-- <Location :visible="locationVisible"></Location> -->
+	<Location @popupClick="popupClick" :show="provinceShow" :chooseArea="chooseArea"></Location>
 </template>
 
 <script setup>
@@ -107,13 +108,37 @@
 		// userInfo = typeof(cache.get('userInfo')) == 'string' ? JSON.parse( cache.get('userInfo') ) : cache.get('userInfo')
 		getUserInfo()
 	})
+	
+	//选中的省市区
+		const chooseArea = reactive([])
+		//省市区弹窗
+		const provinceShow = ref(false)
+	
+	const popupClick = (e) => {
+	  console.log(e,'---------------------------popupClick')
+	  if( e.funName == 'cancle' ){
+	    provinceShow.value = false
+	  }else if( e.funName == 'submit' ){
+		  chooseArea.value = e.value
+		  provinceShow.value = false   //关闭地址弹窗
+		  form.address = chooseArea.value[0].countryName+'-'+chooseArea.value[1].regionName+'-'+chooseArea.value[2].cityName
+	    // submitArea(e.value)
+	  }
+	}
+
+		//提交选中的地区
+		const submitArea = (value)=>{
+			console.log(submitArea,value)
+		}
+		
 	const form = reactive({
 		date:'请选择生日',
 		sex:'',
 		phone:'',
 		wechatId:'',
 		des:'',
-		avatar:''
+		avatar:'',
+		address:'请选择'
 	})
 	
 	const dateChange = e=>{
@@ -255,7 +280,7 @@
 					const base = await imgToBase64(e.tempFiles[0].path)
 					const avatarRes = await uploadAvatar({
 						avatar: base,
-						userId:userInfo.userId
+						userId:userInfo.value.userId
 					})
 					form.avatar = avatarRes.data || e.tempFiles[0]
 				}catch(e){
