@@ -5,6 +5,7 @@ import {
 
 import store from '../../store/index.js'
 import config from "@/common/config";
+import { registerRuntimeCompiler } from '../../../../../../../../Applications/HBuilderX.app/Contents/HBuilderX/plugins/hbuilderx-language-services/builtin-dts/common/vue2And3.js';
 
 /**
  * 获取用户信息
@@ -103,4 +104,14 @@ export function getHouseByUserId(params) {
 //接口名称：头像上传
 export function uploadAvatar(params) {
 	return post('uploadAvatar',params)
+}
+
+// 查看房源待审核
+export function getUnderViewHouse() {
+	return get('getUnderViewHouse')
+}
+
+// 提交房源信息
+export function uploadHouse(params = {}) {
+	return post('uploadHouse', params)
 }

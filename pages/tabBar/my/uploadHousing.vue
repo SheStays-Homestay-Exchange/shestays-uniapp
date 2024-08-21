@@ -54,7 +54,7 @@
 				<uni-number-box :min="1"></uni-number-box>
 			</view>
 		</view>
-		<view class="uploade-col">
+		<view class="uploade-col" @click="handleSetTime">
 			<view class="uploade-title">
 				开放换宿时间
 			</view>
@@ -82,18 +82,21 @@
 		<view class="save">
 			保存编辑
 		</view>
-		<view class="submit">
+		<view class="submit" @click="handleUploadHouse">
 			提交房源
 		</view>
 	</view>
 	
 	<Location :visible="locationVisible"></Location>
+	
+	<!-- 日期选择器 -->
+	<hl-calendar-range ref="hlCalendarRange"></hl-calendar-range>
 </template>
 
 <script setup>
 	import { reactive,ref } from 'vue';
 	import Location from '@/components/location'
-	
+	import { uploadHouse } from '@/common/api/common'
 	const styles = reactive({
 		"borderColor": "#ffffff"
 	})
@@ -104,8 +107,33 @@
 			url: '/pages/public/searchAddress/searchAddress'
 		})
 	}
+	const locationVisible = ref(false);
 	
-	const locationVisible = ref(false)
+	const hlCalendarRange = ref(null);
+	function handleSetTime() {
+		console.log(hlCalendarRange.value)
+	}
+	// 提交房源信息
+	const handleUploadHouse = async () => {
+		let data = {
+			userId: 630,
+			houseTitle: '',
+			houseAmount: '',
+			describle: '',
+			startTime: '',
+			endTime: '',
+			countryId: '',
+			cityId: '',
+			regionId: '',
+			detailAddress: ''
+		}
+		try {
+			const res = await uploadHouse(data);
+			console.log(res);
+		} catch(e) {
+			msg(e.msg || '系统繁忙，请稍后重试')
+		}
+	}
 </script>
 
 <style lang="scss" scoped>

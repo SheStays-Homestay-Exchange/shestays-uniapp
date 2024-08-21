@@ -46,7 +46,7 @@
 			<view class="fn-li" @click="handleGoPage('/pages/tabBar/my/housingList/housingList')">
 				<view class="left">
 					<image class="fn-icon" src="../../../static/image/check-done-02.png" mode=""></image>
-					<text class="fn-li-title">待审核房源</text><text>(3)</text>
+					<text class="fn-li-title">待审核房源</text><text>({{ houseList.length }})</text>
 				</view>
 				<!-- <image class="fn-right" src="../../../static/image/chevron-right.jpg" mode=""></image> -->
 				<uni-icons type="right" size="20" color="#909193"></uni-icons>
@@ -103,13 +103,14 @@
 <script setup>
 	import { reactive, ref, onMounted,computed  } from 'vue'
 	import { onLoad, onShow } from '@dcloudio/uni-app'
-	import { getUserInfoByOpenId } from '@/common/api/common'
+	import { getUserInfoByOpenId, getUnderViewHouse } from '@/common/api/common'
 	import  {msg}  from '@/common/js/util.js'
 	import cache from "@/common/js/cache.js";
 	
 	
 	onShow(()=>{
 		getUserInfo()
+		getUnderViewHouseFun()
 	})
 	
 	const myInfo = ref({})
@@ -158,6 +159,19 @@
 		uni.navigateTo({
 			url: url
 		})
+	}
+	
+	// 查看房源待审核
+	const houseList = ref([]);
+	try {
+		const getUnderViewHouseFun = async () => {
+			const res = await getUnderViewHouse();
+			if (res.code == 200) {
+				houseList.value = res.data;
+			}
+		}
+	} catch(e) {
+		msg(e.msg || '系统繁忙，请稍后重试')
 	}
 </script>
 
