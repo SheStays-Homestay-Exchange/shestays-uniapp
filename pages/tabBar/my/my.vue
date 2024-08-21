@@ -102,13 +102,13 @@
 
 <script setup>
 	import { reactive, ref, onMounted,computed  } from 'vue'
-	import { onLoad } from '@dcloudio/uni-app'
+	import { onLoad, onShow } from '@dcloudio/uni-app'
 	import { getUserInfoByOpenId } from '@/common/api/common'
 	import  {msg}  from '@/common/js/util.js'
 	import cache from "@/common/js/cache.js";
 	
 	
-	onLoad(()=>{
+	onShow(()=>{
 		getUserInfo()
 	})
 	
@@ -122,6 +122,7 @@
 			})
 			if(res.code == 200){
 				myInfo.value = res.data || {}
+				cache.put('userInfo',res.data)
 			}
 
 		}catch(e){

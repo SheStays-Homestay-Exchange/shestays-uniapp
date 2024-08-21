@@ -175,7 +175,7 @@
 				genderDictCode: form.sex,
 				phone: form.phone,
 				personalProfile: form.des,
-				avatar: form.avatar,
+				avatar: 'https://pics0.baidu.com/feed/8718367adab44aed424d9e8e9d02e70fa18bfb01.jpeg?token=1e2e40b76e537620ed17324124cb789c',
 			    bdYear:  Number(dateArr[0]),
 				bdMonth: Number(dateArr[1]),
 				bdDay: Number(dateArr[2]),
