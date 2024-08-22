@@ -1,6 +1,6 @@
 <template>
 	<view class="housing-list">
-		<template v-if="false">
+		<template v-if="houseList.length != 0">
 			<view class="list">
 				<text>待审核：亚洲 - 中国 - 上海</text>
 			</view>
@@ -41,6 +41,28 @@
 </template>
 
 <script setup>
+import  {msg}  from '@/common/js/util.js'
+import { getUnderViewHouse } from '@/common/api/common'
+import { onLoad } from '@dcloudio/uni-app'
+import { ref } from 'vue';
+
+const houseList = ref([]);
+
+onLoad(() => {
+	getUnderViewHouseFun();
+});
+
+const getUnderViewHouseFun = async () => {
+	try {
+		const res = await getUnderViewHouse();
+		if (res.code === 200) {
+			houseList.value = res.data;
+		}
+	}catch(e){
+		msg(e.msg || '系统繁忙，请稍后重试')
+	}
+	
+}
 </script>
 
 <style lang="scss" scoped>
