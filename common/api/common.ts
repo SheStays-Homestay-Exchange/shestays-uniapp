@@ -1,6 +1,7 @@
 import {
 	get,
-	post
+	post,
+	deletes
 } from '@/common/js/request.js';
 
 import store from '../../store/index.js'
@@ -103,4 +104,9 @@ export function getHouseByUserId(params) {
 //接口名称：头像上传
 export function uploadAvatar(params) {
 	return post('uploadAvatar',params)
+}
+
+//接口名称：删除房源
+export function houseDel(params) {
+	return deletes('houseDel',params)
 }

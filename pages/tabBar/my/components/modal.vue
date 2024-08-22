@@ -9,10 +9,10 @@
 			</view>
 			<slot name="content"></slot>
 			<view class="ptc-button flex justify-content-between align-items-center">
-				<view class="flex-1" @click="cancle">
+				<view class="flex-1" @click="confirm">
 					<button type="default" class="cancle-btn">{{confirmText}}</button>
 				</view>
-				<view class="flex-1" @click="confirm">
+				<view class="flex-1" @click="cancle">
 					<button type="primary" class="sure-btn">{{cancelText}}</button>
 				</view>
 			</view>
@@ -156,15 +156,23 @@ defineExpose({
 			.flex-1 + .flex-1 {
 			  margin-left: 20rpx;
 			}
+			button{
+				width: 30vw;
+				border-radius: 40rpx;
+				color: #fff;
+				height: 80rpx;
+				line-height: 80rpx;
+			}
 			.cancle-btn{
-				width: 200rpx;
-				border-radius: 88rpx;
+				
+				background-color: #909193;
+				// color: #fff;
 			}
 			.sure-btn{
-				width: 200rpx;
-				height: 88rpx;
-				color: #ffffff;
-				border-radius: 88rpx;
+				// width: 30vw;
+				// height: 80rpx;
+				// color: #ffffff;
+				// border-radius: 88rpx;
 				text-align: center;
 				background-color: #D8336D;
 			}

@@ -21,7 +21,7 @@
 						编辑房源
 					</view>
 				</view>
-				<view class="edit-fn-col" @click="downAction('down')">
+				<view class="edit-fn-col" @click="downAction('down')" v-if="popStatus == 2">
 					<view class="edit-fn-col-icon">
 						<image class="edit-fn-col-image" src="../../../../static/image/slash-circle-01.png" mode=""></image>
 					</view>
@@ -44,6 +44,17 @@
 
 <script setup>
 	import { ref, defineExpose } from 'vue';
+	/**
+	 * 1.审核中、未通过、已下线，不展示下架房源按钮
+	 * 
+	*/
+	const props = defineProps({
+		//当前弹窗展示的房源状态
+		popStatus: {
+			type: [String,Number],
+			default: 1
+		}
+	});
 	const editPopup = ref(null);
 	const emits = defineEmits(['doAction'])
 	// 打开弹框
