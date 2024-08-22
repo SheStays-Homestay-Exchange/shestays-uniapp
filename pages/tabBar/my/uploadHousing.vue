@@ -102,13 +102,16 @@
 		const provinceShow = ref(false)
 	
 	const popupClick = (e) => {
-	  console.log(e,'---------------------------popupClick')
 	  if( e.funName == 'cancle' ){
 	    provinceShow.value = false
 	  }else if( e.funName == 'submit' ){
 		  chooseArea.value = e.value
 		  provinceShow.value = false   //关闭地址弹窗
 		  form.address = chooseArea.value[0].countryName+'-'+chooseArea.value[1].regionName+'-'+chooseArea.value[2].cityName
+		  // 获取code
+		  formData.countryCode = chooseArea.value[0].countryCode;
+		  formData.regionCode = chooseArea.value[1].regionCode;
+		  formData.cityCode = chooseArea.value[2].cityCode;
 	  }
 	}
 	
@@ -170,9 +173,9 @@
 		startTime: '',
 		endTime: '',
 		files: [],
-		countryId: 1,
-		cityId: 1,
-		regionId: 1
+		countryCode: '',
+		cityCode: '',
+		regionCode: ''
 	});
 	
 	// 日期范围选择回调
