@@ -23,9 +23,14 @@
 							<image src="@/static/images/address.png" mode=""></image>重新定位
 						</view> -->
 					</view>
-					<view class="address-item" v-for="(item,i) in addressList" @click="itemClick(item)">
-						{{item.countryName || item.regionName || item.cityName }}
-					</view>
+					<scroll-view
+						:scroll-y="true" 
+						style="height: 600rpx">
+						<view class="address-item" v-for="(item,i) in addressList" @click="itemClick(item)">
+							{{item.countryName || item.regionName || item.cityName }}
+						</view>
+					</scroll-view>
+					
 			
 				</view>
 			</view>
@@ -61,11 +66,12 @@
   watch(() => props.show , (val) => {
     console.log(val,'----------------------------------------watchLocation')
     if( val ){
-      console.log(props.chooseArea)
+      console.log('长度',props.chooseArea,props.chooseArea.length)
       //已经选了地区
       let code = '000000'
-      if(props.chooseArea?.area?.areaCode){
-        code = props.chooseArea.city.areaCode
+      if(props.chooseArea.length ==3){
+		  areaLevel.value = 3
+        code = props.chooseArea[1].regionCode
         myAreaData.value = JSON.parse(JSON.stringify(props.chooseArea))
       }
 			

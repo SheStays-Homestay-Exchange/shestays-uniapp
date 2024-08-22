@@ -14,13 +14,13 @@
 			</scroll-view>
 		</view>
 		
-		<view class="uploade-col" @click="locationVisible=true">
+		<view class="uploade-col" @click="provinceShow=true">
 			<view class="uploade-title">
 				房源所在地址
 			</view>
 			<view class="col-select">
 				<view class="tips">
-					亚洲-中国-深圳
+					{{ form.address}}
 				</view>
 				<image class="icon" src="../../../static/image/arrow-right.png" mode=""></image>
 			</view>
@@ -71,7 +71,7 @@
 		</view>
 	</view>
 	
-	<Location :show="locationVisible"></Location>
+	<Location @popupClick="popupClick" :show="provinceShow" :chooseArea="chooseArea"></Location>
 </template>
 
 <script setup>
@@ -91,6 +91,26 @@
 	onShow(() => {
 		userInfo.value = uni.getStorageSync('userInfo');
 	});
+	
+	const form = reactive({
+		address:'请选择'
+	})
+	
+	//选中的省市区
+		const chooseArea = ref([])
+		//省市区弹窗
+		const provinceShow = ref(false)
+	
+	const popupClick = (e) => {
+	  console.log(e,'---------------------------popupClick')
+	  if( e.funName == 'cancle' ){
+	    provinceShow.value = false
+	  }else if( e.funName == 'submit' ){
+		  chooseArea.value = e.value
+		  provinceShow.value = false   //关闭地址弹窗
+		  form.address = chooseArea.value[0].countryName+'-'+chooseArea.value[1].regionName+'-'+chooseArea.value[2].cityName
+	  }
+	}
 	
 	// 选择房源地址
 	function hanldeSelectAddress() {
