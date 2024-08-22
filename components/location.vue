@@ -23,9 +23,14 @@
 							<image src="@/static/images/address.png" mode=""></image>重新定位
 						</view> -->
 					</view>
-					<view class="address-item" v-for="(item,i) in addressList" @click="itemClick(item)">
-						{{item.countryName || item.regionName || item.cityName }}
-					</view>
+					<scroll-view
+						:scroll-y="true" 
+						style="height: 600rpx">
+						<view class="address-item" v-for="(item,i) in addressList" @click="itemClick(item)">
+							{{item.countryName || item.regionName || item.cityName }}
+						</view>
+					</scroll-view>
+					
 			
 				</view>
 			</view>
