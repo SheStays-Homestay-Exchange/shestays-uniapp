@@ -71,11 +71,10 @@
 				"provider": "weixin",
 				"onlyAuthorize": true, // 微信登录仅请求授权认证
 				success(event) {
-					console.log('登录成功',event)
 					userAuthorFun(e.detail,event.code)
 				},
 				fail(err){
-					console.log('登录失败',err)
+					console.log('手机号授权',err)
 				}
 			})
 		// #endif
@@ -89,12 +88,16 @@
 	}
 	
 	const userAuthorFun = (param,loginCode)=>{
-		userAuthor({
+		let params = {
 			encryptedData: param.encryptedData,
 			iv: param.iv,
-			code: loginCode
-		}).then(res=>{
-			console.log('auth接口',res)
+			code: loginCode,
+		}
+		if(xhsId.value){
+			params.xhsId = xhsId.value
+		}
+		console.log('授权参数：',params)
+		userAuthor(params).then(res=>{
 			if(res.code == 200){
 				//保存登录信息
 				cache.put('userInfo',res.data)
@@ -110,8 +113,12 @@
 			})
 		})
 	}
+	
+	//场景：通过网页扫描二维码进入小程序
+	const xhsId = ref('')
 	onLoad((option)=>{
 		console.log('登录页option',option)
+		xhsId.value = option.xhsId || ''
 	})
 
 </script>

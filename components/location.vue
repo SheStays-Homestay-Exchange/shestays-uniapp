@@ -61,11 +61,12 @@
   watch(() => props.show , (val) => {
     console.log(val,'----------------------------------------watchLocation')
     if( val ){
-      console.log(props.chooseArea)
+      console.log('长度',props.chooseArea,props.chooseArea.length)
       //已经选了地区
       let code = '000000'
-      if(props.chooseArea?.area?.areaCode){
-        code = props.chooseArea.city.areaCode
+      if(props.chooseArea.length ==3){
+		  areaLevel.value = 3
+        code = props.chooseArea[1].regionCode
         myAreaData.value = JSON.parse(JSON.stringify(props.chooseArea))
       }
 			

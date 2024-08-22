@@ -103,14 +103,12 @@
 		fontSize :'16px'
 	}
 	// 用户信息
-	// var userInfo = {}
 	onLoad(()=>{
-		// userInfo = typeof(cache.get('userInfo')) == 'string' ? JSON.parse( cache.get('userInfo') ) : cache.get('userInfo')
 		getUserInfo()
 	})
 	
 	//选中的省市区
-		const chooseArea = reactive([])
+		const chooseArea = ref([])
 		//省市区弹窗
 		const provinceShow = ref(false)
 	
@@ -186,21 +184,6 @@
 		}
 	}
 	
-	onLoad(()=>{
-		// console.log('date===',dateEnd)
-		// uni.getFuzzyLocation({
-		//  type: 'wgs84',
-		//  success (res) {
-		// 	 console.log('成功==',res)
-		//    const latitude = res.latitude
-		//    const longitude = res.longitude
-		//  },
-		//  fail(err){
-		// 	 console.log('失败',err)
-		//  }
-		// })
-	})
-	
 	
 	const validateFun = ()=>{
 		if(!form.userName){
@@ -240,7 +223,7 @@
 				genderDictCode: form.sex,
 				phone: form.phone,
 				personalProfile: form.des,
-				avatar: 'https://pics0.baidu.com/feed/8718367adab44aed424d9e8e9d02e70fa18bfb01.jpeg?token=1e2e40b76e537620ed17324124cb789c',
+				avatar: form.avatar || 'https://pics0.baidu.com/feed/8718367adab44aed424d9e8e9d02e70fa18bfb01.jpeg?token=1e2e40b76e537620ed17324124cb789c',
 			    bdYear:  Number(dateArr[0]),
 				bdMonth: Number(dateArr[1]),
 				bdDay: Number(dateArr[2]),
@@ -280,9 +263,9 @@
 					const base = await imgToBase64(e.tempFiles[0].path)
 					const avatarRes = await uploadAvatar({
 						avatar: base,
-						userId:userInfo.value.userId
+						userId:userInfo.value.userId ||351
 					})
-					form.avatar = avatarRes.data || e.tempFiles[0]
+					form.avatar = avatarRes.data
 				}catch(e){
 					msg(e.msg)
 				}
