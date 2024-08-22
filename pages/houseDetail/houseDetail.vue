@@ -44,8 +44,7 @@
         >
       </view>
     </view>
-
-    <view class="householder">
+    <view class="householder" v-if="userInfo.statusCode != 'reviewing'">
       <view class="userInfo">
         <img class="user-image" :src="userInfo.avatarUrl" alt="" />
         <view class="info">房主：{{ userInfo.xiaohongshuUsername }}</view>
@@ -54,6 +53,14 @@
         <button class="contact-btn" @click="contactHost">联系房主</button>
       </view>
     </view>
+	<view class="btn-box" v-else>
+		<view class="btn-fn" @click="handleNoBtn">
+			不通过
+		</view>
+		<view class="btn-fn success-fn" @click="hanldeSuccessBtn">
+			通过审核
+		</view>
+	</view>
     <DetailPopup
       :show="popShow"
       @tapClose="popShow = false"
@@ -61,16 +68,31 @@
       :name="userInfo.xiaohongshuUsername"
       userNameType="联系方式"
     />
+	
+	<!-- 审核不通过 -->
+	<uni-popup type="center" ref="noRef" :is-mask-click="false">
+		<view class="no-box">
+			<view class="close-icon" @click="handleNoClose">
+				
+			</view>
+			<view class="no-title">
+				<text>审核不通过</text>
+			</view>
+			<uni-easyinput type="textarea" v-model="formData.unpassReason" placeholder="请输入不通过原因"></uni-easyinput>
+			<view class="no-ok-fn" @click="handleNoSubmit">OK</view>
+		</view>
+	</uni-popup>
   </div>
 </template>
 
 <script setup>
 import { reactive, ref, onMounted } from "vue";
 import { onLoad, useRoute } from "@dcloudio/uni-app";
-import { getHouseDetail } from "@/common/api/common";
+import { getHouseDetail, review } from "@/common/api/common";
 import DetailPopup from "@/components/DetailPopup.vue";
 import holdImage from "@/static/60x60.png";
 import holdBannerImage from "@/static/image/about.png";
+import { msg } from "../../common/js/util";
 
 const current = ref(0);
 
@@ -126,7 +148,6 @@ const houseInfo = [
 const onSwiperChange = (e) => {
   current.value = e.detail.current;
 };
-
 onLoad((options) => {
   getHouseDetail({ houseId: options?.id })
     .then((res) => {
@@ -149,7 +170,52 @@ onLoad((options) => {
     .catch((error) => {
       console.log(error, "rrrr");
     });
+	// 保存房源ID
+	formData.houseId = options?.id;
 });
+
+// 审核不通过弹框
+const noRef = ref(null);
+function handleNoBtn() {
+	noRef.value.open();
+}
+function handleNoClose() {
+	noRef.value.close();
+}
+// 审核表单
+const formData = reactive({
+	houseId: '',
+	statusCode: '',
+	unpassReason: '',
+});
+// 不通过
+const handleNoSubmit = async () => {
+	formData.statusCode = "not_approved";
+	try {
+		const res = await review(formData);
+		if (res.code == 200) {
+			msg(res.msg);
+			noRef.value.close();
+		}
+	} catch(e) {
+		msg(e.msg || '系统错误');
+	}
+}
+// 审核通过
+const hanldeSuccessBtn = async () => {
+	formData.statusCode = "online";
+	try {
+		const res = await review(formData);
+		if (res.code == 200) {
+			msg(res.msg);
+			setTimeout(() => {
+				uni.navigateBack();
+			}, 2000);
+		}
+	} catch(e) {
+		msg(e.msg || '系统错误');
+	}
+}
 </script>
 
 <style lang="scss" scoped>
@@ -272,5 +338,68 @@ onLoad((options) => {
     border-radius: 38rpx;
     box-shadow: 8rpx 8rpx 8rpx 0rpx rgba(212, 212, 212, 0.6);
   }
+}
+
+.btn-box {
+	display: flex;
+	align-items: center;
+	padding: 38rpx;
+	position: fixed;
+	bottom: 86rpx;
+	left: 0;
+	right: 0;
+	justify-content: space-between;
+	.btn-fn {
+		width: 324rpx;
+		height: 86rpx;
+		border-radius: 86rpx;
+		text-align: center;
+		line-height: 86rpx;
+		font-size: 32rpx;
+		font-weight: 600;
+		color: #fff;
+		background-color: #909193;
+		box-shadow: 8rpx 8rpx 16rpx rgba(212, 212, 212, 0.60);
+	}
+	.success-fn {
+		background-color: #d8336d;
+	}
+}
+
+.no-box {
+	width: 536rpx;
+	background-color: #fff;
+	border-radius: 48rpx;
+	padding: 40rpx 32rpx;
+	position: relative;
+	.close-icon {
+		display: inline-block;
+		width: 48rpx;
+		height: 48rpx;
+		background-color: #909193;
+		position: absolute;
+		right: 32rpx;
+		top: 20rpx;
+	}
+	.no-title {
+		font-weight: 600;
+		font-size: 40rpx;
+		text-align: center;
+		color: #000B3B;
+		margin-bottom: 16rpx;
+	}
+	.no-ok-fn {
+		margin-top: 20rpx;
+		width: 150rpx;
+		height: 64rpx;
+		line-height: 64rpx;
+		margin: 0 auto;
+		color: #fff;
+		text-align: center;
+		border-radius: 64rpx;
+		background-color: #D8336D;
+		margin-top: 20rpx;
+		box-shadow: 8rpx 8rpx 16rpx 0px rgba(212, 212, 212, 0.60);
+	}
 }
 </style>

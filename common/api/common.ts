@@ -115,3 +115,8 @@ export function getUnderViewHouse() {
 export function uploadHouse(params = {}) {
 	return post('uploadHouse', params)
 }
+
+// 房源审核接口
+export function review(params = {}) {
+	return post('review', params)
+}
