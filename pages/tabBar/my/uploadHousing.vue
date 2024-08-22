@@ -5,26 +5,8 @@
 				请上传您的房源照片（至少一张）
 			</view>
 			<scroll-view class="uploade-scroll" :scroll-x="true" >
-				<view class="uploade">
+				<view class="uploade" @click="uploadHead">
 					<image src="../../../static/image/union.png" mode=""></image>
-				</view>
-				<view class="uploade-image">
-					
-				</view>
-				<view class="uploade-image">
-					
-				</view>
-				<view class="uploade-image">
-					
-				</view>
-				<view class="uploade-image">
-					
-				</view>
-				<view class="uploade-image">
-					
-				</view>
-				<view class="uploade-image">
-					
 				</view>
 				<view class="uploade-image">
 					
@@ -49,9 +31,9 @@
 			</view>
 			<view class="col-select">
 				<view class="tips">
-					2
+					{{ formData.houseAmount }}
 				</view>
-				<uni-number-box :min="1"></uni-number-box>
+				<uni-number-box :min="1" v-model="formData.houseAmount"></uni-number-box>
 			</view>
 		</view>
 		<view class="uploade-col" @click="handleSetTime">
@@ -60,7 +42,9 @@
 			</view>
 			<view class="col-select">
 				<view class="tips">
-					<text style="color: #909193;">未设置</text>
+					<!-- <text style="color: #909193;">未设置</text> -->
+					<!-- 日期选择器 -->
+					<hl-calendar-range @selectorDate="handleSelectorDate"></hl-calendar-range>
 				</view>
 				<image class="icon" src="../../../static/image/arrow-right.png" mode=""></image>
 			</view>
@@ -70,7 +54,7 @@
 				对房客说的话
 			</view>
 			<view class="col-input">
-				<uni-easyinput :styles="styles" type="textarea" :autoHeight="false" placeholder="请输入内容"></uni-easyinput>
+				<uni-easyinput :styles="styles" type="textarea" :autoHeight="false" placeholder="请输入内容" v-model="formData.describle"></uni-easyinput>
 				<view class="sum">
 					0 / 300
 				</view>
@@ -87,19 +71,26 @@
 		</view>
 	</view>
 	
-	<Location :visible="locationVisible"></Location>
-	
-	<!-- 日期选择器 -->
-	<hl-calendar-range ref="hlCalendarRange"></hl-calendar-range>
+	<Location :show="locationVisible"></Location>
 </template>
 
 <script setup>
 	import { reactive,ref } from 'vue';
 	import Location from '@/components/location'
-	import { uploadHouse } from '@/common/api/common'
+	import hlCalendarRange from '@/components/hlCalendarRange.vue'
+	import { uploadHouse, uploadAvatar } from '@/common/api/common'
+	import  { imgToBase64, msg }  from '@/common/js/util.js'
+	import { onShow } from '@dcloudio/uni-app'
 	const styles = reactive({
-		"borderColor": "#ffffff"
+		"borderColor": "#ffffff",
+		"height": "600px"
 	})
+	
+	// 用户信息
+	const userInfo = ref({});
+	onShow(() => {
+		userInfo.value = uni.getStorageSync('userInfo');
+	});
 	
 	// 选择房源地址
 	function hanldeSelectAddress() {
@@ -109,29 +100,74 @@
 	}
 	const locationVisible = ref(false);
 	
-	const hlCalendarRange = ref(null);
-	function handleSetTime() {
-		console.log(hlCalendarRange.value)
+	// 上传图片
+	const uploadHead = async()=>{
+		uni.chooseImage({
+			count: 1,
+			crop: {
+				width: 100,
+				height: 100
+			},
+			success: async(e)=>{
+				//判断文件后缀名
+				console.log('图片上传',e)
+				if (e.tempFilePaths[0].split('.')[e.tempFilePaths[0].split('.').length - 1].includes('gif')) {
+					msg('暂不支持上传gif图片，请重新选择后上传')
+					return false
+				}
+				// form.avatar = e.tempFiles[0]
+				
+				try{
+					const base = await imgToBase64(e.tempFiles[0].path)
+					const avatarRes = await uploadAvatar({
+						avatar: base,
+						userId:userInfo.value.userId
+					})
+					console.log(avatarRes)
+					// form.avatar = avatarRes.data || e.tempFiles[0]
+				}catch(e){
+					msg(e.msg)
+				}
+				
+				
+				// uploadFile(e.tempFilePaths).then(res => {
+				// 	console.log('图片上传成功',res)
+				// 	form.avatar = res[0]
+				// }).catch(e => {
+				// 	console.log('图片上传错误', e)
+				// })
+			},
+			fail(e) {
+				console.log('选择图片错误', e)
+			}
+		})
+	}
+	
+	const formData = reactive({
+		houseTitle: '测试新增房源',
+		houseAmount: 1,
+		describle: '',
+		startTime: '',
+		endTime: '',
+		files: [],
+		countryId: 1,
+		cityId: 1,
+		regionId: 1
+	});
+	
+	// 日期范围选择回调
+	function handleSelectorDate({start, end}) {
+		formData.startTime = `${start.year}/${start.weak}/${start.day}` ?? '';
+		formData.endTime = `${end.year}/${end.weak}/${end.day}` ?? '';
 	}
 	// 提交房源信息
 	const handleUploadHouse = async () => {
-		let data = {
-			userId: 630,
-			houseTitle: '',
-			houseAmount: '',
-			describle: '',
-			startTime: '',
-			endTime: '',
-			countryId: '',
-			cityId: '',
-			regionId: '',
-			detailAddress: ''
-		}
+		let data = {userId: 630, ...formData}
 		try {
 			const res = await uploadHouse(data);
 			console.log(res);
 		} catch(e) {
-			msg(e.msg || '系统繁忙，请稍后重试')
+			msg(e || '系统繁忙，请稍后重试')
 		}
 	}
 </script>

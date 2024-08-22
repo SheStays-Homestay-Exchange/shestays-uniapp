@@ -46,7 +46,7 @@
   const props = defineProps({
     show: {
       type: Boolean,
-      default: false
+      default: true
     },
 	  //选中的省市区
     chooseArea: {

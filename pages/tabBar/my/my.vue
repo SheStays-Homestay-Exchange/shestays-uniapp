@@ -163,15 +163,15 @@
 	
 	// 查看房源待审核
 	const houseList = ref([]);
-	try {
-		const getUnderViewHouseFun = async () => {
+	const getUnderViewHouseFun = async () => {
+		try {
 			const res = await getUnderViewHouse();
 			if (res.code == 200) {
 				houseList.value = res.data;
 			}
+		} catch(e) {
+			msg(e.msg || '系统繁忙，请稍后重试')
 		}
-	} catch(e) {
-		msg(e.msg || '系统繁忙，请稍后重试')
 	}
 </script>
 
