@@ -94,7 +94,7 @@
 	import { onLoad } from '@dcloudio/uni-app'
 	import editHousing from './components/editHousing.vue';
 	import Modal from './components/modal' 
-	import { getHouseByUserId, houseDel } from '@/common/api/common'
+	import { getHouseByUserId, houseDel, houseOffline } from '@/common/api/common'
 	import cache from "@/common/js/cache.js";
 	import  {msg}  from '@/common/js/util.js'
 	
@@ -152,8 +152,7 @@
 				delHouse()
 			}else{
 				//下架
-				console.log('执行下架操作===')
-				msg('执行下架操作~')
+				offlineHouse()
 			}
 			actionShow.value = false
 		}
@@ -207,6 +206,23 @@
 		}
 	}
 	
+	
+	//下架
+	const offlineHouse = async (type)=>{
+		try{
+			const res = await houseOffline({
+				houseId: houseId.value || '1'   //测试id,
+			})
+			if(res.code == 200){
+				msg('下架该房源成功')
+				houseList.value = []
+				getHouse()
+			}
+	
+		}catch(e){
+			msg(e.msg || '系统繁忙，请稍后重试')
+		}
+	}
 </script>
 
 <style lang="scss" scoped>

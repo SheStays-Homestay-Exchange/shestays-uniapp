@@ -65,7 +65,7 @@
 	</view>
 	<!-- 按钮 -->
 	<view class="button-body">
-		<view class="save">
+		<view class="save" @click="saveDraft">
 			保存编辑
 		</view>
 		<view class="submit" @click="handleUploadHouse">
@@ -83,6 +83,7 @@
 	import { uploadHouse, uploadAvatar } from '@/common/api/common'
 	import  { imgToBase64, msg }  from '@/common/js/util.js'
 	import { onShow } from '@dcloudio/uni-app'
+	import cache from '/common/js/cache.js'
 	const styles = reactive({
 		"borderColor": "#ffffff",
 		"height": "600px"
@@ -90,8 +91,17 @@
 	
 	// 用户信息
 	const userInfo = ref({});
+	const draft = ref({})
 	onShow(() => {
 		userInfo.value = uni.getStorageSync('userInfo');
+		draft.value = uni.getStorageSync('draftHouse') || {}
+		formData.value = draft.value
+		//草稿里地址
+		if(draft.value?.area){
+			chooseArea.value = draft.value?.area
+			form.address = chooseArea.value[0].countryName+'-'+chooseArea.value[1].regionName+'-'+chooseArea.value[2].cityName
+		}
+		console.log('是否有草稿',draft)
 	});
 	
 	const form = reactive({
@@ -111,9 +121,9 @@
 		  provinceShow.value = false   //关闭地址弹窗
 		  form.address = chooseArea.value[0].countryName+'-'+chooseArea.value[1].regionName+'-'+chooseArea.value[2].cityName
 		  // 获取code
-		  formData.countryCode = chooseArea.value[0].countryCode;
-		  formData.regionCode = chooseArea.value[1].regionCode;
-		  formData.cityCode = chooseArea.value[2].cityCode;
+		  formData.value.countryCode = chooseArea.value[0].countryCode;
+		  formData.value.regionCode = chooseArea.value[1].regionCode;
+		  formData.value.cityCode = chooseArea.value[2].cityCode;
 	  }
 	}
 	
@@ -168,7 +178,7 @@
 		})
 	}
 	
-	const formData = reactive({
+	const formData = ref({
 		houseTitle: '测试新增房源',
 		houseAmount: 1,
 		describle: '',
@@ -182,18 +192,35 @@
 	
 	// 日期范围选择回调
 	function handleSelectorDate({start, end}) {
-		formData.startTime = `${start.year}/${start.weak}/${start.day}` ?? '';
-		formData.endTime = `${end.year}/${end.weak}/${end.day}` ?? '';
+		formData.value.startTime = `${start.year}/${start.weak}/${start.day}` ?? '';
+		formData.value.endTime = `${end.year}/${end.weak}/${end.day}` ?? '';
 	}
 	// 提交房源信息
 	const handleUploadHouse = async () => {
-		let data = {userId: 630, ...formData}
+		let data = {userId: 630, ...formData.value}
 		try {
 			const res = await uploadHouse(data);
+			//提交成功清除本地草稿箱
+			cache.remove('draftHouse')
 			console.log(res);
 		} catch(e) {
-			msg(e || '系统繁忙，请稍后重试')
+			msg(e.msg || '系统繁忙，请稍后重试')
 		}
+	}
+	
+	//保存草稿
+	const saveDraft = ()=>{
+		cache.put('draftHouse',{...formData.value,area:chooseArea.value})
+		uni.showModal({
+			content:'保存房源成功！',
+			title:'提示',
+			showCancel: false,
+			confirmText:'知道啦',
+			confirmColor: '#D8336D',
+			success(e){
+				uni.navigateBack()
+			}
+		})
 	}
 </script>
 
