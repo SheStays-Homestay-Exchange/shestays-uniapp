@@ -1,6 +1,7 @@
 import {
 	get,
-	post
+	post,
+	deletes
 } from '@/common/js/request.js';
 
 import store from '../../store/index.js'
@@ -119,4 +120,8 @@ export function uploadHouse(params = {}) {
 // 房源审核接口
 export function review(params = {}) {
 	return post('review', params)
+}
+//接口名称：删除房源
+export function houseDel(params) {
+	return deletes('houseDel',params)
 }

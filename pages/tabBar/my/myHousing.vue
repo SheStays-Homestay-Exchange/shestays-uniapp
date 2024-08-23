@@ -11,7 +11,7 @@
 				</view>
 				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
 			</view> -->
-			<view class="lis" @click="handleEditHousing" v-if="item.statusValue.includes('上传')">
+	<!-- 		<view class="lis" @click="handleEditHousing" v-if="item.statusValue.includes('上传')">
 				<view class="lis-title">
 					<image class="housing-image" src="" mode=""></image>
 					<view class="title">
@@ -19,9 +19,9 @@
 						<image class="title-icon" src="../../../static/image/loading-01.png" mode=""></image>
 					</view>
 				</view>
-				<!-- <image class="right-icon" src="../../../../static/image/right-Icon.jpg" mode=""></image> -->
-			</view>
-			<view class="lis" @click="handleEditHousing" v-if="item.statusValue.includes('审核中')">
+				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
+			</view> -->
+			<view class="lis" @click="handleEditHousing(1,item.houseId)" v-if="item.status == 1">
 				<view class="lis-title">
 					<image class="housing-image" src="" mode=""></image>
 					<view class="title">
@@ -31,7 +31,7 @@
 				</view>
 				<!-- <image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image> -->
 			</view>
-			<view class="lis" @click="handleEditHousing" v-if="item.statusValue.includes('上线')">
+			<view class="lis" @click="handleEditHousing(2,item.houseId)" v-if="item.status == 2">
 				<view class="lis-title">
 					<image class="housing-image" src="" mode=""></image>
 					<view class="title">
@@ -41,7 +41,7 @@
 				</view>
 				<!-- <image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image> -->
 			</view>
-			<view class="lis" @click="handleEditHousing" v-if="item.statusValue.includes('未通过')">
+			<view class="lis" @click="handleEditHousing(3,item.houseId)" v-if="item.status == 3">
 				<view class="lis-title error">
 					<image class="housing-image" src="" mode=""></image>
 					<view class="title">
@@ -51,12 +51,12 @@
 				</view>
 				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
 			</view>
-			<view class="lis" @click="handleEditHousing" v-if="item.statusValue.includes('下线')">
+			<view class="lis" @click="handleEditHousing(4,item.houseId)" v-if="item.status == 4">
 				<view class="lis-title disabled">
 					<image class="housing-image" src="" mode=""></image>
 					<view class="title">
 						<text>房源已下线</text>
-						<image class="title-icon" src="../../../static/image/disabled.jpg" mode=""></image>
+						<image class="title-icon" src="../../../static/image/slash-circle-01.png" mode=""></image>
 					</view>
 				</view>
 				<!-- <image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image> -->
@@ -72,7 +72,7 @@
 		</view>
 		
 		<!-- 编辑房源弹框 -->
-		<editHousing ref="editRef" @doAction="doAction"></editHousing>
+		<editHousing ref="editRef" @doAction="doAction" :popStatus="activePopStatus"></editHousing>
 		<Modal :show="actionShow" @popTap="popTap">
 			<template #content>
 				<view class="action-content" v-if="actionType == 'down'">
@@ -94,15 +94,22 @@
 	import { onLoad } from '@dcloudio/uni-app'
 	import editHousing from './components/editHousing.vue';
 	import Modal from './components/modal' 
-	import { getHouseByUserId } from '@/common/api/common'
+	import { getHouseByUserId, houseDel } from '@/common/api/common'
 	import cache from "@/common/js/cache.js";
 	import  {msg}  from '@/common/js/util.js'
 	
 	const userInfo = ref({})
 	onLoad(()=>{
 		userInfo.value = typeof(cache.get('userInfo')) == 'string' ? JSON.parse( cache.get('userInfo') ) : cache.get('userInfo')
-		getHouse()
+		// getHouse()
 	})
+	
+	const status = {
+		1:'房源审核中',
+		2:'房源已上线',
+		3:'房源审核未通过',
+		4:'房源已下线'
+	}
 	
 	function handleGoPage(url) {
 		uni.navigateTo({
@@ -119,7 +126,11 @@
 	}
 	// 编辑房源
 	const editRef = ref(null);
-	function handleEditHousing() {
+	const activePopStatus = ref(1)   //当前打开弹窗-房源状态
+	const houseId = ref('')   //当前打开弹窗-房源id
+	function handleEditHousing(type,id) {
+		activePopStatus.value = type
+		houseId.value = id
 		editRef.value.open();
 	}
 	
@@ -130,11 +141,35 @@
 			actionShow.value = false
 		}else{
 			//确定-请求接口
+			if(actionType.value == 'del'){
+				//删除
+				delHouse()
+			}else{
+				//下架
+				console.log('执行下架操作===')
+				msg('执行下架操作~')
+			}
 			actionShow.value = false
 		}
 	}
 	
-	const houseList = ref([])    //房源
+	const houseList = ref([
+		{
+			houseId:'1',
+			status:1
+		},
+		{
+			houseId:'1',
+			status:2
+		},
+		{
+			houseId:'1',
+			status:3
+		},{
+			houseId:'1',
+			status:4
+		}
+	])    //房源
 	const getHouse = async (type)=>{
 		try{
 			const res = await getHouseByUserId({
@@ -142,6 +177,23 @@
 			})
 			if(res.code == 200){
 				houseList.value = res.data || []
+			}
+	
+		}catch(e){
+			msg(e.msg || '系统繁忙，请稍后重试')
+		}
+	}
+	
+	//删除
+	const delHouse = async (type)=>{
+		try{
+			const res = await houseDel({
+				houseId: houseId.value || '1'   //测试id,
+			})
+			if(res.code == 200){
+				msg('删除房源成功')
+				houseList.value = []
+				getHouse()
 			}
 	
 		}catch(e){
