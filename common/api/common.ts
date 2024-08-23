@@ -125,3 +125,8 @@ export function review(params = {}) {
 export function houseDel(params) {
 	return deletes('houseDel',params)
 }
+
+// 房源审核接口
+export function houseOffline(params = {}) {
+	return post('houseOffline', params)
+}
