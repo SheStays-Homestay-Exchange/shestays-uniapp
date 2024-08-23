@@ -33,7 +33,7 @@
 						<image class="title-icon" src="../../../static/image/search-refraction.png" mode=""></image>
 					</view>
 				</view>
-				<!-- <image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image> -->
+				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
 			</view>
 			<view class="lis" @click="handleEditHousing(2,item.houseId)" v-if="item.status == 2">
 				<view class="lis-title">
@@ -43,7 +43,7 @@
 						<image class="title-icon" src="../../../static/image/success.png" mode=""></image>
 					</view>
 				</view>
-				<!-- <image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image> -->
+				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
 			</view>
 			<view class="lis" @click="handleEditHousing(3,item.houseId)" v-if="item.status == 3">
 				<view class="lis-title error">
@@ -63,7 +63,7 @@
 						<image class="title-icon" src="../../../static/image/slash-circle-01.png" mode=""></image>
 					</view>
 				</view>
-				<!-- <image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image> -->
+				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
 			</view>
 		</view>
 		<view class="no-text" v-else>
