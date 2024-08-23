@@ -6,7 +6,6 @@ import {
 
 import store from '../../store/index.js'
 import config from "@/common/config";
-import { registerRuntimeCompiler } from '../../../../../../../../Applications/HBuilderX.app/Contents/HBuilderX/plugins/hbuilderx-language-services/builtin-dts/common/vue2And3.js';
 
 /**
  * 获取用户信息
@@ -121,6 +120,7 @@ export function uploadHouse(params = {}) {
 export function review(params = {}) {
 	return post('review', params)
 }
+
 //接口名称：删除房源
 export function houseDel(params) {
 	return deletes('houseDel',params)

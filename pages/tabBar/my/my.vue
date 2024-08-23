@@ -200,6 +200,7 @@
 			}
 			.user-name {
 				margin-left: 40rpx;
+				max-width: 50vw;
 				.user-title {
 					font-size: 48rpx;
 					font-weight: 600;
@@ -220,6 +221,7 @@
 			font-weight: 600;
 			display: inline-flex;
 			align-items: center;
+			flex-shrink: 0;
 			.edit-icon {
 				width: 26rpx;
 				height: 26rpx;

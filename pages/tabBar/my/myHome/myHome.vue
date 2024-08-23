@@ -40,7 +40,7 @@
 				我的房源
 			</view>
 			<view class="houseing-col" v-if="houseList.length > 0">
-				<view class="houseing" v-for="(item,i) in houseList" :key="i">
+				<view class="houseing" v-for="(item,i) in houseList" :key="i" @click="goPage(item)">
 					<image class="houseing-image" :src="item.homePageImgUrl" mode=""></image>
 					<view class="houseing-title">
 						{{item.cityName}}-{{item.countryName}}
@@ -66,6 +66,12 @@
 		getUserInfo()
 		getHouse()
 	})
+	
+	const goPage = (item)=>{
+		uni.navigateTo({
+			url:'/pages/houseDetail/houseDetail?id='+item.houseId
+		})
+	}
 	
 	const userInfo = ref({})
 	const getUserInfo= async (type)=>{
