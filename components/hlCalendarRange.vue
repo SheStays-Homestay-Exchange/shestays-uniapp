@@ -20,16 +20,16 @@
 						<view class="monthdays-view">
 							<view class="monthday" v-for="(dayItem,index) in item.days" :key="index">
 								<view class="block-item" :class="{'active': activeClass(dayItem.timesTamp),'range': rangeClass(dayItem.timesTamp)}" @click="didSelectorDate" :data-model="dayItem">
-									<text class="sign" v-if="dayItem.status == 'today'">今日</text>
-									<text class="sign" v-if="startDate!= null && dayItem.timesTamp == startDate.timesTamp">开始</text>
-									<text class="sign" v-else-if="endDate!= null && dayItem.timesTamp == endDate.timesTamp">结束</text>
+									<text class="sign" v-if="dayItem.status == 'today' && startDate == null">今日</text>
+									<text class="sign" style="color: #ffffff" v-if="startDate!= null && dayItem.timesTamp == startDate.timesTamp">开始</text>
+									<text class="sign" style="color: #ffffff" v-else-if="endDate!= null && dayItem.timesTamp == endDate.timesTamp">结束</text>
 									{{dayItem.day}}
 								</view>
 							</view>
 						</view>
 					</view>
 				</scroll-view>
-				<button class="certain-btn" @click="certainBtnAction">确定</button>
+				<button class="certain-btn" @click="certainBtnAction">选择时间</button>
 				<view class="safe-view"></view>
 			</view>
 		</view>
@@ -242,9 +242,9 @@
 </script>
 <style lang="scss">
 
-	$hl-calendar-primary: #00B29A;
+	$hl-calendar-primary: #D8336D;
 	$sign-color : #FF0000;
-	$range-bg: #ECF5F3;
+	$range-bg: #FFEEF4;
 	
 	button::after{ border: none;} 
 	.hl-popup {
@@ -286,12 +286,14 @@
 			width: 100%;
 		}
 		.certain-btn{
-			width: 100%;
-			height: 44px;
+			width: 322rpx;
+			height: 86rpx;
 			background-color: $hl-calendar-primary;
 			color: #FFF;
 			border-radius: 0;
-			font-size: 16px;
+			font-size: 32rpx;
+			border-radius: 86rpx;
+			font-weight: 600;
 		}
 	}
 	
@@ -332,12 +334,12 @@
 				&.active{
 					background-color: $hl-calendar-primary;
 					color: #FFF;
-					border-radius: 4px;
+					border-radius: 8rpx;
 				}
 				&.range{
 					background-color: $range-bg;
-					color: #FFF;
-					border-radius: 4px;
+					// color: #FFF;
+					// border-radius: 4px;
 				}
 			}
 		}
