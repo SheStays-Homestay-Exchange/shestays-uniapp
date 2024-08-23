@@ -8,9 +8,11 @@
 				<view class="uploade" @click="uploadHead">
 					<image src="../../../static/image/union.png" mode=""></image>
 				</view>
-				<view class="uploade-image">
-					
-				</view>
+				<template v-for="item in formData.files">
+					<view class="uploade-image">
+						<image :src="item" mode=""></image>
+					</view>
+				</template>
 			</scroll-view>
 		</view>
 		
@@ -206,11 +208,19 @@
 				margin-bottom: 16rpx;
 			}
 		}
+		.uploade-scroll::after {
+			content: "";
+			display: block;
+			height: 0;
+			clear: both;
+			visibility: hidden;
+		}
 		.uploade-scroll {
 			// display: flex;
 			// align-items: center;
 			white-space: nowrap;
 			width: 100%;
+			height: 176rpx;
 			.uploade {
 				width: 176rpx;
 				height: 176rpx;

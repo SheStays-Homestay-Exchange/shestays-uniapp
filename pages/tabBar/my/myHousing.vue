@@ -10,8 +10,8 @@
 					</view>
 				</view>
 				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
-			</view> -->
-	<!-- 		<view class="lis" @click="handleEditHousing" v-if="item.statusValue.includes('上传')">
+			</view>
+			<view class="lis" @click="handleEditHousing" v-if="item.statusValue.includes('上传')">
 				<view class="lis-title">
 					<image class="housing-image" src="" mode=""></image>
 					<view class="title">
@@ -19,13 +19,9 @@
 						<image class="title-icon" src="../../../static/image/loading-01.png" mode=""></image>
 					</view>
 				</view>
-<<<<<<< HEAD
-				<!-- <image class="right-icon" src="../../../../static/image/right-Icon.jpg" mode=""></image> -->
-			<!-- </view> -->
-			<!-- <view class="lis" @click="handleEditHousing" v-if="item.statusValue.includes('审核中')">
-				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
-			</view> -->
-			<view class="lis" @click="handleEditHousing(1,item.houseId)" v-if="item.status == 1">
+				<image class="right-icon" src="../../../../static/image/right-Icon.jpg" mode=""></image> 
+			 </view> -->
+			<view class="lis" @click="handleEditHousing(1,item.houseId)" v-if="item.statusCode == 'reviewing'">
 				<view class="lis-title">
 					<image class="housing-image" src="" mode=""></image>
 					<view class="title">
@@ -33,9 +29,9 @@
 						<image class="title-icon" src="../../../static/image/search-refraction.png" mode=""></image>
 					</view>
 				</view>
-				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
+				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image> 
 			</view>
-			<view class="lis" @click="handleEditHousing(2,item.houseId)" v-if="item.status == 2">
+			<view class="lis" @click="handleEditHousing(2,item.houseId)" v-if="item.statusCode == 'online'">
 				<view class="lis-title">
 					<image class="housing-image" src="" mode=""></image>
 					<view class="title">
@@ -45,7 +41,7 @@
 				</view>
 				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
 			</view>
-			<view class="lis" @click="handleEditHousing(3,item.houseId)" v-if="item.status == 3">
+			<view class="lis" @click="handleEditHousing(3,item.houseId)" v-if="item.statusCode == 'not_approved'">
 				<view class="lis-title error">
 					<image class="housing-image" src="" mode=""></image>
 					<view class="title">
@@ -55,7 +51,7 @@
 				</view>
 				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
 			</view>
-			<view class="lis" @click="handleEditHousing(4,item.houseId)" v-if="item.status == 4">
+			<view class="lis" @click="handleEditHousing(4,item.houseId)" v-if="item.statusCode == 'offline'">
 				<view class="lis-title disabled">
 					<image class="housing-image" src="" mode=""></image>
 					<view class="title">
@@ -100,12 +96,12 @@
 	import Modal from './components/modal' 
 	import { getHouseByUserId, houseDel } from '@/common/api/common'
 	import cache from "@/common/js/cache.js";
-	import {msg} from '@/common/js/util.js'
+	import  {msg}  from '@/common/js/util.js'
 	
 	const userInfo = ref({})
 	onLoad(()=>{
 		userInfo.value = typeof(cache.get('userInfo')) == 'string' ? JSON.parse( cache.get('userInfo') ) : cache.get('userInfo')
-		// getHouse()
+		getHouse()
 	})
 	
 	const status = {
@@ -130,6 +126,12 @@
 	}
 	// 编辑房源
 	const editRef = ref(null);
+	/**
+	 * 	1:'房源审核中',
+		2:'房源已上线',
+		3:'房源审核未通过',
+		4:'房源已下线'
+	*/
 	const activePopStatus = ref(1)   //当前打开弹窗-房源状态
 	const houseId = ref('')   //当前打开弹窗-房源id
 	function handleEditHousing(type,id) {
@@ -204,6 +206,7 @@
 			msg(e.msg || '系统繁忙，请稍后重试')
 		}
 	}
+	
 </script>
 
 <style lang="scss" scoped>
@@ -211,7 +214,7 @@ page {
 	background-color: #FCFCFC !important;
 }
 .my-housing {
-	padding: 0 48rpx;
+	padding: 40rpx 48rpx;
 	.lis {
 		display: flex; 
 		align-items: center;
