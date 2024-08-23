@@ -95,6 +95,21 @@ export function post(url, data = {}, options = {}) {
 	return request(options)
 }
 
+export function deletes(url, data = {}, options = {}) {
+	options.url = requestUrl + url
+	options.data = data
+	options.method = 'DELETE'
+	return request(options)
+}
+
+// delete请求
+// export function delete(url, data = {}, options = {}) {
+// 	options.url = requestUrl + url
+// 	options.data = data
+// 	options.method = 'DELETE'
+// 	return request(options)
+// }
+
 // 上传文件
 export function uploadFile(fileList) {
 	const userId =cache.get('userInfo').userId
