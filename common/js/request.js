@@ -113,36 +113,36 @@ export function deletes(url, data = {}, options = {}) {
 // 上传文件
 export function uploadFile(fileList) {
 	const userId =cache.get('userInfo').userId
+	console.log('进入上传',fileList,'&&&&',userId)
 	const uploadTasks = fileList.map((file, index) => {
 		return new Promise((resolve, reject) => {
 			uni.uploadFile({
 				url: requestUrl + 'uploadAvatar',
 				filePath: file,
 				fileType: 'image',
-				// header: {
-				// 	'Authorization': token
-				// },
-				formData:{
-					userId: userId,
-					avatar: file
+				header: {
+					 'content-type': 'multipart/form-data',
 				},
-				name: 'file',
+				formData: {
+					'userId': userId
+				},
+				name: 'img',
 				success: function(res) {
 					console.log('上传文件',res)
 					let data = JSON.parse(res.data)
-					if( data.code == 604 ){
-						uni.showToast({
-							icon: 'none',
-							title:`${data.msg}`
-						})
-						return reject(data)
-					}else{
+					if( data.code == 200 ){
 						let url = data.data.fileUrl;
 						return resolve(url)
+					}else{
+						uni.showToast({
+							icon: 'none',
+							title:`${data.error}`
+						})
+						return reject(data)
 					}
 				},
 				fail: (res) => {
-					console.log(res)
+					console.log('上传文件失败啊',res)
 					reject(res)
 				}
 			});

@@ -17,7 +17,7 @@
 			<HouseItem v-for="(item,i) in listData" :key="i" :item="item" @contactHost="contactHost" @itemClick="itemClick"/>
 		</view>
 		<!-- 加载更多 -->
-		<uni-load-more :status="loadStatus" :contentText="contentText" v-if="listData.length > 0"></uni-load-more>
+		<uni-load-more :status="loadStatus" :contentText="contentText" ></uni-load-more>
 		
 		<!-- 联系弹窗 -->
 		<DetailPopup :show="popShow" @tapClose="popShow=false" :name="itemInfo.name" :id="itemInfo.id"/>
