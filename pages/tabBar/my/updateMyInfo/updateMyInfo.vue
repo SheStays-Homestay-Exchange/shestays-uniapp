@@ -257,18 +257,25 @@
 					msg('暂不支持上传gif图片，请重新选择后上传')
 					return false
 				}
+				
+				uploadFile(e.tempFilePaths).then(res => {
+					console.log('图片上传返回',res)
+				}).catch(err=>{
+					console.log('图片上传返回失败',err)
+				})
+				
 				// form.avatar = e.tempFiles[0]
 				
-				try{
-					const base = await imgToBase64(e.tempFiles[0].path)
-					const avatarRes = await uploadAvatar({
-						avatar: base,
-						userId:userInfo.value.userId ||351
-					})
-					form.avatar = avatarRes.data
-				}catch(e){
-					msg(e.msg)
-				}
+				// try{
+				// 	const base = await imgToBase64(e.tempFiles[0].path)
+				// 	const avatarRes = await uploadAvatar({
+				// 		avatar: base,
+				// 		userId:userInfo.value.userId ||351
+				// 	})
+				// 	form.avatar = avatarRes.data
+				// }catch(e){
+				// 	msg(e.msg)
+				// }
 				
 				
 				// uploadFile(e.tempFilePaths).then(res => {
