@@ -46,8 +46,16 @@
 				type : Number,
 				default : 12
 			},
+			startTime: {
+				type: String,
+				default: ''
+			},
+			endTime: {
+				type: String,
+				default: ''
+			}
 		},
-		
+
 		data() {
 			return {
 				word: 'word',
@@ -66,6 +74,8 @@
 
 		computed: {
 			selectorDate() {
+				console.log(this.startDate)
+				console.log(this.endDate)
 				if(this.startDate != null && this.endDate != null){
 					return this.startDate.date + '至' + this.endDate.date
 				}else{
@@ -77,6 +87,28 @@
 
 		mounted() {
 			this.setBaseDateData()
+			
+			// 设置日期回显
+			if (this.startTime && this.endTime) {
+				console.log(this.startTime, '////')
+				console.log(this.endTime, '///')
+				let sTime = this.startTime.split("/");
+				let eTime = this.endTime.split("/");
+				
+				// 开始时间
+				let sObject = this.getCurrentMonthDayArray(sTime[0], sTime[1], new Date(sTime[0], sTime[1] - 1, sTime[2]).valueOf());
+				sObject.days.forEach(item => {
+					if (item.date === sTime.join("-")) {
+						this.startDate = item;
+					}
+				});
+				let eObject = this.getCurrentMonthDayArray(eTime[0], eTime[1], new Date(eTime[0], eTime[1] - 1, eTime[2]).valueOf());
+				eObject.days.forEach(item => {
+					if (item.date === eTime.join("-")) {
+						this.endDate = item;
+					}
+				});
+			}
 		},
 
 		methods: {

@@ -46,7 +46,12 @@
 				<view class="tips">
 					<!-- <text style="color: #909193;">未设置</text> -->
 					<!-- 日期选择器 -->
-					<hl-calendar-range @selectorDate="handleSelectorDate"></hl-calendar-range>
+					<hl-calendar-range
+						@selectorDate="handleSelectorDate"
+						ref="hlCalendarRange"
+						:startTime="formData.startTime"
+						:endTime="formData.endTime"
+					></hl-calendar-range>
 				</view>
 				<image class="icon" src="../../../static/image/arrow-right.png" mode=""></image>
 			</view>
@@ -77,12 +82,12 @@
 </template>
 
 <script setup>
-	import { reactive,ref } from 'vue';
+	import { reactive, ref } from 'vue';
 	import Location from '@/components/location'
 	import hlCalendarRange from '@/components/hlCalendarRange.vue'
 	import { uploadHouse, uploadAvatar } from '@/common/api/common'
 	import  { imgToBase64, msg }  from '@/common/js/util.js'
-	import { onShow } from '@dcloudio/uni-app'
+	import { onShow, onReady } from '@dcloudio/uni-app'
 	import cache from '/common/js/cache.js'
 	const styles = reactive({
 		"borderColor": "#ffffff",
@@ -192,8 +197,8 @@
 	
 	// 日期范围选择回调
 	function handleSelectorDate({start, end}) {
-		formData.value.startTime = `${start.year}/${start.weak}/${start.day}` ?? '';
-		formData.value.endTime = `${end.year}/${end.weak}/${end.day}` ?? '';
+		formData.value.startTime = `${start.year}/${start.month}/${start.day}` ?? '';
+		formData.value.endTime = `${end.year}/${end.month}/${end.day}` ?? '';
 	}
 	// 提交房源信息
 	const handleUploadHouse = async () => {
@@ -210,6 +215,7 @@
 	
 	//保存草稿
 	const saveDraft = ()=>{
+		console.log(formData.value)
 		cache.put('draftHouse',{...formData.value,area:chooseArea.value})
 		uni.showModal({
 			content:'保存房源成功！',
@@ -222,6 +228,13 @@
 			}
 		})
 	}
+	
+	// 编辑回显
+	onReady(() => {
+		const hlCalendarRange = ref(null);
+		console.log(hlCalendarRange.value)
+		console.log(123);
+	});
 </script>
 
 <style lang="scss" scoped>
