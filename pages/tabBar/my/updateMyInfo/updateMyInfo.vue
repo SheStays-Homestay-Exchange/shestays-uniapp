@@ -260,6 +260,9 @@
 				
 				uploadFile(e.tempFilePaths).then(res => {
 					console.log('图片上传返回',res)
+					if(res?.length>0){
+						form.avatar = res[0]
+					}
 				}).catch(err=>{
 					console.log('图片上传返回失败',err)
 				})

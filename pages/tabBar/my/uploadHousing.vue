@@ -89,6 +89,7 @@
 	import  { imgToBase64, msg }  from '@/common/js/util.js'
 	import { onShow, onReady } from '@dcloudio/uni-app'
 	import cache from '/common/js/cache.js'
+	import { uploadFile } from '@/common/js/request';
 	
 	const styles = reactive({
 		"borderColor": "#ffffff",
@@ -101,7 +102,7 @@
 	onShow(() => {
 		userInfo.value = uni.getStorageSync('userInfo');
 		draft.value = uni.getStorageSync('draftHouse') || {}
-		formData.value = draft.value
+		// formData.value = draft.value
 		//草稿里地址
 		if(draft.value?.area){
 			chooseArea.value = draft.value?.area
@@ -165,25 +166,28 @@
 				}
 				// form.avatar = e.tempFiles[0]
 				
-				try{
-					const base = await imgToBase64(e.tempFiles[0].path)
-					const avatarRes = await uploadAvatar({
-						avatar: base,
-						userId:userInfo.value.userId
-					})
-					console.log(avatarRes)
-					// form.avatar = avatarRes.data || e.tempFiles[0]
-				}catch(e){
-					msg(e.msg)
-				}
+				// try{
+				// 	const base = await imgToBase64(e.tempFiles[0].path)
+				// 	const avatarRes = await uploadAvatar({
+				// 		avatar: base,
+				// 		userId:userInfo.value.userId
+				// 	})
+				// 	console.log(avatarRes)
+				// 	// form.avatar = avatarRes.data || e.tempFiles[0]
+				// }catch(e){
+				// 	msg(e.msg)
+				// }
 				
 				
-				// uploadFile(e.tempFilePaths).then(res => {
-				// 	console.log('图片上传成功',res)
-				// 	form.avatar = res[0]
-				// }).catch(e => {
-				// 	console.log('图片上传错误', e)
-				// })
+				uploadFile(e.tempFilePaths).then(res => {
+					console.log('图片上传返回',res)
+					if(res?.length>0){
+						formData.files = res
+					}
+				}).catch(err=>{
+					console.log('图片上传返回失败',err)
+				})
+				
 			},
 			fail(e) {
 				console.log('选择图片错误', e)
@@ -211,13 +215,13 @@
 		formData.value.startTime = `${start.year}/${start.month}/${start.day}` ?? '';
 		formData.value.endTime = `${end.year}/${end.month}/${end.day}` ?? '';
 	}
+
 	// 提交房源信息
 	const handleUploadHouse = async () => {
 		let data = {userId: 630, ...formData.value}
 		if(data?.area){
 			delete data.area
 		}
-		
 		try {
 			const res = await uploadHouse(data);
 			//提交成功清除本地草稿箱
@@ -300,6 +304,7 @@
 				>image {
 					width: 176rpx;
 					height: 176rpx;
+					border-radius: 16rpx;
 				}
 			}
 			.uploade-image:last-child {
