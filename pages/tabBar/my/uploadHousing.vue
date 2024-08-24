@@ -127,12 +127,16 @@
 	    provinceShow.value = false
 	  }else if( e.funName == 'submit' ){
 		  chooseArea.value = e.value
+		  console.log('选择的地区====',chooseArea.value)
 		  provinceShow.value = false   //关闭地址弹窗
 		  form.address = chooseArea.value[0].countryName+'-'+chooseArea.value[1].regionName+'-'+chooseArea.value[2].cityName
 		  // 获取code
 		  formData.value.countryCode = chooseArea.value[0].countryCode;
 		  formData.value.regionCode = chooseArea.value[1].regionCode;
 		  formData.value.cityCode = chooseArea.value[2].cityCode;
+		  formData.value.countryName= chooseArea.value[0].countryName;
+		  formData.value.regionName = chooseArea.value[1].regionName;
+		  formData.value.cityName = chooseArea.value[2].cityName;
 	  }
 	}
 	
@@ -196,7 +200,10 @@
 		files: [],
 		countryCode: '',
 		cityCode: '',
-		regionCode: ''
+		regionCode: '',
+		countryName:'',
+		regionName:'',
+		cityName:''
 	});
 	
 	// 日期范围选择回调
@@ -207,11 +214,15 @@
 	// 提交房源信息
 	const handleUploadHouse = async () => {
 		let data = {userId: 630, ...formData.value}
+		if(data?.area){
+			delete data.area
+		}
+		
 		try {
 			const res = await uploadHouse(data);
 			//提交成功清除本地草稿箱
 			cache.remove('draftHouse')
-			console.log(res);
+			uni.navigateBack()
 		} catch(e) {
 			msg(e.msg || '系统繁忙，请稍后重试')
 		}
@@ -219,7 +230,6 @@
 	
 	//保存草稿
 	const saveDraft = ()=>{
-		console.log(formData.value)
 		cache.put('draftHouse',{...formData.value,area:chooseArea.value})
 		uni.showModal({
 			content:'保存房源成功！',
