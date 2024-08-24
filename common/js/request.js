@@ -124,7 +124,8 @@ export function uploadFile(fileList) {
 					 'content-type': 'multipart/form-data',
 				},
 				formData: {
-					'userId': userId
+					'userId': userId,
+					'avatar': file
 				},
 				name: 'img',
 				success: function(res) {
