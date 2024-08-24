@@ -21,9 +21,9 @@
 				</view>
 				<image class="right-icon" src="../../../../static/image/right-Icon.jpg" mode=""></image> 
 			 </view> -->
-			<view class="lis" @click="handleEditHousing(1,item.houseId)" v-if="item.statusCode == 'reviewing'">
+			<view class="lis" @click="handleEditHousing(1,item.houseId, item)" v-if="item.statusCode == 'reviewing'">
 				<view class="lis-title">
-					<image class="housing-image" src="" mode=""></image>
+					<image class="housing-image" :src="item.homePageImgUrl" mode=""></image>
 					<view class="title">
 						<text>房源审核中</text>
 						<image class="title-icon" src="../../../static/image/search-refraction.png" mode=""></image>
@@ -31,7 +31,7 @@
 				</view>
 				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image> 
 			</view>
-			<view class="lis" @click="handleEditHousing(2,item.houseId)" v-if="item.statusCode == 'online'">
+			<view class="lis" @click="handleEditHousing(2,item.houseId, item)" v-if="item.statusCode == 'online'">
 				<view class="lis-title">
 					<image class="housing-image" src="" mode=""></image>
 					<view class="title">
@@ -41,7 +41,7 @@
 				</view>
 				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
 			</view>
-			<view class="lis" @click="handleEditHousing(3,item.houseId)" v-if="item.statusCode == 'not_approved'">
+			<view class="lis" @click="handleEditHousing(3,item.houseId, item)" v-if="item.statusCode == 'not_approved'">
 				<view class="lis-title error">
 					<image class="housing-image" src="" mode=""></image>
 					<view class="title">
@@ -51,7 +51,7 @@
 				</view>
 				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
 			</view>
-			<view class="lis" @click="handleEditHousing(4,item.houseId)" v-if="item.statusCode == 'offline'">
+			<view class="lis" @click="handleEditHousing(4,item.houseId, item)" v-if="item.statusCode == 'offline'">
 				<view class="lis-title disabled">
 					<image class="housing-image" src="" mode=""></image>
 					<view class="title">
@@ -90,11 +90,15 @@
 </template>
 
 <script setup>
-	import { ref } from 'vue';
+	import { reactive, ref } from 'vue';
 	import { onLoad } from '@dcloudio/uni-app'
 	import editHousing from './components/editHousing.vue';
 	import Modal from './components/modal' 
-	import { getHouseByUserId, houseDel, houseOffline } from '@/common/api/common'
+	import { 
+		getHouseByUserId,
+		houseDel,
+		houseOffline
+	} from '@/common/api/common'
 	import cache from "@/common/js/cache.js";
 	import  {msg}  from '@/common/js/util.js'
 	
@@ -119,10 +123,42 @@
 
 	const actionShow = ref(false)
 	const actionType = ref('')   //房源操作类型，down:下架 ，del:删除
-	const doAction =(e)=>{
-		actionType.value = e
-		actionShow.value = true
-	
+	const houseObj = ref({}); // 编辑房源对象
+	const doAction = (e)=>{
+		// 编辑回显
+		if (e == 'edit') {
+			let copEditObje = {
+				area: [
+					{
+						countryCode: houseObj.value.countryCode,
+						countryName: houseObj.value.countryName
+					},
+					{
+						regionCode: houseObj.value.regionCode,
+						regionName: houseObj.value.regionName
+					},
+					{
+						cityCode: houseObj.value.cityCode,
+						cityName: houseObj.value.cityName
+					}
+				],
+				cityCode: houseObj.value.cityCode,
+				countryCode: houseObj.value.countryCode,
+				describle: houseObj.value.describle,
+				endTime: houseObj.value.endTime?.split(" ")[0],
+				houseAmount: houseObj.value.houseAmount,
+				regionCode: houseObj.value.regionCode,
+				startTime: houseObj.value.startTime?.split(" ")[0],
+			};
+			cache.put('draftHouse',{...copEditObje});
+			uni.navigateTo({
+				url: '/pages/tabBar/my/uploadHousing'
+			});
+		} else {
+			// 下架，删除
+			actionType.value = e
+			actionShow.value = true
+		}
 	}
 	// 编辑房源
 	const editRef = ref(null);
@@ -134,9 +170,10 @@
 	*/
 	const activePopStatus = ref(1)   //当前打开弹窗-房源状态
 	const houseId = ref('')   //当前打开弹窗-房源id
-	function handleEditHousing(type,id) {
+	function handleEditHousing(type,id,item) {
 		activePopStatus.value = type
 		houseId.value = id
+		houseObj.value = item
 		editRef.value.open();
 	}
 	
@@ -150,7 +187,7 @@
 			if(actionType.value == 'del'){
 				//删除
 				delHouse()
-			}else{
+			} else {
 				//下架
 				offlineHouse()
 			}

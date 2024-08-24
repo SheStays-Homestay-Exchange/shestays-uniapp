@@ -89,6 +89,7 @@
 	import  { imgToBase64, msg }  from '@/common/js/util.js'
 	import { onShow, onReady } from '@dcloudio/uni-app'
 	import cache from '/common/js/cache.js'
+	
 	const styles = reactive({
 		"borderColor": "#ffffff",
 		"height": "600px"
@@ -104,6 +105,9 @@
 		//草稿里地址
 		if(draft.value?.area){
 			chooseArea.value = draft.value?.area
+			console.log(chooseArea.value[0]);
+			console.log(chooseArea.value[1]);
+			console.log(chooseArea.value[2]);
 			form.address = chooseArea.value[0].countryName+'-'+chooseArea.value[1].regionName+'-'+chooseArea.value[2].cityName
 		}
 		console.log('是否有草稿',draft)

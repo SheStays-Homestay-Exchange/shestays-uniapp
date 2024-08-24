@@ -13,7 +13,7 @@
 				</view>
 			</view>
 			<view class="edit-fn">
-				<view class="edit-fn-col" @click="edit">
+				<view class="edit-fn-col" @click="downAction('edit')">
 					<view class="edit-fn-col-icon">
 						<image class="edit-fn-col-image" src="../../../../static/image/edit-05.png" mode=""></image>
 					</view>
