@@ -133,7 +133,7 @@
 			{
 				"pagePath": "pages/tabBar/about/about",
 				"iconPath": "static/image/logo-icon.png",
-				"selectedIconPath": "static/image/logo-icon.png",
+				"selectedIconPath": "static/image/logo-active.png",
 				"text": "关于SS"
 			}, {
 				"pagePath": "pages/tabBar/my/my",

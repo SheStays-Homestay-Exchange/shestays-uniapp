@@ -1,7 +1,6 @@
 <template>
 	<view class="login-box">
 		<view class="login-logo-box">
-			<image src="@/static/image/logo-icon.png" class="icon"></image>
 			<image src="@/static/image/logo-text.png" class="logo-text"></image>
 		</view>
 		<view class="login-btn-box">
@@ -136,8 +135,8 @@
 			height: 124upx;
 		}
 		.logo-text{
-			width: 268upx;
-			height: 130rpx;
+			width: 220upx;
+			height: 260rpx;
 		}
 	}
 	.login-btn{
@@ -146,7 +145,7 @@
 		border-radius: 40upx;
 	}
 	.login-btn-box{
-		margin: 222rpx 30rpx 48rpx;
+		margin: 176rpx 30rpx 48rpx;
 	}
 	.argument {
 		display: flex;

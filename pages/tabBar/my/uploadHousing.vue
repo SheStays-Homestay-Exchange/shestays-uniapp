@@ -122,7 +122,7 @@
 			let editHouse = JSON.parse(option.edit) 
 			editHouse.statusCode = 'pending_view'    //编辑状态
 			formData.value = editHouse
-			formData.files = editHouse.houseImgs || []
+			formData.value.files = editHouse.houseImgs.map(item=>item.imgUrl)
 			//地址
 			if(editHouse.cityCode){
 				let houseArea = [

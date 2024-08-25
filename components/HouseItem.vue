@@ -7,8 +7,11 @@
 			</swiper-item>
 		</swiper>
 		<view class="time-body">
-			<text class="address wrap1">{{item.countryName}} - {{item.regionName}}</text>
-			<text class="time" v-if="item.startTime">开放时间：{{ item.startTime.split(' ')[0] }}</text>
+			<text class="address wrap1">{{item.countryName}}  {{item.regionName}}</text>
+			<view class="time" v-if="item.startTime">
+				<image src="@/static/image/calendar.png" mode="" class="calendat"></image>
+				{{ item.startTime.split(' ')[0] }}
+			</view>
 		</view>
 		<view class="contact" v-if="item?.houseImgs?.length > 0">
 			房东：Lily11
@@ -54,6 +57,11 @@
 <style lang="scss" scoped>
 	.new-house {
 		margin-bottom: 24rpx;
+		.calendat{
+			width: 28upx;
+			height: 28upx;
+			margin-right: 4upx;
+		}
 		&.hava-border{
 			border: 1rpx solid #ECECEC;
 			border-radius: 24rpx;
