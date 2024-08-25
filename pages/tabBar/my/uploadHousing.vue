@@ -123,6 +123,26 @@
 			editHouse.statusCode = 'pending_view'    //编辑状态
 			formData.value = editHouse
 			formData.files = editHouse.houseImgs || []
+			//地址
+			if(editHouse.cityCode){
+				let houseArea = [
+					{
+						countryName: editHouse.countryName,
+						countryCode: editHouse.countryCode
+					},
+					{
+						regionName: editHouse.regionName,
+						regionCode: editHouse.regionCode
+					},
+					{
+						cityName: editHouse.cityName,
+						cityCode: editHouse.cityCode
+					}
+				]
+				console.log('地址~~~~',houseArea)
+				chooseArea.value = houseArea
+				form.address = houseArea[0].countryName+'-'+houseArea[1].regionName+'-'+ houseArea[2].cityName
+			}
 			console.log('editHouse',formData.value)
 		}else{
 			draft.value = uni.getStorageSync('draftHouse') || {}
