@@ -155,7 +155,6 @@ export function uploadFile(fileList,data={}) {
 
 export function uploadHouseImg(fileList,data={}) {
 	const userId =cache.get('userInfo').userId
-	console.log('进入上传',fileList,'&&&&',userId)
 	const uploadTasks = fileList.map((file, index) => {
 		console.log(file, userId);
 		return new Promise((resolve, reject) => {
@@ -171,12 +170,12 @@ export function uploadHouseImg(fileList,data={}) {
 					'houseImgs': [file],
 					...data
 				},
-				name: 'avatar',
+				name: 'houseImgs',
 				success: function(res) {
-					console.log('上传文件',res)
+					console.log('图片上传文件====',res)
 					let data = JSON.parse(res.data)
 					if( data.code == 200 ){
-						let url = data.data;
+						let url = data.data[0];
 						return resolve(url)
 					}else{
 						uni.showToast({
@@ -195,7 +194,6 @@ export function uploadHouseImg(fileList,data={}) {
 	});
 	return Promise.all(uploadTasks)
 }
-
 
 function clearCache() {
 	//清除缓存

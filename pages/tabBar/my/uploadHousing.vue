@@ -125,7 +125,6 @@
 	    provinceShow.value = false
 	  }else if( e.funName == 'submit' ){
 		  chooseArea.value = e.value
-		  console.log('选择的地区====',chooseArea.value)
 		  provinceShow.value = false   //关闭地址弹窗
 		  form.address = chooseArea.value[0].countryName+'-'+chooseArea.value[1].regionName+'-'+chooseArea.value[2].cityName
 		  // 获取code
@@ -165,7 +164,7 @@
 				uploadHouseImg(e.tempFilePaths).then(res => {
 					console.log('图片上传返回',res)
 					if(res?.length>0){
-						formData.files = res
+						formData.value.files = formData.value.files.concat(res)
 					}
 				}).catch(err=>{
 					console.log('图片上传返回失败',err)
@@ -202,17 +201,22 @@
 
 	// 提交房源信息
 	const handleUploadHouse = async () => {
-		let data = {userId: 630, ...formData.value}
+		uni.showLoading()
+		let data = {userId: userInfo.value.userId, ...formData.value,houseImgPath:formData.value.files}
 		if(data?.area){
 			delete data.area
 		}
 		try {
 			const res = await uploadHouse(data);
+			uni.hideLoading()
 			//提交成功清除本地草稿箱
 			cache.remove('draftHouse')
-			uni.navigateBack()
+			uni.switchTab({
+				url:'/pages/tabBar/my/my'
+			})
 		} catch(e) {
 			msg(e.msg || '系统繁忙，请稍后重试')
+			uni.hideLoading()
 		}
 	}
 	
