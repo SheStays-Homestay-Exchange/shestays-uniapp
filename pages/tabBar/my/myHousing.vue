@@ -21,7 +21,8 @@
 				</view>
 				<image class="right-icon" src="../../../../static/image/right-Icon.jpg" mode=""></image> 
 			 </view> -->
-			<view class="lis" @click="handleEditHousing(1,item.houseId, item)" v-if="item.statusCode == 'reviewing'">
+			 
+			<!-- <view class="lis" @click="handleEditHousing(1,item.houseId, item)" v-if="item.statusCode == 'reviewing'">
 				<view class="lis-title">
 					<image class="housing-image" :src="item.homePageImgUrl" mode=""></image>
 					<view class="title">
@@ -60,7 +61,59 @@
 					</view>
 				</view>
 				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
+			</view> -->
+			
+			<view class="lis" @click="() => {
+				console.log(item);
+				// 房源审核中
+				if (item.statusCode == null || item.statusCode == 'reviewing' || item.statusCode == 'pending_view') {
+					return handleEditHousing(1,item.houseId, item)
+				}
+				// 房源已上线
+				if (item.statusCode == 'online') {
+					return handleEditHousing(2,item.houseId, item)
+				}
+				// 房源审核未通过
+				if (item.statusCode == 'not_approved') {
+					return handleEditHousing(3,item.houseId, item)
+				}
+				// 房源已下线
+				if (item.statusCode == 'offline') {
+					return handleEditHousing(4,item.houseId, item)
+				}
+			}">
+				<view class="lis-title">
+					<image class="housing-image" src="" mode=""></image>
+					
+					<view class="title" v-if="item.statusCode == 'pending_view'">
+						<text>房源待发布</text>
+						<image class="title-icon" src="../../../static/image/released.jpg" mode=""></image>
+					</view>
+					
+					<view class="title" v-if="item.statusCode == 'reviewing'">
+						<text>房源审核中</text>
+						<image class="title-icon" src="../../../static/image/search-refraction.png" mode=""></image>
+					</view>
+					
+					<view class="title" v-if="item.statusCode == 'online'">
+						<text>房源已上线</text>
+						<image class="title-icon" src="../../../static/image/success.png" mode=""></image>
+					</view>
+					
+					<view class="title" v-if="item.statusCode == 'not_approved'">
+						<text>房源审核未通过</text>
+						<image class="title-icon" src="../../../static/image/error.png" mode=""></image>
+					</view>
+					
+					<view class="title"  v-if="item.statusCode == 'offline'">
+						<text>房源已下线</text>
+						<image class="title-icon" src="../../../static/image/slash-circle-01.png" mode=""></image>
+					</view>
+					
+				</view>
+				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
 			</view>
+			
 		</view>
 		<view class="no-text" v-else>
 			还没有发布房子哦~
@@ -268,6 +321,7 @@ page {
 }
 .my-housing {
 	padding: 40rpx 48rpx;
+	padding-bottom: 260rpx;
 	.lis {
 		display: flex; 
 		align-items: center;
