@@ -41,7 +41,7 @@
 			</view>
 			<view class="houseing-col" v-if="houseList.length > 0">
 				<view class="houseing" v-for="(item,i) in houseList" :key="i" @click="goPage(item)">
-					<image class="houseing-image" :src="item.homePageImgUrl" mode=""></image>
+					<image class="houseing-image" :src="item.houseImgs?.length>0?item.houseImgs[0].imgUrl:''" mode="aspectFill"></image>
 					<view class="houseing-title">
 						{{item.cityName}}-{{item.countryName}}
 					</view>
