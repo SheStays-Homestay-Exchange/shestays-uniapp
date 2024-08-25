@@ -83,7 +83,7 @@
 				}
 			}">
 				<view class="lis-title">
-					<image class="housing-image" src="" mode=""></image>
+					<image class="housing-image" :src="item.homePageImgUrl" mode=""></image>
 					
 					<view class="title" v-if="item.statusCode == 'pending_view'">
 						<text>房源待发布</text>
