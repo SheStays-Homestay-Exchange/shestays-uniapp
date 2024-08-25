@@ -8,9 +8,21 @@
 				<view class="uploade" @click="uploadHead">
 					<image src="../../../static/image/union.png" mode=""></image>
 				</view>
-				<template v-for="item in formData.files">
+				<template v-for="(item, index) in formData.files">
 					<view class="uploade-image">
 						<image :src="item" mode=""></image>
+						<view class="remover">
+							<image
+								src="../../../static/image/search-refraction.png"
+								mode=""
+								@click="previewImage(index)"
+							></image>
+							<image
+								src="../../../static/image/trash-01.png" 
+								mode=""
+								@click="handleRemover(index)"
+							></image>
+						</view>
 					</view>
 				</template>
 			</scroll-view>
@@ -87,7 +99,7 @@
 	import hlCalendarRange from '@/components/hlCalendarRange.vue'
 	import { uploadHouse, uploadAvatar } from '@/common/api/common'
 	import  { imgToBase64, msg }  from '@/common/js/util.js'
-	import { onShow, onReady } from '@dcloudio/uni-app'
+	import { onShow, onReady, onUnload } from '@dcloudio/uni-app'
 	import cache from '/common/js/cache.js'
 	import { uploadFile, uploadHouseImg } from '@/common/js/request';
 	
@@ -243,6 +255,24 @@
 		console.log(hlCalendarRange.value)
 		console.log(123);
 	});
+	
+	// 预览图片
+	function previewImage(index) {
+		uni.previewImage({
+			current: index, // 当前显示图片索引
+			urls: formData.value.files // 需要预览的图片http链接列表
+		});
+	}
+	
+	// 删除图片
+	function handleRemover(index) {
+		formData.value.files.splice(index, 1);
+	}
+	
+	// 界面离开
+	onUnload(() => {
+		cache.remove('draftHouse');
+	});
 </script>
 
 <style lang="scss" scoped>
@@ -291,10 +321,26 @@
 				margin-left: 20rpx;
 				border-radius: 16rpx;
 				display: inline-block;
+				position: relative;
 				>image {
 					width: 176rpx;
 					height: 176rpx;
 					border-radius: 16rpx;
+				}
+				.remover {
+					position: absolute;
+					top: 0;
+					right: 0;
+					width: 100%;
+					height: 100%;
+					display: flex;
+					align-items: center;
+					justify-content: space-around;
+					background-color: rgba(212, 212, 212, 0.60);
+					>image {
+						width: 50rpx;
+						height: 50rpx;
+					}
 				}
 			}
 			.uploade-image:last-child {
