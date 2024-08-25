@@ -2,7 +2,7 @@
 	<view class="my-home">
 		<view class="my-head">
 			<view class="my-icon">
-				<image class="my-icon-image" src="../../../../static/image/avatar.png" mode=""></image>
+				<image class="my-icon-image" :src="userInfo.avatarUrl?userInfo.avatarUrl:'../../../../static/image/avatar.png'" mode=""></image>
 			</view>
 			<!-- 默认头像 -->
 		<!-- 	<view class="init-head">

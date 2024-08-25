@@ -111,7 +111,7 @@ export function deletes(url, data = {}, options = {}) {
 // }
 
 // 上传文件
-export function uploadFile(fileList) {
+export function uploadFile(fileList,data={}) {
 	const userId =cache.get('userInfo').userId
 	console.log('进入上传',fileList,'&&&&',userId)
 	const uploadTasks = fileList.map((file, index) => {
@@ -125,14 +125,15 @@ export function uploadFile(fileList) {
 				},
 				formData: {
 					'userId': userId,
-					'avatar': file
+					'avatar': file,
+					...data
 				},
-				name: 'img',
+				name: 'avatar',
 				success: function(res) {
 					console.log('上传文件',res)
 					let data = JSON.parse(res.data)
 					if( data.code == 200 ){
-						let url = data.data.fileUrl;
+						let url = data.data;
 						return resolve(url)
 					}else{
 						uni.showToast({
