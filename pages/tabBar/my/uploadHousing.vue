@@ -87,7 +87,7 @@
 	import hlCalendarRange from '@/components/hlCalendarRange.vue'
 	import { uploadHouse, uploadAvatar } from '@/common/api/common'
 	import  { imgToBase64, msg }  from '@/common/js/util.js'
-	import { onShow, onReady } from '@dcloudio/uni-app'
+	import { onShow, onReady,onLoad } from '@dcloudio/uni-app'
 	import cache from '/common/js/cache.js'
 	import { uploadFile, uploadHouseImg } from '@/common/js/request';
 	
@@ -101,15 +101,27 @@
 	const draft = ref({})
 	onShow(() => {
 		userInfo.value = uni.getStorageSync('userInfo');
-		draft.value = uni.getStorageSync('draftHouse') || {}
-		// formData.value = draft.value
-		//草稿里地址
-		if(draft.value?.area){
-			chooseArea.value = draft.value?.area
-			form.address = chooseArea.value[0].countryName+'-'+chooseArea.value[1].regionName+'-'+chooseArea.value[2].cityName
-		}
-		console.log('是否有草稿',draft)
 	});
+	
+	onLoad((option)=>{
+		//有编辑展示编辑信息，没有编辑查找是否有草稿
+		if(option.edit){
+			//编辑页面跳转过来的
+			let editHouse = JSON.parse(option.edit) 
+			editHouse.statusCode = 'pending_view'    //编辑状态
+			formData.value = editHouse
+			formData.files = editHouse.houseImgs || []
+			console.log('editHouse',formData.value)
+		}else{
+			draft.value = uni.getStorageSync('draftHouse') || {}
+			// formData.value = draft.value
+			//草稿里地址
+			if(draft.value?.area){
+				chooseArea.value = draft.value?.area
+				form.address = chooseArea.value[0].countryName+'-'+chooseArea.value[1].regionName+'-'+chooseArea.value[2].cityName
+			}
+		}
+	})
 	
 	const form = reactive({
 		address:'请选择'
@@ -148,14 +160,13 @@
 	// 上传图片
 	const uploadHead = async()=>{
 		uni.chooseImage({
-			count: 1,
+			count: 10,
 			crop: {
 				width: 100,
 				height: 100
 			},
 			success: async(e)=>{
 				//判断文件后缀名
-				console.log('图片上传',e)
 				if (e.tempFilePaths[0].split('.')[e.tempFilePaths[0].split('.').length - 1].includes('gif')) {
 					msg('暂不支持上传gif图片，请重新选择后上传')
 					return false
@@ -190,7 +201,8 @@
 		countryName:'',
 		regionName:'',
 		cityName:'',
-		detailAddress: ''
+		detailAddress: '',
+		statusCode:'reviewing'   //房源状态reviewing新增，pending_view编辑
 	});
 	
 	// 日期范围选择回调
