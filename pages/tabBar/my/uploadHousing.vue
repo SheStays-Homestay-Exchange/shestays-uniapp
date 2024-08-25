@@ -367,7 +367,7 @@
 					display: flex;
 					align-items: center;
 					justify-content: space-around;
-					background-color: rgba(212, 212, 212, 0.60);
+					background-color: rgba(0, 0, 0, 0.3);
 					>image {
 						width: 50rpx;
 						height: 50rpx;
