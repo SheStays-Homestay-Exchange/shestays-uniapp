@@ -89,7 +89,7 @@
 	import  { imgToBase64, msg }  from '@/common/js/util.js'
 	import { onShow, onReady } from '@dcloudio/uni-app'
 	import cache from '/common/js/cache.js'
-	import { uploadFile } from '@/common/js/request';
+	import { uploadFile, uploadHouseImg } from '@/common/js/request';
 	
 	const styles = reactive({
 		"borderColor": "#ffffff",
@@ -106,9 +106,6 @@
 		//草稿里地址
 		if(draft.value?.area){
 			chooseArea.value = draft.value?.area
-			console.log(chooseArea.value[0]);
-			console.log(chooseArea.value[1]);
-			console.log(chooseArea.value[2]);
 			form.address = chooseArea.value[0].countryName+'-'+chooseArea.value[1].regionName+'-'+chooseArea.value[2].cityName
 		}
 		console.log('是否有草稿',draft)
@@ -164,22 +161,8 @@
 					msg('暂不支持上传gif图片，请重新选择后上传')
 					return false
 				}
-				// form.avatar = e.tempFiles[0]
 				
-				// try{
-				// 	const base = await imgToBase64(e.tempFiles[0].path)
-				// 	const avatarRes = await uploadAvatar({
-				// 		avatar: base,
-				// 		userId:userInfo.value.userId
-				// 	})
-				// 	console.log(avatarRes)
-				// 	// form.avatar = avatarRes.data || e.tempFiles[0]
-				// }catch(e){
-				// 	msg(e.msg)
-				// }
-				
-				
-				uploadFile(e.tempFilePaths).then(res => {
+				uploadHouseImg(e.tempFilePaths).then(res => {
 					console.log('图片上传返回',res)
 					if(res?.length>0){
 						formData.files = res
@@ -207,7 +190,8 @@
 		regionCode: '',
 		countryName:'',
 		regionName:'',
-		cityName:''
+		cityName:'',
+		detailAddress: ''
 	});
 	
 	// 日期范围选择回调

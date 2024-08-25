@@ -153,6 +153,49 @@ export function uploadFile(fileList,data={}) {
 	return Promise.all(uploadTasks)
 }
 
+export function uploadHouseImg(fileList,data={}) {
+	const userId =cache.get('userInfo').userId
+	console.log('进入上传',fileList,'&&&&',userId)
+	const uploadTasks = fileList.map((file, index) => {
+		console.log(file, userId);
+		return new Promise((resolve, reject) => {
+			uni.uploadFile({
+				url: requestUrl + 'uploadHouseImg',
+				filePath: file,
+				fileType: 'image',
+				header: {
+					 'content-type': 'multipart/form-data',
+				},
+				formData: {
+					'userId': userId,
+					'houseImgs': [file],
+					...data
+				},
+				name: 'avatar',
+				success: function(res) {
+					console.log('上传文件',res)
+					let data = JSON.parse(res.data)
+					if( data.code == 200 ){
+						let url = data.data;
+						return resolve(url)
+					}else{
+						uni.showToast({
+							icon: 'none',
+							title:`${data.error}`
+						})
+						return reject(data)
+					}
+				},
+				fail: (res) => {
+					console.log('上传文件失败啊',res)
+					reject(res)
+				}
+			});
+		})
+	});
+	return Promise.all(uploadTasks)
+}
+
 
 function clearCache() {
 	//清除缓存
