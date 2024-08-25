@@ -44,7 +44,16 @@
         >
       </view>
     </view>
-    <view class="householder" v-if="userInfo.statusCode != 'reviewing'">
+	
+	<view class="btn-box" v-if="userInfo.statusCode == 'reviewing' && roleDictCode.some(item => item == 'admin')">
+		<view class="btn-fn" @click="handleNoBtn">
+			不通过
+		</view>
+		<view class="btn-fn success-fn" @click="hanldeSuccessBtn">
+			通过审核
+		</view>
+	</view>
+    <view class="householder" v-else>
       <view class="userInfo">
         <img class="user-image" :src="userInfo.avatarUrl" alt="" />
         <view class="info">房主：{{ userInfo.xiaohongshuUsername }}</view>
@@ -53,14 +62,7 @@
         <button class="contact-btn" @click="contactHost">联系房主</button>
       </view>
     </view>
-	<view class="btn-box" v-else>
-		<view class="btn-fn" @click="handleNoBtn">
-			不通过
-		</view>
-		<view class="btn-fn success-fn" @click="hanldeSuccessBtn">
-			通过审核
-		</view>
-	</view>
+	
     <DetailPopup
       :show="popShow"
       @tapClose="popShow = false"
@@ -87,12 +89,13 @@
 
 <script setup>
 import { reactive, ref, onMounted } from "vue";
-import { onLoad, useRoute } from "@dcloudio/uni-app";
+import { onLoad, useRoute, onShow } from "@dcloudio/uni-app";
 import { getHouseDetail, review } from "@/common/api/common";
 import DetailPopup from "@/components/DetailPopup.vue";
 import holdImage from "@/static/60x60.png";
 import holdBannerImage from "@/static/image/about.png";
 import { msg } from "../../common/js/util";
+import cache from '/common/js/cache.js'
 
 const current = ref(0);
 
@@ -148,6 +151,7 @@ const houseInfo = [
 const onSwiperChange = (e) => {
   current.value = e.detail.current;
 };
+
 onLoad((options) => {
   getHouseDetail({ houseId: options?.id })
     .then((res) => {
@@ -216,6 +220,13 @@ const hanldeSuccessBtn = async () => {
 		msg(e.msg || '系统错误');
 	}
 }
+
+// 保存用户权限
+// 用户权限
+const roleDictCode = ref([]);
+onShow(() => {
+	roleDictCode.value = cache.get("roles");
+});
 </script>
 
 <style lang="scss" scoped>

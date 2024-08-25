@@ -39,7 +39,7 @@
 		</view>
 		
 		<!-- 房屋审核管理 -->
-		<view class="fn-body">
+		<view class="fn-body" v-if="roleDictCode.some(item => item == 'admin')">
 			<view class="title">
 				房屋审核管理
 			</view>
@@ -115,6 +115,7 @@
 	
 	const myInfo = ref({})
 	const userInfo = ref({})
+	const roleDictCode = ref([]);
 	const getUserInfo= async (type)=>{
 		userInfo.value = typeof(cache.get('userInfo')) == 'string' ? JSON.parse( cache.get('userInfo') ) : cache.get('userInfo') 
 		if(!(userInfo.value?.openId)){
@@ -130,6 +131,9 @@
 			if(res.code == 200){
 				myInfo.value = res.data || {}
 				cache.put('userInfo',res.data)
+				// 存储用户权限
+				cache.put('roles', res.data.roles.map(item => item.roleDictCode));
+				roleDictCode.value = res.data.roles.map(item => item.roleDictCode);
 				if(!(res.data.openId)){
 					uni.reLaunch({
 						url:'/pages/login/login'
