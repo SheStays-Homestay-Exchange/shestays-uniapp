@@ -99,7 +99,7 @@
 	import hlCalendarRange from '@/components/hlCalendarRange.vue'
 	import { uploadHouse, uploadAvatar } from '@/common/api/common'
 	import  { imgToBase64, msg }  from '@/common/js/util.js'
-	import { onShow, onReady, onUnload } from '@dcloudio/uni-app'
+	import { onLoad, onShow, onReady, onUnload } from '@dcloudio/uni-app'
 	import cache from '/common/js/cache.js'
 	import { uploadFile, uploadHouseImg } from '@/common/js/request';
 	
