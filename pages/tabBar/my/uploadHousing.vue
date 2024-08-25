@@ -70,10 +70,10 @@
 	</view>
 	<!-- 按钮 -->
 	<view class="button-body">
-		<view class="save" @click="saveDraft">
+		<view class="save" @click="handleUploadHouse('pending_view')">
 			保存编辑
 		</view>
-		<view class="submit" @click="handleUploadHouse">
+		<view class="submit" @click="handleUploadHouse('reviewing')">
 			提交房源
 		</view>
 	</view>
@@ -190,7 +190,8 @@
 		countryName:'',
 		regionName:'',
 		cityName:'',
-		detailAddress: ''
+		detailAddress: '',
+		statusCode: ''	// 状态code
 	});
 	
 	// 日期范围选择回调
@@ -200,9 +201,10 @@
 	}
 
 	// 提交房源信息
-	const handleUploadHouse = async () => {
+	const handleUploadHouse = async (status) => {
 		uni.showLoading()
 		let data = {userId: userInfo.value.userId, ...formData.value,houseImgPath:formData.value.files}
+		data.statusCode = status;
 		if(data?.area){
 			delete data.area
 		}
@@ -210,7 +212,7 @@
 			const res = await uploadHouse(data);
 			uni.hideLoading()
 			//提交成功清除本地草稿箱
-			cache.remove('draftHouse')
+			// cache.remove('draftHouse')
 			uni.switchTab({
 				url:'/pages/tabBar/my/my'
 			})
