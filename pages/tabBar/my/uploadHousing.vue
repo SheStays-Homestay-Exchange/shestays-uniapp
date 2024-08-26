@@ -124,8 +124,9 @@
 			formData.value = editHouse
 			formData.value.files = editHouse.houseImgs.map(item=>item.imgUrl)
 			//地址
+			var houseArea = []
 			if(editHouse.cityCode){
-				let houseArea = [
+				 houseArea = [
 					{
 						countryName: editHouse.countryName,
 						countryCode: editHouse.countryCode
