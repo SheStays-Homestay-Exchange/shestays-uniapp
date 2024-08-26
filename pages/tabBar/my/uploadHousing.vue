@@ -137,10 +137,6 @@
 					{
 						cityName: editHouse.cityName,
 						cityCode: editHouse.cityCode
-					},
-					{
-						cityName: editHouse.cityName,
-						cityCode: editHouse.cityCode
 					}
 				]
 				console.log('地址~~~~',houseArea)
@@ -149,6 +145,10 @@
 			}
 			//含区县
 			if(editHouse.districtCode){
+				chooseArea.value.push({
+					districtName: editHouse.districtName,
+					districtCode: editHouse.districtCode
+				})
 				form.address = houseArea[0].countryName+'-'+houseArea[1].regionName+'-'+ houseArea[2].cityName+'-'+ houseArea[3].districtName
 			}
 			console.log('editHouse',formData.value)
