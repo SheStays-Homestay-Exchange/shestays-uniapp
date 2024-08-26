@@ -13,7 +13,8 @@
 							<template v-if="myAreaData[0]?.countryName">
 								<text @click="changeArea(1,'')">{{myAreaData[0]?.countryName}}</text>
 								<text v-if="myAreaData[1]?.regionName" @click="changeArea(2,myAreaData[0].countryCode)">/{{myAreaData[1]?.regionName}}</text>
-								<text v-if="myAreaData[2]?.cityName">/{{myAreaData[2]?.cityName}}</text>
+								<text v-if="myAreaData[2]?.cityName" @click="changeArea(3,myAreaData[1].regionCode)">/{{myAreaData[2]?.cityName}}</text>
+								<text v-if="myAreaData[3]?.districtName">/{{myAreaData[3]?.districtName}}</text>
 							</template>
 							<view class="" v-else @click="getAreaList('000000')">
 								{{cityName}}
@@ -27,7 +28,7 @@
 						:scroll-y="true" 
 						style="height: 600rpx">
 						<view class="address-item" v-for="(item,i) in addressList" @click="itemClick(item)">
-							{{item.countryName || item.regionName || item.cityName }}
+							{{item.countryName || item.regionName || item.cityName || item.districtName}}
 						</view>
 					</scroll-view>
 					
@@ -42,7 +43,7 @@
 <script setup>
 	import { ref, watch , computed } from "vue";
 	import PopupBottom from '@/components/popup-bottom.vue'
-	import { getNation, getRegion, getCity } from '@/common/api/common'
+	import { getNation, getRegion, getCity, getDistrict } from '@/common/api/common'
 	import cache from '@/common/js/cache.js'
 	
 
@@ -71,10 +72,11 @@
       let code = '000000'
       if(props.chooseArea.length ==3){
 		  areaLevel.value = 3
-        code = props.chooseArea[1].regionCode
-        myAreaData.value = JSON.parse(JSON.stringify(props.chooseArea))
-      }
-			
+			code = props.chooseArea[1].regionCode
+      }else if(props.chooseArea.length ==4){   //国家-省-市-区
+		  code = props.chooseArea[2].cityCode
+	  }
+		myAreaData.value = JSON.parse(JSON.stringify(props.chooseArea))	
 		getAreaList(code)
     }
   })
@@ -91,8 +93,10 @@
 			getCountry()
 		}else if(areaLevel.value == 2){
 			getReginFun(code)
-		}else{
+		}else if(areaLevel.value == 3){
 			getCityFun(code)
+		}else{
+			getDisFun(code)
 		}
 	}
 	
@@ -133,6 +137,19 @@
 		})
 	}
 	
+	//获取区县
+	const getDisFun = (cityCode)=>{
+		getDistrict({
+			cityCode
+		}).then(res=>{
+			if(res.code == 200){
+				addressList.value = res.data || []
+			}
+		}).catch(err=>{
+			console.log('获取省市区失败')
+		})
+	}
+	
 
 	//地区列表
 	const addressList = ref([{areaName:'',id:'',areaLevel:'',areaCode:''}])
@@ -146,14 +163,12 @@
 	})
 	
 	//当前展示的列表层级
-	const areaLevel = ref(1)  //1国家，2区省、3城市
+	const areaLevel = ref(1)  //1国家，2区省、3市、4区县
 	//省市区列表点击
 	const itemClick = (item)=>{
-		authCity.value = true
+		console.log('item',item)
 		if(areaLevel.value == 1){   //省
 			myAreaData.value = [item]
-			// myAreaData.value.city = {}
-			// myAreaData.value.area = {}
 			areaLevel.value = 2   //去请求省
 			getAreaList(item.countryCode)
 	
@@ -163,10 +178,15 @@
 			areaLevel.value = 3   //去请求城市
 			getAreaList(item.regionCode)
 
-		}else{
+		}else if(areaLevel.value == 3){
 			myAreaData.value[2] = item
+			myAreaData.value[3] = []
+			areaLevel.value = 4   //去请求区县
+			getAreaList(item.cityCode)
+		}else{
+			myAreaData.value[3] = item
 			console.log('myAreaData.value',myAreaData.value)
-		  emits('popupClick',{funName:'submit',value:myAreaData.value})
+			emits('popupClick',{funName:'submit',value:myAreaData.value})
 		}
 	}
 	
@@ -178,6 +198,9 @@
 		}else if(level == 2){
 			//点击省，清除城市
 			myAreaData.value.splice(2,1)
+		}else{
+			//点击城市，清除县
+			myAreaData.value.splice(3,1)
 		}
 		areaLevel.value = level
 		getAreaList(code)

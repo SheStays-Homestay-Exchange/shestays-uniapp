@@ -119,7 +119,7 @@
 	  }else if( e.funName == 'submit' ){
 		  chooseArea.value = e.value
 		  provinceShow.value = false   //关闭地址弹窗
-		  form.address = chooseArea.value[0].countryName+'-'+chooseArea.value[1].regionName+'-'+chooseArea.value[2].cityName
+		  form.address = chooseArea.value[0].countryName+'-'+chooseArea.value[1].regionName+'-'+chooseArea.value[2].cityName+'-'+chooseArea.value[3].districtName
 	    // submitArea(e.value)
 	  }
 	}

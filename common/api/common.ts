@@ -68,7 +68,7 @@ export function getNation() {
 	return get('getNation')
 }
 
-//接口名称：地区查询接口
+//接口名称：省查询接口
 export function getRegion(params) {
 	return get('getRegion',params)
 }
@@ -76,6 +76,11 @@ export function getRegion(params) {
 //接口名称：地区查询接口
 export function getCity(params) {
 	return get('getCity',params)
+}
+
+//接口名称：城市查询接口
+export function getDistrict(params) {
+	return get('getDistrict',params)
 }
 
 //接口名称：房源详情接口
