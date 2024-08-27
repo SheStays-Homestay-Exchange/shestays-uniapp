@@ -64,9 +64,9 @@
 				对房客说的话
 			</view>
 			<view class="col-input">
-				<uni-easyinput :styles="styles" type="textarea" :autoHeight="false" placeholder="请输入内容" v-model="formData.describle"></uni-easyinput>
+				<uni-easyinput :styles="styles" type="textarea" maxlength="300" :autoHeight="false" placeholder="请输入内容" v-model="formData.describle"></uni-easyinput>
 				<view class="sum">
-					0 / 300
+					{{formData.describle.length ?? 0}} / 300
 				</view>
 			</view>
 		</view>
