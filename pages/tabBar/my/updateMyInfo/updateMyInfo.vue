@@ -214,7 +214,9 @@
 		editUserData(param).then(res=>{
 			if(res.code == 200){
 				msg('编辑个人信息成功')
-				uni.navigateBack()
+				setTimeout(() => {
+					uni.navigateBack();
+				}, 1000);
 			}
 		}).catch(e=>{
 			msg(e.msg)
