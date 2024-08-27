@@ -1,5 +1,10 @@
 <template>
-	<uni-popup ref="popup" type="center">
+	<uni-popup
+		ref="popup"
+		type="bottom"
+		:is-mask-click="false"
+		:safe-area="false"
+	>
 		<view class="housing-fn">
 			<view class="housing-title flex-jb">
 				<text class="ptc-title">{{props.title}}</text>
@@ -92,13 +97,13 @@ defineExpose({
 <style lang="scss" scoped>
 	// 弹出选择层
 	.housing-fn {
+		width: 100%;
 		background: #fff;
 		box-sizing: border-box;
-		padding: 40rpx 50rpx 60rpx 50rpx;
+		border-top-left-radius: 24rpx;
+		border-top-right-radius: 24rpx;
+		padding: 40rpx 50rpx 138rpx 50rpx;
 		box-shadow: 0rpx 0rpx 10rpx 1rpx rgba(179,179,179,0.3);
-		border-radius: 24rpx;
-		width: 630rpx;
-		margin: auto 40rpx;
 		.flex-jb{
 			display: flex;
 			align-item: center;
@@ -118,6 +123,9 @@ defineExpose({
 			font-family: PingFang SC-Bold, PingFang SC;
 			font-weight: bold;
 			color: #333333;
+			display: inline-block;
+			flex: 1;
+			text-align: center;
 		}
 	
 		// 内容

@@ -73,14 +73,19 @@
 		
 		<!-- 编辑房源弹框 -->
 		<editHousing ref="editRef" @doAction="doAction" :popStatus="activePopStatus"></editHousing>
-		<Modal :show="actionShow" @popTap="popTap">
+		<Modal
+			:show="actionShow"
+			@popTap="popTap"
+		>
 			<template #content>
 				<view class="action-content" v-if="actionType == 'down'">
 					<text>您确定要下架该房源吗？</text>
+					<br />
 					<text>下架之后您可以重新提交上线房源</text>
 				</view>
-				<view class="" v-if="actionType == 'del'">
+				<view class="action-content" v-if="actionType == 'del'">
 					<text>您确定要删除该房源吗？</text>
+					<br />
 					<text>删除后将无法恢复</text>
 				</view>
 			</template>
@@ -352,5 +357,9 @@ page {
 	text-align: center;
 	font-size: 32upx;
 	color: #999;
+}
+
+.action-content {
+	text-align: center;
 }
 </style>
