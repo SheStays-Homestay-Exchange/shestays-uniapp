@@ -48,6 +48,60 @@
 		pages.pageIndex =  1;
 		listData.value = [];
 		getHouseListFun();
+		
+		// 获取地址位置
+		// uni.authorize({
+		// 	scope: 'scope.userLocation',
+		// 	success() {
+		// 		uni.getLocation({
+		// 			success(res) {
+		// 				console.log(res)
+		// 			},
+		// 			fail(e) {
+		// 				console.log(e, '拒绝2');
+		// 			}
+		// 		})
+		// 	},
+		// 	fail(e) {
+		// 		uni.showModal({
+		// 			title: '提示',
+		// 			content: '您拒绝了位置的授权，将不会为您推荐附近房源，确定拒绝吗？',
+		// 			showCancel:false,
+		// 			success(res) {
+		// 				uni.openSetting({
+		// 					success(res) {
+		// 						let userLocation = res.authSetting['scope.userLocation'];
+		// 						if (userLocation) {
+		// 							// 继续进行授权成功后的操作
+		// 							//用户开启位置权限
+		// 							uni.chooseLocation({
+		// 								success: res => {
+		// 									// 返回用户当前选择的位置信息；
+		// 									// 可进行保存data 回显在表单上/提交后台
+		// 									if (state === 'start') {
+		// 										this.formDate.startDestination = res.name
+		// 									} else {
+		// 										this.formDate.endDestination = res.name
+		// 									};
+		// 									console.log('位置名称：' + res.name);
+		// 									console.log('详细地址：' + res.address);
+		// 									console.log('纬度：' + res.latitude);
+		// 									console.log('经度：' + res.longitude);
+		// 								}
+		// 							});
+		// 						} else {
+		// 							// 用户拒接授权 给提示
+		// 							uni.showToast({
+		// 								title: '您已拒绝位置授权',
+		// 								duration: 2000
+		// 							});
+		// 						}
+		// 					}
+		// 				})
+		// 			}
+		// 		})
+		// 	}
+		// })
 	});
 	
 	onShareAppMessage(() => {
