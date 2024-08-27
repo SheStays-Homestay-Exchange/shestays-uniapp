@@ -7,7 +7,7 @@
 			</swiper-item>
 		</swiper>
 		<view class="time-body">
-			<text class="address wrap1">{{item.countryName}}  {{item.regionName}}</text>
+			<text class="address wrap1">{{item.cityName ? item.countryName+' '+item.cityName :item.countryName+' '+item.regionName}}</text>
 			<view class="time" v-if="item.startTime">
 				<image src="@/static/image/calendar.png" mode="" class="calendat"></image>
 				{{ item.startTime.split(' ')[0] }}
