@@ -32,7 +32,7 @@
 
 <script setup>
 	import { reactive, ref, onMounted,computed  } from 'vue'
-	import { onLoad, onReachBottom, onPullDownRefresh , onShareAppMessage } from '@dcloudio/uni-app'
+	import { onShow, onLoad, onReachBottom, onPullDownRefresh , onShareAppMessage } from '@dcloudio/uni-app'
 	import { getHouseList } from '@/common/api/common'
 	import  DetailPopup from '@/components/DetailPopup.vue'
 	import  HouseItem from '@/components/HouseItem.vue'
@@ -42,8 +42,13 @@
 	onLoad(()=>{
 		 userInfo.value = cache.get('userInfo') || {}
 		console.log('userInfo',userInfo)
-		getHouseListFun()
-	})
+	});
+	
+	onShow(() => {
+		pages.pageIndex =  1;
+		listData.value = [];
+		getHouseListFun();
+	});
 	
 	onShareAppMessage(() => {
 		

@@ -25,9 +25,9 @@
 					<label class="radio" style="margin-right: 40rpx;">
 						<radio color="#d8336d" value="1" :checked="form.sex == '1'"/>女
 					</label>
-					<label class="radio">
+					<!-- <label class="radio">
 						<radio color="#d8336d" value="2" :checked="form.sex == '2'"/>男
-					</label>
+					</label> -->
 				</radio-group>
 			</view>
 		</view>
@@ -119,7 +119,12 @@
 	  }else if( e.funName == 'submit' ){
 		  chooseArea.value = e.value
 		  provinceShow.value = false   //关闭地址弹窗
+		  console.log(chooseArea.value)
 		  form.address = chooseArea.value[0].countryName+'-'+chooseArea.value[1].regionName+'-'+chooseArea.value[2].cityName+'-'+chooseArea.value[3].districtName
+		  // 设置对应code
+		  form.nationCode = chooseArea.value[0].countryCode //国家id
+		  form.regionCode = chooseArea.value[1].regionCode //区域id
+		  form.cityCode = chooseArea.value[2].cityCode //城市id
 	    // submitArea(e.value)
 	  }
 	}
@@ -131,12 +136,15 @@
 		
 	const form = reactive({
 		date:'请选择生日',
-		sex:'',
+		sex:'1',
 		phone:'',
 		wechatId:'',
 		des:'',
 		avatar:'',
-		address:'请选择'
+		address:'请选择',
+		nationCode:'', //国家id
+		regionCode:'', //区域id
+		cityCode:'', //城市id
 	})
 	
 	const dateChange = e=>{
@@ -228,9 +236,9 @@
 				bdMonth: Number(dateArr[1]),
 				bdDay: Number(dateArr[2]),
 				userId: userInfo.value.userId,
-				nationId:'1', //国家id
-				regionId:'1', //区域id
-				cityId:'1', //城市id
+				nationCode: form.nationCode, //国家id
+				regionCode: form.regionCode, //区域id
+				cityCode: form.cityCode, //城市id
 				// wechatId: '1',
 			})
 		}
