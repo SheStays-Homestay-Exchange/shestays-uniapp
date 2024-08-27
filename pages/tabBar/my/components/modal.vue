@@ -14,11 +14,11 @@
 			</view>
 			<slot name="content"></slot>
 			<view class="ptc-button flex justify-content-between align-items-center">
-				<view class="flex-1" @click="confirm">
-					<button type="default" class="cancle-btn">{{confirmText}}</button>
-				</view>
 				<view class="flex-1" @click="cancle">
-					<button type="primary" class="sure-btn">{{cancelText}}</button>
+					<button type="primary" class="cancle-btn">{{cancelText}}</button>
+				</view>
+				<view class="flex-1" @click="confirm">
+					<button type="default" class="sure-btn">{{confirmText}}</button>
 				</view>
 			</view>
 		</view>

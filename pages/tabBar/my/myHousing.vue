@@ -76,6 +76,9 @@
 		<Modal
 			:show="actionShow"
 			@popTap="popTap"
+			:title="modTitle"
+			:confirmText="confirmText"
+			:cancelText="cancelText"
 		>
 			<template #content>
 				<view class="action-content" v-if="actionType == 'down'">
@@ -160,6 +163,16 @@
 				url: `/pages/tabBar/my/uploadHousing?edit=${JSON.stringify(houseObj.value)}`
 			});
 		} else {
+			if (e == 'del') {
+				modTitle.value = "删除房源";
+				cancelText.value = "取消删除";
+				confirmText.value = "确定删除";
+			}
+			if (e == 'down') {
+				modTitle.value = "下线房源";
+				cancelText.value = "否";
+				confirmText.value = "是";
+			}
 			// 下架，删除
 			actionType.value = e
 			actionShow.value = true
@@ -183,6 +196,10 @@
 	}
 	
 	//弹窗操作
+	const modTitle = ref("");
+	const cancelText = ref("");
+	const confirmText = ref("");
+	
 	const popTap =(e)=>{
 		console.log('弹窗操作==',actionType.value,e)
 		if(e=='close'){
