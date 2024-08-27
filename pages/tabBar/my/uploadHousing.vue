@@ -138,10 +138,10 @@
 			formData.value.files = editHouse.houseImgs.map(item=>item.imgUrl);
 			
 			formData.value.houseTitle =  editHouse.houseTitle;
-			formData.value.houseAmount = editHouse.houseAmount;
+			formData.value.houseAmount = editHouse.houseAmount ?? 1;
 			formData.value.describle = editHouse.describle ?? "";
-			formData.value.startTime = editHouse.startTime.split(" ")[0];
-			formData.value.endTime = editHouse.endTime.split(" ")[0];
+			formData.value.startTime = editHouse.startTime?.split(" ")[0];
+			formData.value.endTime = editHouse.endTime?.split(" ")[0];
 			formData.value.countryCode = editHouse.countryCode;
 			formData.value.cityCode = editHouse.cityCode;
 			formData.value.regionCode = editHouse.regionCode;
