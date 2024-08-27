@@ -134,6 +134,14 @@
 				chooseArea.value = houseArea
 				form.address = houseArea[0].countryName+'-'+houseArea[1].regionName+'-'+ houseArea[2].cityName
 			}
+			//含区县
+			if(editHouse.districtCode){
+				chooseArea.value.push({
+					districtName: editHouse.districtName,
+					districtCode: editHouse.districtCode
+				})
+				form.address = houseArea[0].countryName+'-'+houseArea[1].regionName+'-'+ houseArea[2].cityName+'-'+ houseArea[3].districtName
+			}
 			console.log('editHouse',formData.value)
 		}else{
 			draft.value = uni.getStorageSync('draftHouse') || {}
@@ -161,7 +169,8 @@
 	  }else if( e.funName == 'submit' ){
 		  chooseArea.value = e.value
 		  provinceShow.value = false   //关闭地址弹窗
-		  form.address = chooseArea.value[0].countryName+'-'+chooseArea.value[1].regionName+'-'+chooseArea.value[2].cityName
+		  console.log('选址的地址====',chooseArea.value)
+		  form.address = chooseArea.value[0].countryName+'-'+chooseArea.value[1].regionName+'-'+chooseArea.value[2].cityName+'-'+chooseArea.value[3].districtName
 		  // 获取code
 		  formData.value.countryCode = chooseArea.value[0].countryCode;
 		  formData.value.regionCode = chooseArea.value[1].regionCode;
@@ -169,6 +178,8 @@
 		  formData.value.countryName= chooseArea.value[0].countryName;
 		  formData.value.regionName = chooseArea.value[1].regionName;
 		  formData.value.cityName = chooseArea.value[2].cityName;
+		  formData.value.districtName = chooseArea.value[3].districtName;
+		  formData.value.districtCode = chooseArea.value[3].districtCode;
 	  }
 	}
 	
