@@ -101,7 +101,28 @@
 	
 	// 用户信息
 	const userInfo = ref({});
-	const draft = ref({})
+	const draft = ref({});
+	const form = reactive({
+		address:'请选择'
+	});
+	// 表单
+	const formData = ref({
+		houseTitle: '测试新增房源',
+		houseAmount: 1,
+		describle: '',
+		startTime: '',
+		endTime: '',
+		files: [],
+		countryCode: '',
+		cityCode: '',
+		regionCode: '',
+		countryName:'',
+		regionName:'',
+		cityName:'',
+		detailAddress: '',
+		statusCode:'reviewing'   //房源状态reviewing新增，pending_view编辑
+	});
+	
 	onShow(() => {
 		userInfo.value = uni.getStorageSync('userInfo');
 	});
@@ -110,10 +131,26 @@
 		//有编辑展示编辑信息，没有编辑查找是否有草稿
 		if(option.edit){
 			//编辑页面跳转过来的
-			let editHouse = JSON.parse(option.edit) 
-			editHouse.statusCode = 'pending_view'    //编辑状态
-			formData.value = editHouse
-			formData.value.files = editHouse.houseImgs.map(item=>item.imgUrl)
+			let editHouse = JSON.parse(option.edit); 
+			// editHouse.statusCode = 'pending_view'    //编辑状态
+			// formData.value = editHouse
+			// 数据回显
+			formData.value.files = editHouse.houseImgs.map(item=>item.imgUrl);
+			
+			formData.value.houseTitle =  editHouse.houseTitle;
+			formData.value.houseAmount = editHouse.houseAmount;
+			formData.value.describle = editHouse.describle ?? "";
+			formData.value.startTime = editHouse.startTime.split(" ")[0];
+			formData.value.endTime = editHouse.endTime.split(" ")[0];
+			formData.value.countryCode = editHouse.countryCode;
+			formData.value.cityCode = editHouse.cityCode;
+			formData.value.regionCode = editHouse.regionCode;
+			formData.value.countryName = editHouse.countryName;
+			formData.value.regionName = editHouse.regionName;
+			formData.value.cityName = editHouse.cityName;
+			formData.value.detailAddress = editHouse.detailAddress;
+			
+			console.log(formData.value)
 			//地址
 			var houseArea = []
 			if(editHouse.cityCode){
@@ -144,6 +181,8 @@
 				form.address = houseArea[0].countryName+'-'+houseArea[1].regionName+'-'+ houseArea[2].cityName+'-'+ houseArea[3].districtName
 			}
 			console.log('editHouse',formData.value)
+			// 图片回显
+			
 		}else{
 			draft.value = uni.getStorageSync('draftHouse') || {}
 			// formData.value = draft.value
@@ -155,9 +194,7 @@
 		}
 	})
 	
-	const form = reactive({
-		address:'请选择'
-	})
+	
 	
 	//选中的省市区
 		const chooseArea = ref([])
@@ -222,23 +259,6 @@
 			}
 		})
 	}
-	
-	const formData = ref({
-		houseTitle: '测试新增房源',
-		houseAmount: 1,
-		describle: '',
-		startTime: '',
-		endTime: '',
-		files: [],
-		countryCode: '',
-		cityCode: '',
-		regionCode: '',
-		countryName:'',
-		regionName:'',
-		cityName:'',
-		detailAddress: '',
-		statusCode:'reviewing'   //房源状态reviewing新增，pending_view编辑
-	});
 	
 	// 日期范围选择回调
 	function handleSelectorDate({start, end}) {
