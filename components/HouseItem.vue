@@ -46,10 +46,10 @@
 	
 	const houseClick = ()=>{
 		//有图片才去详情
-		// if(props.item.houseImgs?.length > 0){
-		// 	emits('itemClick',item)
-		// }
-		emits('itemClick',props.item)
+		if(props.item.houseImgs?.length > 0){
+			emits('itemClick', props.item)
+		}
+		// emits('itemClick',props.item)
 	}
 	
 </script>
