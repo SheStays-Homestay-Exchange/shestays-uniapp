@@ -29,7 +29,7 @@
 <script setup>
 	import { reactive, ref, onMounted  } from 'vue'
 	import { onLoad } from '@dcloudio/uni-app'
-	import { userAuthor } from '@/common/api/common'
+	import { userAuthor, saveBuriedPoint } from '@/common/api/common'
 	import cache from '@/common/js/cache.js'
 	import store from '@/store';
 	
@@ -63,6 +63,7 @@
 		}
 	}
 	
+	var locatcionObj = {}
 	const getphonenumber=(e)=>{
 		console.log('手机号返回',e)
 		// #ifdef MP-WEIXIN
@@ -70,7 +71,19 @@
 				"provider": "weixin",
 				"onlyAuthorize": true, // 微信登录仅请求授权认证
 				success(event) {
-					userAuthorFun(e.detail,event.code)
+					wx.getFuzzyLocation({
+					 type: 'wgs84',
+					 success (res) {
+						 if(res.errMsg.includes('ok')){
+							 locatcionObj.latitude = res.latitude
+							 locatcionObj.longitude = res.longitude
+							 console.log('地理位置信息成功',res)
+							 //去登录
+							 userAuthorFun(e.detail,event.code)
+						 }
+					   
+					 }
+					})
 				},
 				fail(err){
 					console.log('手机号授权',err)
@@ -95,9 +108,10 @@
 		if(xhsId.value){
 			params.xhsId = xhsId.value
 		}
-		console.log('授权参数：',params)
 		userAuthor(params).then(res=>{
 			if(res.code == 200){
+				//调用埋点接口
+				pointFun(res.data.userId)
 				//保存登录信息
 				cache.put('userInfo',res.data)
 				uni.switchTab({
@@ -111,6 +125,19 @@
 				 icon:'none'
 			})
 		})
+	}
+	
+	const pointFun = async (userId)=>{
+		try{
+			const res = await saveBuriedPoint({
+				buried_id:'USER_REGISTRATION',
+				key: userId,
+				location: JSON.stringify(locatcionObj),
+				operation_type:'login',
+			})
+		}catch(err){
+			console.log('埋点接口错误',err)
+		}
 	}
 	
 	//场景：通过网页扫描二维码进入小程序

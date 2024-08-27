@@ -10,7 +10,7 @@
 				</view>
 				<template v-for="(item, index) in formData.files">
 					<view class="uploade-image">
-						<image :src="item" mode="" @click="previewImage(index)"></image>
+						<image :src="item" mode="aspectFill" @click="previewImage(index)"></image>
 						<view class="remover" @click="handleRemover(index)">
 							删除图片
 						</view>

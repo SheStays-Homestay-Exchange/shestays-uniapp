@@ -135,3 +135,8 @@ export function houseDel(params) {
 export function houseOffline(params = {}) {
 	return post('houseOffline', params)
 }
+
+// 接口埋点
+export function saveBuriedPoint(params = {}) {
+	return post('saveBuriedPoint', params)
+}
