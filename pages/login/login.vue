@@ -170,6 +170,9 @@
 		background: #D8336D;
 		color: #fff;
 		border-radius: 40upx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 	.login-btn-box{
 		margin: 176rpx 30rpx 48rpx;
@@ -210,5 +213,6 @@
 	.btn-img{
 		width: 38upx;
 		height: 34upx;
+		margin-right: 10rpx;
 	}
 </style>

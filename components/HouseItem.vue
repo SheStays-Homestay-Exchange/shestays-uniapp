@@ -7,8 +7,7 @@
 			</swiper-item>
 		</swiper>
 		<view class="time-body">
-			<!-- <text class="address wrap1">{{item.countryName}}  {{item.regionName}}</text> -->
-			<text class="address wrap1">{{item.cityName ? item.countryName+' '+item.cityName : item.countryName+' '+item.regionName}}</text>
+			<text class="address wrap1">{{item.cityName ? item.countryName+' · '+item.cityName :item.countryName+' · '+item.regionName}}</text>
 			<view class="time" v-if="item.startTime">
 				<image src="@/static/image/calendar.png" mode="" class="calendat"></image>
 				{{ item.startTime.split(' ')[0] }}
@@ -47,10 +46,10 @@
 	
 	const houseClick = ()=>{
 		//有图片才去详情
-		// if(props.item.houseImgs?.length > 0){
-		// 	emits('itemClick',item)
-		// }
-		emits('itemClick',props.item)
+		if(props.item.houseImgs?.length > 0){
+			emits('itemClick', props.item)
+		}
+		// emits('itemClick',props.item)
 	}
 	
 </script>

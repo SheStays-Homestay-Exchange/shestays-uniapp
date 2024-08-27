@@ -203,14 +203,20 @@
 		bottom: 40upx;
 		left: 10%;
 		width: 80%;
+		display: inline-block;
+		align-items: center;
 		.btn-img{
 			width: 38upx;
 			height: 34upx;
+			margin-right: 10rpx;
 		}
 		.login-btn{
 			background: #D8336D;
 			color: #fff;
 			border-radius: 40upx;
+			display: flex;
+			justify-content: center;
+			align-items: center;
 		}
 	}
 	.baner-box{

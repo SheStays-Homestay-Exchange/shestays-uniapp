@@ -21,7 +21,17 @@
 				</view>
 				<image class="right-icon" src="../../../../static/image/right-Icon.jpg" mode=""></image> 
 			 </view> -->
-			<view class="lis" @click="handleEditHousing(1,item.houseId, item)" v-if="!item.statusCode || item.statusCode == 'reviewing'">
+			<view class="lis" @click="handleEditHousing(1,item.houseId, item)" v-if="item.statusCode == 'pending_view'">
+			 	<view class="lis-title">
+			 		<image class="housing-image" :src="item.houseImgs?.length>0 ?item.houseImgs[0].imgUrl:''" mode="aspectFill"></image>
+			 		<view class="title">
+			 			<text>房源待发布</text>
+			 			<image class="title-icon" src="../../../static/image/released.jpg" mode=""></image>
+			 		</view>
+			 	</view>
+			 	<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
+			</view>
+			<view class="lis" @click="handleEditHousing(1,item.houseId, item)" v-if="item.statusCode == 'reviewing'">
 				<view class="lis-title">
 					<image class="housing-image" :src="item.houseImgs?.length>0 ?item.houseImgs[0].imgUrl:''" mode="aspectFill"></image>
 					<view class="title">
@@ -135,30 +145,31 @@
 	const doAction = (e)=>{
 		// 编辑回显
 		if (e == 'edit') {
-			// let copEditObje = {
-			// 	area: [
-			// 		{
-			// 			countryCode: houseObj.value.countryCode,
-			// 			countryName: houseObj.value.countryName
-			// 		},
-			// 		{
-			// 			regionCode: houseObj.value.regionCode,
-			// 			regionName: houseObj.value.regionName
-			// 		},
-			// 		{
-			// 			cityCode: houseObj.value.cityCode,
-			// 			cityName: houseObj.value.cityName
-			// 		}
-			// 	],
-			// 	cityCode: houseObj.value.cityCode,
-			// 	countryCode: houseObj.value.countryCode,
-			// 	describle: houseObj.value.describle,
-			// 	endTime: houseObj.value.endTime?.split(" ")[0],
-			// 	houseAmount: houseObj.value.houseAmount,
-			// 	regionCode: houseObj.value.regionCode,
-			// 	startTime: houseObj.value.startTime?.split(" ")[0],
-			// };
-			// cache.put('draftHouse',{...copEditObje});
+			let copEditObje = {
+				area: [
+					{
+						countryCode: houseObj.value.countryCode,
+						countryName: houseObj.value.countryName
+					},
+					{
+						regionCode: houseObj.value.regionCode,
+						regionName: houseObj.value.regionName
+					},
+					{
+						cityCode: houseObj.value.cityCode,
+						cityName: houseObj.value.cityName
+					}
+				],
+				cityCode: houseObj.value.cityCode,
+				countryCode: houseObj.value.countryCode,
+				describle: houseObj.value.describle,
+				endTime: houseObj.value.endTime?.split(" ")[0],
+				houseAmount: houseObj.value.houseAmount,
+				regionCode: houseObj.value.regionCode,
+				startTime: houseObj.value.startTime?.split(" ")[0],
+				houseImgs: houseObj.value.houseImgs
+			};
+			cache.put('draftHouse',{...copEditObje});
 			uni.navigateTo({
 				url: `/pages/tabBar/my/uploadHousing?edit=${JSON.stringify(houseObj.value)}`
 			});

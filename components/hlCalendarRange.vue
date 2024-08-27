@@ -74,8 +74,6 @@
 
 		computed: {
 			selectorDate() {
-				console.log(this.startDate)
-				console.log(this.endDate)
 				if(this.startDate != null && this.endDate != null){
 					return this.startDate.date + '至' + this.endDate.date
 				}else{
@@ -92,8 +90,8 @@
 			if (this.startTime && this.endTime) {
 				console.log(this.startTime, '////')
 				console.log(this.endTime, '///')
-				let sTime = this.startTime.split("/");
-				let eTime = this.endTime.split("/");
+				let sTime = this.startTime.split("-");
+				let eTime = this.endTime.split("-");
 				
 				// 开始时间
 				let sObject = this.getCurrentMonthDayArray(sTime[0], sTime[1], new Date(sTime[0], sTime[1] - 1, sTime[2]).valueOf());

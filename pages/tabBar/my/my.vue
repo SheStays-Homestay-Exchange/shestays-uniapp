@@ -224,7 +224,7 @@
 			color: #909193;
 			font-weight: 600;
 			display: inline-flex;
-			align-items: center;
+			// align-items: center;
 			flex-shrink: 0;
 			.edit-icon {
 				width: 26rpx;
