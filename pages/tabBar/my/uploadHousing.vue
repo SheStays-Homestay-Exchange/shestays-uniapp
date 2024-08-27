@@ -10,18 +10,9 @@
 				</view>
 				<template v-for="(item, index) in formData.files">
 					<view class="uploade-image">
-						<image :src="item" mode=""></image>
-						<view class="remover">
-							<image
-								src="../../../static/image/search-refraction.png"
-								mode=""
-								@click="previewImage(index)"
-							></image>
-							<image
-								src="../../../static/image/trash-01.png" 
-								mode=""
-								@click="handleRemover(index)"
-							></image>
+						<image :src="item" mode="" @click="previewImage(index)"></image>
+						<view class="remover" @click="handleRemover(index)">
+							删除图片
 						</view>
 					</view>
 				</template>
@@ -360,18 +351,18 @@
 				}
 				.remover {
 					position: absolute;
-					top: 0;
+					left: 0;
 					right: 0;
+					bottom: 0;
 					width: 100%;
-					height: 100%;
+					height: 40rpx;
 					display: flex;
+					line-height: 40rpx;
 					align-items: center;
+					color: #D8336D;
+					font-weight: 600;
 					justify-content: space-around;
-					background-color: rgba(0, 0, 0, 0.3);
-					>image {
-						width: 50rpx;
-						height: 50rpx;
-					}
+					background-color: rgba(212, 212, 212, 0.60);
 				}
 			}
 			.uploade-image:last-child {
