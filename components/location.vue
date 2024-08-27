@@ -78,7 +78,11 @@
 	  }
 		myAreaData.value = JSON.parse(JSON.stringify(props.chooseArea))	
 		getAreaList(code)
-    }
+    } else {
+		// 关闭弹窗
+		console.log('关闭弹窗')
+		areaLevel.value = 1;
+	}
   })
 
 	//关闭省市区弹窗
