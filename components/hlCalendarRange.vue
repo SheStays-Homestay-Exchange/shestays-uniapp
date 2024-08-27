@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<text @click="openPopup()">{{selectorDate}} </text>
+		<view @click="openPopup()">{{selectorDate}} </view>
 
 		<view v-if="showPopup" class="hl-popup" ref="popup" @tap="closedPopup()">
 			<view class="shade-bg-view"></view>
