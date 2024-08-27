@@ -1,7 +1,7 @@
 <template>
 	<view class="update-info">
 		<view class="user-icon" @click="uploadHead">
-			<image class="user-icon-image" :src="form.avatar ? form.avatar : '../../../../static/image/avatar.png'" mode=""></image>
+			<image class="user-icon-image" :src="form.avatar ? form.avatar : '../../../../static/image/avatar.png'" mode="aspectFill"></image>
 			<!-- <uni-icons type="person-filled" size="60" color="#999" class="init-head" v-if="!form.avatarimg"></uni-icons> -->
 
 			<view class="user-update-icon">
