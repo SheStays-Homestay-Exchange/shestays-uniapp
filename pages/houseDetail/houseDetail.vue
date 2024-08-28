@@ -75,7 +75,7 @@
 	<uni-popup type="center" ref="noRef" :is-mask-click="false">
 		<view class="no-box">
 			<view class="close-icon" @click="handleNoClose">
-				
+				<image src="../../static/image/x-close.png" mode=""></image>
 			</view>
 			<view class="no-title">
 				<text>审核不通过</text>
@@ -184,6 +184,7 @@ function handleNoBtn() {
 	noRef.value.open();
 }
 function handleNoClose() {
+	formData.unpassReason = '';
 	noRef.value.close();
 }
 // 审核表单
@@ -200,6 +201,9 @@ const handleNoSubmit = async () => {
 		if (res.code == 200) {
 			msg(res.msg);
 			noRef.value.close();
+			setTimeout(() => {
+				uni.navigateBack();
+			}, 1000);
 		}
 	} catch(e) {
 		msg(e.msg || '系统错误');
@@ -214,7 +218,7 @@ const hanldeSuccessBtn = async () => {
 			msg(res.msg);
 			setTimeout(() => {
 				uni.navigateBack();
-			}, 2000);
+			}, 1000);
 		}
 	} catch(e) {
 		msg(e.msg || '系统错误');
@@ -387,10 +391,13 @@ onShow(() => {
 		display: inline-block;
 		width: 48rpx;
 		height: 48rpx;
-		background-color: #909193;
 		position: absolute;
 		right: 32rpx;
 		top: 20rpx;
+		>image {
+			width: 48rpx;
+			height: 48rpx;
+		}
 	}
 	.no-title {
 		font-weight: 600;
