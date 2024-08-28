@@ -15,7 +15,7 @@
 					</view>
 					<view class="address">
 						<image class="address-icon" src="../../../../static/image/location.png" mode=""></image>
-						<text>{{userInfo.cityName}}-{{userInfo.nationName}}</text>
+						<text>{{userInfo.regionName}}-{{userInfo.cityName}}</text>
 					</view>
 				</view>
 				<view class="my-info">
