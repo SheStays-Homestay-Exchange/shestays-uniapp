@@ -14,6 +14,7 @@
 			</view>
 			<uni-easyinput type="text" placeholder="未设置" maxlength="16"
 			 v-model="form.userName" primaryColor="#D8336D" :style="style"
+			 :clearable="false"
 			 placeholderStyle="color:#909193;font-size:16px;"></uni-easyinput>
 		</view>
 		<view class="user-cli">
@@ -43,6 +44,7 @@
 			</view>
 			<uni-easyinput type="text" placeholder="未设置" 
 			:style="style"
+			:clearable="false"
 			placeholderStyle="color:#909193;font-size:16px;"
 			v-model="form.phone" maxlength="20" primaryColor="#D8336D"></uni-easyinput>
 		</view>
@@ -358,7 +360,7 @@
 	.user-cli {
 		display: flex;
 		align-items: center;
-		padding: 28rpx 0;
+		padding: 24rpx 0;
 		justify-content: space-between;
 		border-bottom: 1rpx solid #eeeeee;
 		.user-title {
@@ -392,6 +394,10 @@
 		::v-deep .is-input-border {
 			border-color: transparent !important;
 		}
+		
+		::v-deep input {
+			padding-left: 0 !important;
+		}
 	}
 	
 	.textarea-body {
@@ -402,6 +408,10 @@
 		}
 		::v-deep .is-input-border {
 			border-color: #e5e5e5 !important;
+		}
+		::v-deep textarea {
+			margin: 0 !important;
+			padding: 18rpx !important;
 		}
 	}
 	
