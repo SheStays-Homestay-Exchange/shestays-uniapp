@@ -56,14 +56,14 @@
 
 <style lang="scss" scoped>
 	.new-house {
-		margin-bottom: 24rpx;
+		margin-bottom: 40rpx;
 		.calendat{
 			width: 28upx;
 			height: 28upx;
 			margin-right: 4upx;
 		}
 		&.hava-border{
-			border: 1rpx solid #ECECEC;
+			border: 2rpx solid #ECECEC;
 			border-radius: 24rpx;
 			padding: 20rpx 28rpx;
 		}
@@ -97,7 +97,7 @@
 	}
 	.content-body {
 		display: flex;
-		align-items: flex-end;
+		align-items: center;
 		.left {
 			flex: 1;
 			overflow: hidden;

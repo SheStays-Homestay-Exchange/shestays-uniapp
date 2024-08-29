@@ -226,7 +226,7 @@
 		}
 	}
 	.list-box{
-		padding-top: 60rpx;
+		padding-top: 40rpx;
 	}
 	.search-body {
 		background-color: #ffffff;
