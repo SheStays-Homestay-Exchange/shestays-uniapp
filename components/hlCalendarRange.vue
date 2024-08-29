@@ -29,7 +29,7 @@
 						</view>
 					</view>
 				</scroll-view>
-				<button class="certain-btn" @click="certainBtnAction">选择时间</button>
+				<view class="certain-btn" @click="certainBtnAction">选择时间</view>
 				<view class="safe-view"></view>
 			</view>
 		</view>
@@ -311,19 +311,24 @@
 		left: 0;
 		max-height: 75%;
 		background-color: #FFF;
+		padding-bottom: 50rpx;
 		.list-view{	
 			height: 500px;
 			width: 100%;
 		}
 		.certain-btn{
-			width: 322rpx;
-			height: 86rpx;
+			width: 320rpx;
+			height: 88rpx;
 			background-color: $hl-calendar-primary;
 			color: #FFF;
 			border-radius: 0;
 			font-size: 32rpx;
 			border-radius: 86rpx;
 			font-weight: 600;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			margin: 0 auto;
 		}
 	}
 	

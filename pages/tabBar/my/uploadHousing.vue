@@ -107,7 +107,7 @@
 	});
 	// 表单
 	const formData = ref({
-		houseTitle: '测试新增房源',
+		houseTitle: '新增房源',
 		houseAmount: 1,
 		describle: '',
 		startTime: '',
@@ -174,7 +174,6 @@
 						cityCode: editHouse.cityCode
 					}
 				]
-				console.log('地址~~~~',houseArea)
 				chooseArea.value = houseArea
 				form.address = houseArea[0].countryName+'-'+houseArea[1].regionName+'-'+ houseArea[2].cityName
 			}
