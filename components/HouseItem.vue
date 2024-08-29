@@ -3,7 +3,7 @@
 	<view :class="['new-house',(item.houseImgs?.length > 0)?'':'hava-border']" @click="houseClick">
 		<swiper class="swiper" circular :indicator-dots="true" :autoplay="false" indicator-active-color="#D8336D" v-if="item?.houseImgs?.length > 0">
 			<swiper-item v-for="(el,index) in item.houseImgs">
-				<image :src="el" class="house-image" mode="widthFix"></image>
+				<image :src="el.imgUrl" class="house-image" mode="widthFix"></image>
 			</swiper-item>
 		</swiper>
 		<view class="time-body">
@@ -14,7 +14,7 @@
 			</view>
 		</view>
 		<view class="contact" v-if="item?.houseImgs?.length > 0">
-			房东：Lily11
+			房东：
 		</view>
 		<view class="content-body">
 			<view class="left">

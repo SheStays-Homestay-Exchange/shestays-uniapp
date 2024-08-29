@@ -21,7 +21,7 @@
             :key="item.houseImgId"
           >
             <view class="swiper-item image-wrapper">
-              <img class="house-image" :src="item.imgUrl" alt="" />
+              <image class="house-image" :src="item.imgUrl" alt="" mode="widthFix"/>
             </view>
           </swiper-item>
         </swiper>
@@ -37,13 +37,15 @@
     </view>
 
     <view class="house-content">
-      <view class="house-info" v-for="(item, index) in houseInfo" :key="index">
-        <view class="label">{{ item.label }}</view>
-        <view class="value"
-          ><text>{{ item.value }}</text></view
-        >
+      <view class="house-info">
+        <view class="label">房源开放日期</view>
+        <view class="value"><text>{{ userInfo.startTime ? `${formatDate(userInfo.startTime)} ~ ${formatDate(userInfo.endTime)}` : '-' }}</text></view>
       </view>
     </view>
+	<view class="house-info">
+	    <view class="label">对房客姐妹说的话</view>
+	    <view class="value"><text>{{ userInfo.describle }}</text></view>
+	</view>
 	
 	<view class="btn-box" v-if="userInfo.statusCode == 'reviewing' && roleDictCode.some(item => item == 'admin')">
 		<view class="btn-fn" @click="handleNoBtn">
@@ -55,7 +57,7 @@
 	</view>
     <view class="householder" v-else>
       <view class="userInfo">
-        <img class="user-image" :src="userInfo.avatarUrl" alt="" />
+        <image class="user-image" :src="userInfo.avatarUrl" alt="" />
         <view class="info">房主：{{ userInfo.xiaohongshuUsername }}</view>
       </view>
       <view>
@@ -156,8 +158,10 @@ onLoad((options) => {
   getHouseDetail({ houseId: options?.id })
     .then((res) => {
       const { code, data = {} } = res || {}
-      if (+code === 200) {
+	  console.log('code===',code,data)
+      if (code == 200) {
         const keys = Object.keys(data);
+		console.log('keys===',keys)
         if (keys.length) {
           keys.forEach((key) => {
             if (key === "houseImgs") {
@@ -169,6 +173,7 @@ onLoad((options) => {
             }
           });
         }
+		console.log('userInfo====',userInfo)
       }
     })
     .catch((error) => {
@@ -264,7 +269,7 @@ onShow(() => {
   justify-content: space-between;
   background-color: $uni-bg-color;
   border-radius: 40rpx;
-  width: 70%;
+  width: 78%;
   padding: 32rpx 40rpx;
   position: absolute;
   top: 480rpx;
@@ -293,13 +298,13 @@ onShow(() => {
 }
 
 .house-content {
-  padding: 48rpx;
+  padding: 48rpx 0;
   margin-top: 30rpx;
 }
 
 .house-info {
   margin: 32rpx 0;
-
+	padding: 0 48rpx;
   .label {
     font-weight: 700;
     font-size: 32rpx;
@@ -308,6 +313,8 @@ onShow(() => {
   .value {
     font-size: 28rpx;
     font-weight: 400;
+	display: block;
+	margin-top: 16rpx;
   }
 }
 

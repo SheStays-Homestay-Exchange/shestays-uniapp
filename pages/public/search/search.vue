@@ -38,11 +38,14 @@
 <script setup> 
 	import { reactive,ref } from 'vue';
 	import { onLoad } from '@dcloudio/uni-app'
-	import { getHouseList, getHouseByRegion, getName } from '@/common/api/common'
+	import { getHouseList, getHouseByRegion, getName, saveBuriedPoint } from '@/common/api/common'
 	import  HouseItem from '@/components/HouseItem.vue'
 	import  DetailPopup from '@/components/DetailPopup.vue'
+	import cache from '@/common/js/cache';
 	
+	const userInfo = ref()
 	onLoad(()=>{
+		userInfo.value = typeof(cache.get('userInfo')) == 'string' ? JSON.parse( cache.get('userInfo') ) : cache.get('userInfo')
 		recommend()  //获取推荐
 	})
 	const showResult = ref(false)
@@ -71,6 +74,7 @@
 				}
 			}
 			uni.hideLoading()
+			pointFun()    //搜索埋点
 		}catch(e){
 			//TODO handle the exception
 			uni.showToast({
@@ -117,6 +121,19 @@
 	const inputChange = (e)=>{
 		if(!e){
 			showResult.value = false
+		}
+	}
+	//埋点
+	const pointFun = async ()=>{
+		try{
+			const res = await saveBuriedPoint({
+				buried_id:'PROPERTY_SEARCH',
+				key: userInfo.userId,
+				search_keywords: region.value,
+				equipment: cache.get('device') || ''
+			})
+		}catch(err){
+			console.log('搜索埋点接口错误',err)
 		}
 	}
 	

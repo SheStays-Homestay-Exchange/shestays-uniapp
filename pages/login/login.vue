@@ -134,6 +134,7 @@
 				key: userId,
 				location: JSON.stringify(locatcionObj),
 				operation_type:'login',
+				equipment: cache.get('device')
 			})
 		}catch(err){
 			console.log('埋点接口错误',err)
