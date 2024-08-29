@@ -336,6 +336,7 @@
 
 <style lang="scss" scoped>
 	.uploade {
+		margin-top: 24rpx;
 		.uploade-button {
 			.title {
 				font-weight: 500;
@@ -446,7 +447,7 @@
 				padding: 32rpx 0;
 			}
 			.col-input {
-				padding: 20rpx;
+				padding: 16rpx;
 				border-radius: 8rpx;
 				border: 1rpx solid #EEE;
 				.sum {
@@ -454,6 +455,10 @@
 					color: #909193;
 					font-weight: 400;
 					text-align: right;
+				}
+				::v-deep .uni-easyinput__content-textarea {
+					margin: 0 !important;
+					padding: 0 !important;
 				}
 			}
 		}
