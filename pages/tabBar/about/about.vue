@@ -59,9 +59,9 @@
 <script setup>
 	
 	const goPage = ()=>{
-		uni.switchTab({
-			url:'/pages/tabBar/my/my'
-		})
+		uni.navigateTo({
+			url:'/pages/tabBar/my/uploadHousing'
+		});
 	}
 </script>
 
