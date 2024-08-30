@@ -237,6 +237,7 @@
 		display: flex;
 		align-items: center;
 		padding: 0 24rpx;
+		z-index: 999;
 		box-shadow: rgba(0, 11, 59, 0.1) 10rpx 20rpx 70rpx;
 		margin-top: -40upx;
 		.search-image {
