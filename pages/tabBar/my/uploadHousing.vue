@@ -38,7 +38,7 @@
 				<view class="tips">
 					{{ formData.houseAmount }}
 				</view>
-				<uni-number-box :min="1" v-model="formData.houseAmount"></uni-number-box>
+				<uni-number-box :min="1" v-model="formData.houseAmount" @change="handleHoseAmountChange"></uni-number-box>
 			</view>
 		</view>
 		<view class="uploade-col" @click="handleSetTime">
@@ -332,6 +332,11 @@
 	onUnload(() => {
 		cache.remove('draftHouse');
 	});
+	
+	// 可接待房客数
+	function handleHoseAmountChange(value) {
+		formData.value.houseAmount = value;
+	}
 </script>
 
 <style lang="scss" scoped>
