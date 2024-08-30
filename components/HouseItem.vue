@@ -27,7 +27,7 @@
 				</view>
 				<view class="fold" @click="handleSetExpand(index, false)" v-else>
 					<image class="flod-icon" src="../static/image/chevron-right.png" mode=""></image>
-					<text>收起全部</text>
+					<text>折叠内容</text>
 				</view>
 			</view>
 			<view class="contact-button" @tap.stop="emits('contactHost',item)">
