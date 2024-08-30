@@ -163,10 +163,10 @@
 				cityCode: houseObj.value.cityCode,
 				countryCode: houseObj.value.countryCode,
 				describle: houseObj.value.describle,
-				endTime: houseObj.value.endTime?.split(" ")[0],
+				endTime: houseObj.value.endTime,
 				houseAmount: houseObj.value.houseAmount,
 				regionCode: houseObj.value.regionCode,
-				startTime: houseObj.value.startTime?.split(" ")[0],
+				startTime: houseObj.value.startTime,
 				houseImgs: houseObj.value.houseImgs
 			};
 			cache.put('draftHouse',{...copEditObje});
@@ -263,7 +263,8 @@
 	const delHouse = async (type)=>{
 		try{
 			const res = await houseDel({
-				houseId: houseId.value || '1'   //测试id,
+				houseId: houseId.value || '1'   ,//测试id,
+				openId: userInfo.value.openId
 			})
 			if(res.code == 200){
 				msg('删除房源成功')
@@ -281,7 +282,7 @@
 	const offlineHouse = async (type)=>{
 		try{
 			const res = await houseOffline({
-				houseId: houseId.value || '1'   //测试id,
+				houseId: houseId.value || '1'   ,//测试id,
 			})
 			if(res.code == 200){
 				msg('下架该房源成功')

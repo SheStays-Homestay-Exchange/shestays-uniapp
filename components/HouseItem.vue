@@ -22,7 +22,7 @@
 					备注：{{item.describle}}
 				</view>
 				<!-- <view class="fold">
-					<image class="flod-icon" src="../../../static/image/chevron-home-right.png" mode=""></image>
+					<image class="flod-icon" src="../../../../static/image/chevron-home-right.png" mode=""></image>
 					<text>展开全部</text>
 				</view> -->
 			</view>

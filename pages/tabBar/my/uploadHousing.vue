@@ -141,13 +141,13 @@
 			formData.value.houseAmount = editHouse.houseAmount ?? 1;
 			formData.value.describle = editHouse.describle ?? "";
 			// 处理开始日期
-			const newStartTime = editHouse.startTime?.split(" ")[0].split("-");
+			const newStartTime = editHouse.startTime?.split(" ")[0].split("/");
 				  newStartTime[2] = newStartTime[2].replace(/^0+/, '')
-			formData.value.startTime = newStartTime.join("-");
+			formData.value.startTime = newStartTime.join("/");
 			// 处理结束日期
-			const newEndTime = editHouse.endTime?.split(" ")[0].split("-");
+			const newEndTime = editHouse.endTime?.split(" ")[0].split("/");
 				  newEndTime[2] = newEndTime[2].replace(/^0+/, '');
-			formData.value.endTime = newEndTime.join("-");
+			formData.value.endTime = newEndTime.join("/");
 			formData.value.countryCode = editHouse.countryCode;
 			formData.value.cityCode = editHouse.cityCode;
 			formData.value.regionCode = editHouse.regionCode;
