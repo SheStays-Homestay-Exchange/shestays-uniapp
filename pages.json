@@ -89,7 +89,8 @@
 			"path" : "pages/houseDetail/houseDetail",
 			"style" : 
 			{
-				"navigationBarTitleText" : "房源详情"
+				"navigationBarTitleText" : "房源详情",
+				"navigationStyle": "custom"
 			}
 		},
 		{

@@ -1,5 +1,8 @@
 <template>
   <div class="house-detail">
+	  <view class="return-box" :style="{ top:`${boundingData.top-5}px` }" @tap="goBefore">
+	  	<image src="@/static/image/return.png" mode=""></image>
+	  </view>
     <view class="house-banner">
       <uni-swiper-dot
         :current="current"
@@ -20,7 +23,7 @@
             v-for="item in userInfo.houseImgs"
             :key="item.houseImgId"
           >
-            <view class="swiper-item image-wrapper">
+            <view class="swiper-item image-wrapper" style="height: 100%;">
               <image class="house-image" :src="item.imgUrl" alt="" mode="widthFix"/>
             </view>
           </swiper-item>
@@ -37,15 +40,16 @@
     </view>
 
     <view class="house-content">
-      <view class="house-info">
+      <view class="house-info data-info">
         <view class="label">房源开放日期</view>
         <view class="value"><text>{{ userInfo.startTime ? `${formatDate(userInfo.startTime)} ~ ${formatDate(userInfo.endTime)}` : '-' }}</text></view>
       </view>
+	  <view class="house-info">
+	      <view class="label">对房客姐妹说的话</view>
+	      <view class="value"><text>{{ userInfo.describle }}</text></view>
+	  </view>
     </view>
-	<view class="house-info">
-	    <view class="label">对房客姐妹说的话</view>
-	    <view class="value"><text>{{ userInfo.describle }}</text></view>
-	</view>
+	
 	
 	<view class="btn-box" v-if="userInfo.statusCode == 'reviewing' && roleDictCode.some(item => item == 'admin')">
 		<view class="btn-fn" @click="handleNoBtn">
@@ -57,7 +61,7 @@
 	</view>
     <view class="householder" v-else>
       <view class="userInfo">
-        <image class="user-image" :src="userInfo.avatarUrl" alt="" />
+        <image class="user-image" :src="userInfo.avatarUrl? userInfo.avatarUrl: '../../static/image/avatar.png'" alt="" mode="widthFix"/>
         <view class="info">房主：{{ userInfo.xiaohongshuUsername }}</view>
       </view>
       <view>
@@ -135,20 +139,17 @@ const userInfo = reactive({
   xiaohongshuUsername: "",
 });
 
+const goBefore = ()=>{
+	uni.navigateBack()
+}
+
 const formatDate = (time) => {
   return time ? time.split(" ")[0] : "";
 };
-
-const houseInfo = [
-  {
-    label: "房源开放日期",
-    value: userInfo.startTime ? `${formatDate(userInfo.startTime)} ~ ${formatDate(userInfo.endTime)}` : '-',
-  },
-  {
-    label: "对房客姐妹说的话",
-    value: userInfo.describle,
-  },
-];
+	let boundingData = null
+	// #ifndef APP-PLUS
+	boundingData = cache.getBoundingData()
+	// #endif
 
 const onSwiperChange = (e) => {
   current.value = e.detail.current;
@@ -158,10 +159,8 @@ onLoad((options) => {
   getHouseDetail({ houseId: options?.id })
     .then((res) => {
       const { code, data = {} } = res || {}
-	  console.log('code===',code,data)
       if (code == 200) {
         const keys = Object.keys(data);
-		console.log('keys===',keys)
         if (keys.length) {
           keys.forEach((key) => {
             if (key === "houseImgs") {
@@ -173,7 +172,6 @@ onLoad((options) => {
             }
           });
         }
-		console.log('userInfo====',userInfo)
       }
     })
     .catch((error) => {
@@ -243,15 +241,27 @@ onShow(() => {
   background-color: #fff;
   position: relative;
   padding-bottom: 50rpx;
+  .return-box{
+	  position: fixed;
+	  left: 24rpx;
+	  z-index: 5;
+	  image{
+		  width: 64rpx;
+		  height: 64rpx;
+	  }
+  }
 }
 
 .swiper-box {
-  height: 600rpx;
+  height: 750rpx;
 }
-
+.image-wrapper{
+	border-radius: 0 0 40px 40px;
+}
 .image-wrapper .house-image {
   width: 100%;
-  height: 600rpx;
+  // height: 600rpx !important;
+  height: 100% !important;
   border-bottom-left-radius: 80rpx;
   border-bottom-right-radius: 80rpx;
 }
@@ -272,7 +282,7 @@ onShow(() => {
   width: 78%;
   padding: 32rpx 40rpx;
   position: absolute;
-  top: 480rpx;
+  top: 610rpx;
   left: 50%;
   transform: translateX(-50%);
   box-shadow: 0 10rpx 20rpx rgba(0, 0, 0, 0.1);
@@ -298,13 +308,16 @@ onShow(() => {
 }
 
 .house-content {
-  padding: 48rpx 0;
+  padding: 48rpx 0 140rpx;
   margin-top: 30rpx;
 }
 
 .house-info {
   margin: 32rpx 0;
 	padding: 0 48rpx;
+	&.data-info{
+		margin-top: 54rpx;
+	}
   .label {
     font-weight: 700;
     font-size: 32rpx;
@@ -323,7 +336,7 @@ onShow(() => {
   box-shadow: 0px 8rpx 30rpx 0px rgba(212, 212, 212, 0.6);
   width: 80%;
   position: fixed;
-  bottom: 40rpx;
+  bottom: 88rpx;
   left: 50%;
   transform: translateX(-50%);
   background-color: $uni-bg-color;
@@ -332,8 +345,8 @@ onShow(() => {
   justify-content: space-between;
   align-items: center;
   color: #000;
-  padding: 12rpx 18rpx;
-  height: 126rpx;
+  padding: 10rpx 16rpx;
+  // height: 136rpx;
 
   .userInfo {
     display: flex;
@@ -347,6 +360,10 @@ onShow(() => {
     .info {
       font-size: 32rpx;
       font-weight: 600;
+	  max-width: 40vw;
+	  overflow: hidden; 
+	white-space: nowrap; 
+	text-overflow: ellipsis; 
     }
   }
 
