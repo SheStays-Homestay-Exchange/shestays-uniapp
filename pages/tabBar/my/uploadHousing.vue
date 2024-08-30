@@ -59,6 +59,16 @@
 				<image class="icon" src="../../../static/image/arrow-right.png" mode=""></image>
 			</view>
 		</view>
+		<view class="uploade-col">
+			<view class="uploade-title">
+				联系方式
+			</view>
+			<view class="col-select">
+				<uni-easyinput :inputBorder="false" maxlength="20" :autoHeight="false"
+				:placeholderStyle="placeholderStyle"
+				 placeholder="请输入联系方式" :styles="concatStyle" v-model="formData.concat"></uni-easyinput>
+			</view>
+		</view>
 		<view class="uploade-col-textarea">
 			<view class="uploade-title">
 				对房客说的话
@@ -99,6 +109,14 @@
 		"height": "600px"
 	})
 	
+	const concatStyle = {
+		"font-size": "32rpx",
+		"color":'#000B3B',
+		"font-weight": 400
+	}
+	
+	const placeholderStyle = "color:#2979FF;font-size:14px"
+	
 	// 用户信息
 	const userInfo = ref({});
 	const draft = ref({});
@@ -120,6 +138,7 @@
 		regionName:'',
 		cityName:'',
 		detailAddress: '',
+		concat:'',   //联系方式，还需要和后端确认字段
 		statusCode:'reviewing'   //房源状态reviewing新增，pending_view编辑
 	});
 	
@@ -271,9 +290,27 @@
 		formData.value.startTime = `${start.year}/${start.month}/${start.day}` ?? '';
 		formData.value.endTime = `${end.year}/${end.month}/${end.day}` ?? '';
 	}
+	
+	const validateFun = ()=>{
+		if(formData.value.files.length == 0){
+			msg('请至少上传一张图片')
+			return false
+		}else if(!formData.value.address){
+			msg('请选择房源所在地区')
+			return false
+		}else if(!formData.value.startTime || formData.value.endTime){
+			msg('请选择开放换宿的时间段')
+			return false
+		}
+		return true
+	}
 
 	// 提交房源信息
 	const handleUploadHouse = async (status) => {
+		if(status == 'reviewing' && !validateFun()){
+			return
+		}
+		
 		uni.showLoading()
 		let data = {userId: userInfo.value.userId, ...formData.value,houseImgPath:formData.value.files}
 		data.statusCode = status;
@@ -292,6 +329,7 @@
 			msg(e.msg || '系统繁忙，请稍后重试')
 			uni.hideLoading()
 		}
+		
 	}
 	
 	//保存草稿

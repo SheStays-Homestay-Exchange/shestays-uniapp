@@ -1,7 +1,7 @@
 <template>
 	<view class="update-info">
 		<view class="user-icon" @click="uploadHead">
-			<image class="user-icon-image" :src="form.avatar ? form.avatar : '../../../../static/image/avatar.png'" mode="aspectFill"></image>
+			<image class="user-icon-image" :src="form.avatarUrl ? form.avatarUrl : '../../../../static/image/avatar.png'" mode="aspectFill"></image>
 			<!-- <uni-icons type="person-filled" size="60" color="#999" class="init-head" v-if="!form.avatarimg"></uni-icons> -->
 
 			<view class="user-update-icon">
@@ -140,7 +140,7 @@
 		phone:'',
 		wechatId:'',
 		des:'',
-		avatar:'',
+		avatarUrl:'',
 		address:'请选择',
 		nationCode:'', //国家id
 		regionCode:'', //区域id
@@ -181,7 +181,7 @@
 				const {bdYear,bdMonth,bdDay} = res.data
 				form.des = res.data.personalProfile
 				form.phone = res.data.phone
-				form.avatarUrl = res.data.avatar
+				form.avatarUrl = res.data.avatarUrl
 				form.sex = res.data.genderDictCode
 				form.userName = res.data.userName
 				form.date = `${bdYear}-${bdMonth}-${bdDay}`
@@ -211,7 +211,9 @@
 	}
 	
 	const editUserDataFun = (param)=>{
+		uni.showLoading({title:'加载中'})
 		editUserData(param).then(res=>{
+			uni.hideLoading()
 			if(res.code == 200){
 				msg('编辑个人信息成功')
 				setTimeout(() => {
@@ -219,6 +221,7 @@
 				}, 1000);
 			}
 		}).catch(e=>{
+			uni.hideLoading()
 			msg(e.msg)
 		})
 	}
@@ -233,7 +236,7 @@
 				genderDictCode: form.sex,
 				phone: form.phone,
 				personalProfile: form.des,
-				avatar: form.avatar || 'https://pics0.baidu.com/feed/8718367adab44aed424d9e8e9d02e70fa18bfb01.jpeg?token=1e2e40b76e537620ed17324124cb789c',
+				avatarUrl: form.avatarUrl,
 			    bdYear:  Number(dateArr[0]),
 				bdMonth: Number(dateArr[1]),
 				bdDay: Number(dateArr[2]),
@@ -271,7 +274,7 @@
 				uploadFile(e.tempFilePaths).then(res => {
 					console.log('图片上传返回',res)
 					if(res?.length>0){
-						form.avatar = res[0]
+						form.avatarUrl = res[0]
 					}
 				}).catch(err=>{
 					console.log('图片上传返回失败',err)

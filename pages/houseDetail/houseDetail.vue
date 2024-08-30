@@ -241,6 +241,9 @@ onShow(() => {
   background-color: #fff;
   position: relative;
   padding-bottom: 50rpx;
+  .house-banner{
+	  position: relative;
+  }
   .return-box{
 	  position: fixed;
 	  left: 24rpx;
@@ -256,6 +259,7 @@ onShow(() => {
   height: 750rpx;
 }
 .image-wrapper{
+	overflow: hidden;
 	border-radius: 0 0 40px 40px;
 }
 .image-wrapper .house-image {
@@ -282,7 +286,7 @@ onShow(() => {
   width: 78%;
   padding: 32rpx 40rpx;
   position: absolute;
-  top: 610rpx;
+  bottom: -90rpx;
   left: 50%;
   transform: translateX(-50%);
   box-shadow: 0 10rpx 20rpx rgba(0, 0, 0, 0.1);

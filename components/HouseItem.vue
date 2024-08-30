@@ -3,20 +3,20 @@
 	<view :class="['new-house',(item.houseImgs?.length > 0)?'':'hava-border']" @click="houseClick">
 		<swiper class="swiper" circular :indicator-dots="true" :autoplay="false" indicator-active-color="#D8336D" v-if="item?.houseImgs?.length > 0">
 			<swiper-item v-for="(el,index) in item.houseImgs">
-				<image :src="el.imgUrl" class="house-image" mode="widthFix"></image>
+				<image :src="el.imgUrl" class="house-image" mode="aspectFill"></image>
 			</swiper-item>
 		</swiper>
 		<view class="time-body">
 			<text class="address wrap1">{{item.cityName ? item.countryName+' '+item.cityName :item.countryName+' '+item.regionName}}</text>
 			<view class="time" v-if="item.startTime">
-				<image src="@/static/image/calendar.png" mode="" class="calendat"></image>
+				<image src="@/static/image/calendar.png" mode="widthFix" class="calendat"></image>
 				{{ item.startTime.split(' ')[0] }}
 			</view>
 		</view>
 		<view class="contact" v-if="item?.houseImgs?.length > 0">
 			房东：
 		</view>
-		<view class="content-body">
+		<view class="content-body" v-else>
 			<view class="left">
 				<view class="remark wrap2">
 					备注：{{item.describle}}
@@ -57,10 +57,13 @@
 <style lang="scss" scoped>
 	.new-house {
 		margin-bottom: 40rpx;
+		.swiper{
+			height: 496rpx;
+		}
 		.calendat{
 			width: 28upx;
 			height: 28upx;
-			margin-right: 4upx;
+			margin-right: 6upx;
 		}
 		&.hava-border{
 			border: 2rpx solid #ECECEC;
@@ -69,14 +72,14 @@
 		}
 		.house-image {
 			width: 100%;
-			height: 496rpx;
+			height: 496rpx !important;
 			border-radius: 32rpx;
 			background-color: #eee;
 		}
 		.time-body {
 			display: flex;
 			align-items: center;
-			margin-top: 6rpx;
+			margin-top: 10rpx;
 			justify-content: space-between;
 			.address {
 				font-size: 32rpx;
@@ -87,6 +90,9 @@
 			.time {
 				font-size: 28rpx;
 				font-weight: 400;
+				display: flex;
+				align-items: center;
+				justify-content: center;
 			}
 		}
 		.contact {

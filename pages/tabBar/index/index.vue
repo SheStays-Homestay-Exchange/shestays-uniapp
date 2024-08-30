@@ -239,6 +239,7 @@
 		padding: 0 24rpx;
 		box-shadow: rgba(0, 11, 59, 0.1) 10rpx 20rpx 70rpx;
 		margin-top: -40upx;
+		z-index: 5;
 		.search-image {
 			width: 48rpx;
 			height: 48rpx;
