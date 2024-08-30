@@ -82,7 +82,8 @@
 		</view>
 		
 		<!-- 编辑房源弹框 -->
-		<editHousing ref="editRef" @doAction="doAction" :popStatus="activePopStatus"></editHousing>
+		<editHousing ref="editRef" @doAction="doAction" :popStatus="activePopStatus" :popUnpassReason="houseObj.unpassReason"></editHousing>
+		<!-- 下架房源 -->
 		<Modal
 			:show="actionShow"
 			@popTap="popTap"
