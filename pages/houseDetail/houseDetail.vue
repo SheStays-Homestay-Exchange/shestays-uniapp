@@ -371,7 +371,7 @@ onShow(() => {
 	flex: 1;
     .user-image {
       width: 100rpx;
-      height: 100rpx;
+      height: 100rpx !important;
       border-radius: 50%;
       margin-right: 24rpx;
     }

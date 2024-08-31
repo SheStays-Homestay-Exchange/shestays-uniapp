@@ -121,11 +121,12 @@ const btnClick = () => {
     padding-bottom: 26upx;
     margin-bottom: 26upx;
     .img {
-      width: 104upx;
-      height: 104upx;
+      width: 104upx !important;
+      height: 104upx !important;
       background-color: #c4c4c4;
       border-radius: 50%;
       margin-right: 32upx;
+	  flex-shrink: 0;
     }
     .name-box {
       font-size: 32upx;
