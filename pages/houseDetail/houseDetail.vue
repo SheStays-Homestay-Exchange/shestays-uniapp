@@ -156,8 +156,12 @@ const onSwiperChange = (e) => {
 };
 
 onLoad((options) => {
+	uni.showLoading({
+		title:'加载中'
+	})
   getHouseDetail({ houseId: options?.id })
     .then((res) => {
+		uni.hideLoading()
       const { code, data = {} } = res || {}
       if (code == 200) {
         const keys = Object.keys(data);
@@ -175,6 +179,8 @@ onLoad((options) => {
       }
     })
     .catch((error) => {
+		msg(error.msg)
+		uni.hideLoading()
       console.log(error, "rrrr");
     });
 	// 保存房源ID

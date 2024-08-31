@@ -170,10 +170,14 @@
 			})
 			return
 		}
+		uni.showToast({
+			title:'加载中'
+		})
 		try{
 			const res = await getUserInfoByOpenId({
 				openId: userInfo.value.openId
 			})
+			uni.hideToast()
 			if(res.code == 200){
 				if(!(res.data.openId)){
 					uni.reLaunch({
@@ -213,6 +217,7 @@
 	
 		}catch(e){
 			msg(e.msg || '系统繁忙，请稍后重试')
+			uni.hideToast()
 		}
 	}
 	
