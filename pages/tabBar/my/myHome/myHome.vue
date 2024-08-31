@@ -54,7 +54,7 @@
 <script setup>
 	import { reactive, ref, onMounted,computed  } from 'vue'
 	import { onLoad } from '@dcloudio/uni-app'
-	import { getUserInfoByOpenId, getHouseByUserId } from '@/common/api/common'
+	import { getUserInfoByOpenId, getHouseByUserId, getUserInfoByUserId } from '@/common/api/common'
 	import {msg} from '@/common/js/util.js'
 	
 	const userId = ref()
@@ -76,13 +76,13 @@
 	const userInfo = ref({})
 	const getUserInfo= async (type)=>{
 		try{
-			const res = await getUserInfoByOpenId({
-				openId: openId.value
-			})
+			// const res = await getUserInfoByOpenId({
+			// 	openId: openId.value
+			// })
+			const res = await getUserInfoByUserId({userId: userId.value});
 			if(res.code == 200){
 				userInfo.value = res.data || {}
 			}
-	
 		}catch(e){
 			msg(e.msg || '系统繁忙，请稍后重试')
 		}
