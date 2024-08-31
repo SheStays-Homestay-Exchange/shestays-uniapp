@@ -58,7 +58,12 @@
     chooseArea: {
       type: Array,
       default: () => []
-    }
+    },
+	//总共层级，3级or四级
+	totalLevel: {
+		type: [String, Number],
+		default: 3
+	}
 	});
 	const authCity = ref(true)  //是否定位授权
 
@@ -67,7 +72,6 @@
   watch(() => props.show , (val) => {
     console.log(val,'----------------------------------------watchLocation')
     if( val ){
-      console.log('长度',props.chooseArea,props.chooseArea.length)
       //已经选了地区
       let code = '000000'
       if(props.chooseArea.length ==3){
@@ -80,7 +84,6 @@
 		getAreaList(code)
     } else {
 		// 关闭弹窗
-		console.log('关闭弹窗')
 		areaLevel.value = 1;
 	}
   })
@@ -100,7 +103,10 @@
 		}else if(areaLevel.value == 3){
 			getCityFun(code)
 		}else{
-			getDisFun(code)
+			//需要显示四级，最低级县城
+			if(props.totalLevel == 4){
+				getDisFun(code)
+			}
 		}
 	}
 	
@@ -185,8 +191,13 @@
 		}else if(areaLevel.value == 3){
 			myAreaData.value[2] = item
 			myAreaData.value[3] = []
-			areaLevel.value = 4   //去请求区县
-			getAreaList(item.cityCode)
+			if(props.totalLevel == 4){
+				areaLevel.value = 4   //去请求区县
+				getAreaList(item.cityCode)
+			}else{
+				emits('popupClick',{funName:'submit',value:myAreaData.value})
+			}
+			
 		}else{
 			myAreaData.value[3] = item
 			console.log('myAreaData.value',myAreaData.value)

@@ -20,7 +20,7 @@
 		<uni-load-more :status="loadStatus" :contentText="contentText" ></uni-load-more>
 		
 		<!-- 联系弹窗 -->
-		<DetailPopup :show="popShow" @tapClose="popShow=false" :name="itemInfo.name" :id="itemInfo.id"/>
+		<DetailPopup :show="popShow" @tapClose="popShow=false" :name="itemInfo.name" :id="itemInfo.id" :avatar="itemInfo.avatarUrl"/>
 	</view>
 	<view class="btn-box" v-if="!userInfo?.openId">
 		<button class="login-btn" style="margin-top: 20px;" @click="isLogin">

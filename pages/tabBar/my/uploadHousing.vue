@@ -66,7 +66,7 @@
 			<view class="col-select">
 				<uni-easyinput :inputBorder="false" maxlength="20" :autoHeight="false"
 				:placeholderStyle="placeholderStyle"
-				 placeholder="请输入联系方式" :styles="concatStyle" v-model="formData.concat"></uni-easyinput>
+				 placeholder="请输入联系方式" :styles="concatStyle" v-model="formData.contactInfo"></uni-easyinput>
 			</view>
 		</view>
 		<view class="uploade-col-textarea">
@@ -138,7 +138,7 @@
 		regionName:'',
 		cityName:'',
 		detailAddress: '',
-		concat:'',   //联系方式，还需要和后端确认字段
+		contactInfo:'',   //联系方式
 		statusCode:'reviewing'   //房源状态reviewing新增，pending_view编辑
 	});
 	
@@ -270,7 +270,6 @@
 				}
 				
 				uploadHouseImg(e.tempFilePaths).then(res => {
-					console.log('图片上传返回',res)
 					if(res?.length>0){
 						formData.value.files = formData.value.files.concat(res)
 					}

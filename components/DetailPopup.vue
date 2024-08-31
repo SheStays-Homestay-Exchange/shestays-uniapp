@@ -12,7 +12,8 @@
         <uni-icons type="closeempty" size="24" @click="close"></uni-icons>
       </view>
       <view class="info-box">
-        <view class="img"> </view>
+        <!-- <view class="img"> </view> -->
+		<image class="img" :src="avatar ? avatar:defaultAvatar" mode="aspectFill"></image>
         <view class="name-box">
           <view class="name text-ellipis">用户名：{{ name }}</view>
           <view class="name text-ellipis">{{ userNameType }}：{{ id }}</view>
@@ -33,7 +34,7 @@
 
 <script setup>
 import { ref, watch, nextTick, onMounted } from "vue";
-
+import defaultAvatar from '@/static/image/avatar.png'
 const emits = defineEmits(["tapClose"]);
 const props = defineProps({
   show: {
@@ -55,6 +56,11 @@ const props = defineProps({
     type: String,
     default: "小红书ID",
   },
+  //头像图片
+  avatar:{
+	  type: String,
+	  default: defaultAvatar,
+  }
 });
 const detialpop = ref(null);
 watch(

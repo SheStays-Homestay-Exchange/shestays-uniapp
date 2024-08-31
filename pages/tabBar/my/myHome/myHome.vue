@@ -2,7 +2,7 @@
 	<view class="my-home">
 		<view class="my-head">
 			<view class="my-icon">
-				<image class="my-icon-image" :src="userInfo.avatarUrl?userInfo.avatarUrl:'../../../../static/image/avatar.png'" mode=""></image>
+				<image class="my-icon-image" :src="userInfo.avatarUrl?userInfo.avatarUrl:'../../../../static/image/avatar.png'" mode="widthFix"></image>
 			</view>
 			<!-- 默认头像 -->
 		<!-- 	<view class="init-head">
@@ -13,10 +13,10 @@
 					<view class="name">
 						{{userInfo.userName}}
 					</view>
-					<view class="address">
-						<image class="address-icon" src="../../../../static/image/location.png" mode=""></image>
-						<text>{{userInfo.regionName}}-{{userInfo.cityName}}</text>
-					</view>
+				</view>
+				<view class="address">
+					<image class="address-icon" src="../../../../static/image/location.png" mode=""></image>
+					<text>{{userInfo.regionName}}-{{userInfo.cityName}}</text>
 				</view>
 				<view class="my-info">
 					<view class="phone">
@@ -149,19 +149,21 @@
 					font-size: 40rpx;
 					font-weight: 600;
 				}
-				.address {
-					font-size: 20rpx;
-					font-weight: 400;
-					border-radius: 6rpx;
-					padding: 4rpx 12rpx;
-					color: #D8336D;
-					display: inline-flex;
-					align-items: center;
-					background-color: rgba(255, 214, 228, 0.30);
-					.address-icon {
-						width: 24rpx;
-						height: 24rpx;
-					}
+				
+			}
+			.address {
+				font-size: 20rpx;
+				font-weight: 400;
+				border-radius: 6rpx;
+				padding: 6rpx 12rpx;
+				color: #D8336D;
+				display: inline-flex;
+				align-items: center;
+				background-color: rgba(255, 214, 228, 0.30);
+				margin-bottom: 16rpx;
+				.address-icon {
+					width: 24rpx;
+					height: 24rpx;
 				}
 			}
 			.my-info {

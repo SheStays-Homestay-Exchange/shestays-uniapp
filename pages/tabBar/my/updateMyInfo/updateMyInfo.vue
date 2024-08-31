@@ -122,7 +122,7 @@
 		  console.log(chooseArea.value)
 		  form.address = chooseArea.value[0].countryName+'-'+chooseArea.value[1].regionName+'-'+chooseArea.value[2].cityName+'-'+chooseArea.value[3].districtName
 		  // 设置对应code
-		  form.nationCode = chooseArea.value[0].countryCode //国家id
+		  form.countryCode = chooseArea.value[0].countryCode //国家id
 		  form.regionCode = chooseArea.value[1].regionCode //区域id
 		  form.cityCode = chooseArea.value[2].cityCode //城市id
 	    // submitArea(e.value)
@@ -142,7 +142,7 @@
 		des:'',
 		avatarUrl:'',
 		address:'请选择',
-		nationCode:'', //国家id
+		countryCode:'', //国家id
 		regionCode:'', //区域id
 		cityCode:'', //城市id
 	})
@@ -185,6 +185,28 @@
 				form.sex = res.data.genderDictCode
 				form.userName = res.data.userName
 				form.date = `${bdYear}-${bdMonth}-${bdDay}`
+				//地址回显
+				var houseArea = []
+				if(res.data.cityCode){
+					 houseArea = [
+						{
+							countryName: res.data.nationName,
+							countryCode: res.data.countryCode
+						},
+						{
+							regionName: res.data.regionName,
+							regionCode: res.data.regionCode
+						},
+						{
+							cityName: res.data.cityName,
+							cityCode: res.data.cityCode
+						}
+					]
+					console.log('地址~~~~',houseArea)
+					chooseArea.value = houseArea
+					form.address = res.data.nationName+'-'+res.data.regionName+'-'+ res.data.cityName
+				}
+				
 			}
 	
 		}catch(e){
@@ -241,7 +263,7 @@
 				bdMonth: Number(dateArr[1]),
 				bdDay: Number(dateArr[2]),
 				userId: userInfo.value.userId,
-				nationCode: form.nationCode, //国家id
+				countryCode: form.countryCode, //国家id
 				regionCode: form.regionCode, //区域id
 				cityCode: form.cityCode, //城市id
 				// wechatId: '1',
