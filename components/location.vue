@@ -74,10 +74,12 @@
     if( val ){
       //已经选了地区
       let code = '000000'
+	  console.log('watch====',props.chooseArea)
       if(props.chooseArea.length ==3){
 		  areaLevel.value = 3
 			code = props.chooseArea[1].regionCode
       }else if(props.chooseArea.length ==4){   //国家-省-市-区
+			areaLevel.value = 4;
 		  code = props.chooseArea[2].cityCode
 	  }
 		myAreaData.value = JSON.parse(JSON.stringify(props.chooseArea))	

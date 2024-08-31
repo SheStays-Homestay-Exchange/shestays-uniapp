@@ -91,7 +91,7 @@
 		</view>
 	</view>
 	
-	<Location @popupClick="popupClick" :show="provinceShow" :chooseArea="chooseArea"></Location>
+	<Location @popupClick="popupClick" :show="provinceShow" :chooseArea="chooseArea" :totalLevel="4"></Location>
 </template>
 
 <script setup>
@@ -139,7 +139,7 @@
 		cityName:'',
 		detailAddress: '',
 		contactInfo:'',   //联系方式
-		statusCode:'reviewing'   //房源状态reviewing新增，pending_view编辑
+		statusCode:'reviewing'   //房源状态reviewing新增, 编辑是什么状态就传什么状态，一共有5个状态
 	});
 	
 	onShow(() => {
@@ -151,9 +151,11 @@
 		if(option.edit){
 			//编辑页面跳转过来的
 			let editHouse = JSON.parse(option.edit); 
-			// editHouse.statusCode = 'pending_view'    //编辑状态
+			console.log('编辑回显==',editHouse)
+			editHouse.statusCode = editHouse.statusCode    //编辑回显状态
 			// formData.value = editHouse
 			// 数据回显
+			formData.value.houseId = editHouse.houseId
 			formData.value.files = editHouse.houseImgs.map(item=>item.imgUrl);
 			
 			formData.value.houseTitle =  editHouse.houseTitle;
@@ -170,10 +172,11 @@
 			formData.value.countryCode = editHouse.countryCode;
 			formData.value.cityCode = editHouse.cityCode;
 			formData.value.regionCode = editHouse.regionCode;
+			formData.value.districtCode = editHouse.districtCode;
 			formData.value.countryName = editHouse.countryName;
 			formData.value.regionName = editHouse.regionName;
 			formData.value.cityName = editHouse.cityName;
-			formData.value.detailAddress = editHouse.detailAddress;
+			formData.value.districtName = editHouse.districtName;   //县级
 			
 			console.log(formData.value)
 			//地址
@@ -231,7 +234,7 @@
 	  }else if( e.funName == 'submit' ){
 		  chooseArea.value = e.value
 		  provinceShow.value = false   //关闭地址弹窗
-		  console.log('选址的地址====',chooseArea.value)
+		  // console.log('选址的地址====',chooseArea.value)
 		  form.address = chooseArea.value[0].countryName+'-'+chooseArea.value[1].regionName+'-'+chooseArea.value[2].cityName+'-'+chooseArea.value[3].districtName
 		  // 获取code
 		  formData.value.countryCode = chooseArea.value[0].countryCode;
@@ -293,10 +296,13 @@
 		if(formData.value.files.length == 0){
 			msg('请至少上传一张图片')
 			return false
-		}else if(!formData.value.address){
+		}else if(!form.address){
 			msg('请选择房源所在地区')
 			return false
-		}else if(!formData.value.startTime || formData.value.endTime){
+		}else if(!formData.value.contactInfo){
+			msg('请填写联系方式')
+			return false
+		}else if(!formData.value.startTime || !formData.value.endTime){
 			msg('请选择开放换宿的时间段')
 			return false
 		}
@@ -305,12 +311,13 @@
 
 	// 提交房源信息
 	const handleUploadHouse = async (status) => {
-		if(status == 'reviewing' && !validateFun()){
+		if(status == 'reviewing' && !(validateFun())){
 			return
 		}
 		
 		uni.showLoading()
 		let data = {userId: userInfo.value.userId, ...formData.value,houseImgPath:formData.value.files}
+		console.log('去上传参数===',data)
 		data.statusCode = status;
 		if(data?.area){
 			delete data.area
