@@ -3,7 +3,7 @@
 		<!-- 头像 -->
 		<view class="user">
 			<view class="user-icon">
-				<image :src="myInfo.avatarUrl?myInfo.avatarUrl:'../../../static/image/avatar.png'" class="user-image" mode=""  @click="handleGoPage('/pages/tabBar/my/updateMyInfo/updateMyInfo')"></image>
+				<image :src="myInfo.avatarUrl?myInfo.avatarUrl:'../../../static/image/avatar.png'" class="user-image" mode="aspectFill"  @click="handleGoPage('/pages/tabBar/my/updateMyInfo/updateMyInfo')"></image>
 			<!-- 	<view class="init-head" v-else @click="handleGoPage('/pages/tabBar/my/updateMyInfo/updateMyInfo')">
 					<uni-icons type="person-filled" size="40" color="#999"></uni-icons>
 				</view> -->

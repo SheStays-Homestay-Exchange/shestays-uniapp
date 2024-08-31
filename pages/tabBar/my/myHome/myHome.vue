@@ -129,11 +129,12 @@
 		.my-icon {
 			width: 160rpx;
 			height: 160rpx;
+			border-radius: 50%;
+			background-color: #ECECEC;
 			.my-icon-image {
-				width: 160rpx;
-				height: 160rpx;
-				border-radius: 160rpx;
-				background-color: #ECECEC;
+				width: 100%;
+				height: 100% !important;
+				border-radius: 50%;
 			}
 		}
 		.my-head-content {
