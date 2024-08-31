@@ -140,3 +140,8 @@ export function houseOffline(params = {}) {
 export function saveBuriedPoint(params = {}) {
 	return post('saveBuriedPoint', params)
 }
+
+// 根据用户ID查询用户信息
+export function getUserInfoByUserId(params = {}) {
+	return get('getUserInfoByUserId', params)
+}

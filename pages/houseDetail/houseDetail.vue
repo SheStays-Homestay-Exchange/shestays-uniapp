@@ -60,7 +60,7 @@
 		</view>
 	</view>
     <view class="householder" v-else>
-      <view class="userInfo">
+      <view class="userInfo" @click="handleGoPage">
         <image class="user-image" :src="userInfo.avatarUrl? userInfo.avatarUrl: '../../static/image/avatar.png'" alt="" mode="widthFix"/>
         <view class="info">房主：{{ userInfo.xiaohongshuUsername }}</view>
       </view>
@@ -234,6 +234,13 @@ const hanldeSuccessBtn = async () => {
 	}
 }
 
+// 跳转个人主页
+function handleGoPage() {
+	uni.navigateTo({
+		url: `/pages/tabBar/my/myHome/myHome?userId=${userInfo.userId}&openId=''`
+	});
+}
+
 // 保存用户权限
 // 用户权限
 const roleDictCode = ref([]);
@@ -361,6 +368,7 @@ onShow(() => {
   .userInfo {
     display: flex;
     align-items: center;
+	flex: 1;
     .user-image {
       width: 100rpx;
       height: 100rpx !important;
