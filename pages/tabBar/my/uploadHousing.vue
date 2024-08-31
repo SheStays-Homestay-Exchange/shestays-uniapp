@@ -157,7 +157,7 @@
 			// 数据回显
 			formData.value.houseId = editHouse.houseId
 			formData.value.files = editHouse.houseImgs.map(item=>item.imgUrl);
-			
+			formData.value.contactInfo = editHouse.contactInfo
 			formData.value.houseTitle =  editHouse.houseTitle;
 			formData.value.houseAmount = editHouse.houseAmount ?? 1;
 			formData.value.describle = editHouse.describle ?? "";

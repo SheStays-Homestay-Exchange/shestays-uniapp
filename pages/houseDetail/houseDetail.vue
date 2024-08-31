@@ -24,7 +24,7 @@
             :key="item.houseImgId"
           >
             <view class="swiper-item image-wrapper" style="height: 100%;">
-              <image class="house-image" :src="item.imgUrl" alt="" mode="widthFix"/>
+              <image class="house-image" :src="item.imgUrl" alt="" mode="aspectFill"/>
             </view>
           </swiper-item>
         </swiper>
@@ -71,6 +71,7 @@
 	
     <DetailPopup
       :show="popShow"
+	  :avatar="userInfo.avatarUrl"
       @tapClose="popShow = false"
       :id="userInfo.phone"
       :name="userInfo.xiaohongshuUsername"
@@ -98,7 +99,7 @@ import { reactive, ref, onMounted } from "vue";
 import { onLoad, useRoute, onShow } from "@dcloudio/uni-app";
 import { getHouseDetail, review } from "@/common/api/common";
 import DetailPopup from "@/components/DetailPopup.vue";
-import holdImage from "@/static/60x60.png";
+import holdImage from "@/static/image/avatar.png";
 import holdBannerImage from "@/static/image/about.png";
 import { msg } from "../../common/js/util";
 import cache from '/common/js/cache.js'
