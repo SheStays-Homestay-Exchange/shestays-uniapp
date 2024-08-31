@@ -145,3 +145,8 @@ export function saveBuriedPoint(params = {}) {
 export function getUserInfoByUserId(params = {}) {
 	return get('getUserInfoByUserId', params)
 }
+
+// 根据用户ID，查询上线房源
+export function getOnlineHouseInfoByUserId(params = {}) {
+	return get('getOnlineHouseInfoByUserId', params)
+}

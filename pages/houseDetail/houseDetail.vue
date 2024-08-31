@@ -61,7 +61,7 @@
 	</view>
     <view class="householder" v-else>
       <view class="userInfo" @click="handleGoPage">
-        <image class="user-image" :src="userInfo.avatarUrl? userInfo.avatarUrl: '../../static/image/avatar.png'" alt="" mode="widthFix"/>
+        <image class="user-image" :src="userInfo.avatarUrl? userInfo.avatarUrl: '../../static/image/avatar.png'" alt="" mode="aspectFill"/>
         <view class="info">房主：{{ userInfo.xiaohongshuUsername }}</view>
       </view>
       <view>

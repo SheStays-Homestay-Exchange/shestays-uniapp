@@ -11,7 +11,7 @@
 					<view class="user-title" @click="handleGoPage('/pages/tabBar/my/updateMyInfo/updateMyInfo')">
 						{{myInfo.userName ? myInfo.userName : myInfo.phone}}
 					</view>
-					<view class="user-home" @click="handleGoPage(`/pages/tabBar/my/myHome/myHome?openId=${userInfo.openId}&userId=${userInfo.userId}`)">
+					<view class="user-home" @click="handleGoPage(`/pages/tabBar/my/myHome/myHome?userId=${userInfo.userId}`)">
 						个人主页
 					</view>
 				</view>

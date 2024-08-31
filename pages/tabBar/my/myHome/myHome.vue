@@ -2,7 +2,7 @@
 	<view class="my-home">
 		<view class="my-head">
 			<view class="my-icon">
-				<image class="my-icon-image" :src="userInfo.avatarUrl?userInfo.avatarUrl:'../../../../static/image/avatar.png'" mode="widthFix"></image>
+				<image class="my-icon-image" :src="userInfo.avatarUrl?userInfo.avatarUrl:'../../../../static/image/avatar.png'" mode="aspectFill"></image>
 			</view>
 			<!-- 默认头像 -->
 		<!-- 	<view class="init-head">
@@ -54,15 +54,13 @@
 <script setup>
 	import { reactive, ref, onMounted,computed  } from 'vue'
 	import { onLoad } from '@dcloudio/uni-app'
-	import { getUserInfoByOpenId, getHouseByUserId, getUserInfoByUserId } from '@/common/api/common'
+	import { getUserInfoByUserId, getOnlineHouseInfoByUserId } from '@/common/api/common'
 	import {msg} from '@/common/js/util.js'
 	
 	const userId = ref()
-	const openId = ref()
 	onLoad((option)=>{
 		console.log('----',option)
 		userId.value = option.userId || 280
-		openId.value = option.openId || 'oqmkh7bujr3pkHclTLhGUxwbmVqI'
 		getUserInfo()
 		getHouse()
 	})
@@ -76,9 +74,6 @@
 	const userInfo = ref({})
 	const getUserInfo= async (type)=>{
 		try{
-			// const res = await getUserInfoByOpenId({
-			// 	openId: openId.value
-			// })
 			const res = await getUserInfoByUserId({userId: userId.value});
 			if(res.code == 200){
 				userInfo.value = res.data || {}
@@ -91,13 +86,10 @@
 	const houseList = ref([])    //房源
 	const getHouse = async (type)=>{
 		try{
-			const res = await getHouseByUserId({
-				userId: userId.value
-			})
+			const res = await getOnlineHouseInfoByUserId({userId: userId.value});
 			if(res.code == 200){
 				houseList.value = res.data || []
 			}
-	
 		}catch(e){
 			msg(e.msg || '系统繁忙，请稍后重试')
 		}
