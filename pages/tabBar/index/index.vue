@@ -10,7 +10,7 @@
 		<!-- 搜索 -->
 		<view class="search-body" @click="handleSearch">
 			<image src="../../../static/image/search.png" class="search-image" mode=""></image>
-			<text class="search-text">搜索目的地</text>
+			<text class="search-text">搜索目的地（仅支持国家和城市关键词搜索）</text>
 		</view>
 		<!-- 房源 -->
 		<view class="list-box">
@@ -237,6 +237,7 @@
 		display: flex;
 		align-items: center;
 		padding: 0 24rpx;
+		z-index: 999;
 		box-shadow: rgba(0, 11, 59, 0.1) 10rpx 20rpx 70rpx;
 		margin-top: -40upx;
 		z-index: 5;
@@ -246,7 +247,7 @@
 			margin-right: 6rpx;
 		}
 		.search-text {
-			font-size: 32rpx;
+			font-size: 28rpx;
 			font-weight: 500;
 			color: #909193;
 		}

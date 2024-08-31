@@ -3,7 +3,7 @@
 		<view class="search-input-body">
 			<view class="search-input">
 				<image class="search-icon" src="../../../static/image/search.png" mode=""></image>
-				<uni-easyinput :styles="styles" :inputBorder="false" type="text" trim="both" primaryColor="#D8336D" placeholder="搜索目的地"
+				<uni-easyinput :styles="styles" :inputBorder="false" type="text" trim="both" primaryColor="#D8336D" placeholder="搜索目的地（仅支持国家和城市关键词搜索）"
 				 confirmType="search" v-model="region" @confirm="search" @input="inputChange"></uni-easyinput>
 			</view>
 			<!-- <text class="search-tipes" @click="search">搜索</text> -->

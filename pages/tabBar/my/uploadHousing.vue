@@ -38,7 +38,7 @@
 				<view class="tips">
 					{{ formData.houseAmount }}
 				</view>
-				<uni-number-box :min="1" v-model="formData.houseAmount"></uni-number-box>
+				<uni-number-box :min="1" v-model="formData.houseAmount" @change="handleHoseAmountChange"></uni-number-box>
 			</view>
 		</view>
 		<view class="uploade-col" @click="handleSetTime">
@@ -125,7 +125,7 @@
 	});
 	// 表单
 	const formData = ref({
-		houseTitle: '测试新增房源',
+		houseTitle: '新增房源',
 		houseAmount: 1,
 		describle: '',
 		startTime: '',
@@ -160,13 +160,13 @@
 			formData.value.houseAmount = editHouse.houseAmount ?? 1;
 			formData.value.describle = editHouse.describle ?? "";
 			// 处理开始日期
-			const newStartTime = editHouse.startTime?.split(" ")[0].split("-");
+			const newStartTime = editHouse.startTime?.split(" ")[0].split("/");
 				  newStartTime[2] = newStartTime[2].replace(/^0+/, '')
-			formData.value.startTime = newStartTime.join("-");
+			formData.value.startTime = newStartTime.join("/");
 			// 处理结束日期
-			const newEndTime = editHouse.endTime?.split(" ")[0].split("-");
+			const newEndTime = editHouse.endTime?.split(" ")[0].split("/");
 				  newEndTime[2] = newEndTime[2].replace(/^0+/, '');
-			formData.value.endTime = newEndTime.join("-");
+			formData.value.endTime = newEndTime.join("/");
 			formData.value.countryCode = editHouse.countryCode;
 			formData.value.cityCode = editHouse.cityCode;
 			formData.value.regionCode = editHouse.regionCode;
@@ -193,7 +193,6 @@
 						cityCode: editHouse.cityCode
 					}
 				]
-				console.log('地址~~~~',houseArea)
 				chooseArea.value = houseArea
 				form.address = houseArea[0].countryName+'-'+houseArea[1].regionName+'-'+ houseArea[2].cityName
 			}
@@ -370,10 +369,16 @@
 	onUnload(() => {
 		cache.remove('draftHouse');
 	});
+	
+	// 可接待房客数
+	function handleHoseAmountChange(value) {
+		formData.value.houseAmount = value;
+	}
 </script>
 
 <style lang="scss" scoped>
 	.uploade {
+		margin-top: 24rpx;
 		.uploade-button {
 			.title {
 				font-weight: 500;
@@ -484,7 +489,7 @@
 				padding: 32rpx 0;
 			}
 			.col-input {
-				padding: 20rpx;
+				padding: 16rpx;
 				border-radius: 8rpx;
 				border: 1rpx solid #EEE;
 				.sum {
@@ -492,6 +497,10 @@
 					color: #909193;
 					font-weight: 400;
 					text-align: right;
+				}
+				::v-deep .uni-easyinput__content-textarea {
+					margin: 0 !important;
+					padding: 0 !important;
 				}
 			}
 		}

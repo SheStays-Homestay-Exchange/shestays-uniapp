@@ -14,17 +14,21 @@
 			</view>
 		</view>
 		<view class="contact" v-if="item?.houseImgs?.length > 0">
-			房东：
+			房东：{{ item.xiaohongshuUsername }}
 		</view>
 		<view class="content-body" v-else>
 			<view class="left">
-				<view class="remark wrap2">
+				<view class="remark" :class="idx == index && isExpand ? '' : 'wrap1'">
 					备注：{{item.describle}}
 				</view>
-				<!-- <view class="fold">
-					<image class="flod-icon" src="../../../static/image/chevron-home-right.png" mode=""></image>
+				<view class="fold" @click="handleSetExpand(index, true)" v-if="idx == index && !isExpand">
+					<image class="flod-icon" src="../static/image/chevron-home-right.png" mode=""></image>
 					<text>展开全部</text>
-				</view> -->
+				</view>
+				<view class="fold" @click="handleSetExpand(index, false)" v-else>
+					<image class="flod-icon" src="../static/image/chevron-right.png" mode=""></image>
+					<text>折叠内容</text>
+				</view>
 			</view>
 			<view class="contact-button" @tap.stop="emits('contactHost',item)">
 				联系房东
@@ -52,6 +56,12 @@
 		// emits('itemClick',props.item)
 	}
 	
+	const isExpand = ref(false);
+	const idx = ref(null);
+	function handleSetExpand(index, state) {
+		idx.value = index;
+		isExpand.value = state;
+	}
 </script>
 
 <style lang="scss" scoped>
