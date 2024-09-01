@@ -6,7 +6,7 @@
 		:safe-area="false"
 	>
 		<view class="edit-housing">
-			<template v-if="popStatus != 3">
+			<template v-if="!notPass">
 				<view class="edit-title">
 					<text>管理房源</text>
 					<view class="close" @click="close">
@@ -40,7 +40,8 @@
 					</view>
 				</view>
 			</template>
-			<template v-if="popStatus == 3">
+			<!-- 审核未通过原因 -->
+			<template v-else>
 				<view class="edit-title">
 					<text>审核未通过</text>
 					<view class="close" @click="close">
@@ -73,6 +74,11 @@
 		popUnpassReason: {
 			type: String,
 			default: '审核未通过描述'
+		},
+		//查看审核未通过的原因
+		notPass: {
+			type: Boolean,
+			default: false
 		}
 	});
 	const editPopup = ref(null);

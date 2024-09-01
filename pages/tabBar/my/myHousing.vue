@@ -52,7 +52,7 @@
 				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
 			</view>
 			<view class="lis" @click="handleEditHousing(3,item.houseId, item)" v-if="item.statusCode == 'not_approved'">
-				<view class="lis-title error">
+				<view class="lis-title error" @click.stop="handleEditHousing(4,item.houseId, item,true)">
 					<image class="housing-image" :src="item.houseImgs?.length>0 ?item.houseImgs[0].imgUrl:''" mode="aspectFill"></image>
 					<view class="title">
 						<text>房源审核未通过</text>
@@ -66,7 +66,7 @@
 					<image class="housing-image" :src="item.houseImgs?.length>0 ?item.houseImgs[0].imgUrl:''" mode="aspectFill"></image>
 					<view class="title">
 						<text>房源已下线</text>
-						<image class="title-icon" src="../../../static/image/slash-circle-01.png" mode=""></image>
+						<image class="title-icon" src="../../../static/image/slash-circle-01.png" mode="" ></image>
 					</view>
 				</view>
 				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
@@ -82,7 +82,7 @@
 		</view>
 		
 		<!-- 编辑房源弹框 -->
-		<editHousing ref="editRef" @doAction="doAction" :popStatus="activePopStatus" :popUnpassReason="houseObj.unpassReason"></editHousing>
+		<editHousing ref="editRef" @doAction="doAction" :popStatus="activePopStatus" :notPass="notPass" :popUnpassReason="houseObj.unpassReason"></editHousing>
 		<!-- 下架房源 -->
 		<Modal
 			:show="actionShow"
@@ -199,11 +199,13 @@
 		4:'房源已下线'
 	*/
 	const activePopStatus = ref(1)   //当前打开弹窗-房源状态
+	const notPass = ref(false)   //true就是点击查看不通过原因
 	const houseId = ref('')   //当前打开弹窗-房源id
-	function handleEditHousing(type,id,item) {
+	function handleEditHousing(type,id,item,isShowReason) {
 		activePopStatus.value = type
 		houseId.value = id
 		houseObj.value = item
+		notPass.value = isShowReason || false
 		editRef.value.open();
 	}
 	

@@ -265,6 +265,7 @@
 				height: 100
 			},
 			success: async(e)=>{
+				console.log('图片上传====',e)
 				//判断文件后缀名
 				if (e.tempFilePaths[0].split('.')[e.tempFilePaths[0].split('.').length - 1].includes('gif')) {
 					msg('暂不支持上传gif图片，请重新选择后上传')
@@ -276,7 +277,7 @@
 						formData.value.files = formData.value.files.concat(res)
 					}
 				}).catch(err=>{
-					console.log('图片上传返回失败',err)
+					msg(err.msg || '图片上传失败，请稍后重试')
 				})
 				
 			},

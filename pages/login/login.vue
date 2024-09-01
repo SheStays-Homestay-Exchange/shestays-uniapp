@@ -147,6 +147,9 @@
 	//场景：通过网页扫描二维码进入小程序
 	const xhsId = ref('')
 	onLoad((option)=>{
+		let a = getCurrentPages()
+		let indexCurrent = a[a.length-1].$page.fullPath
+		console.log('获取当前页面全路径：',indexCurrent)
 		console.log('登录页option',option)
 		xhsId.value = option.xhsId || ''
 	})

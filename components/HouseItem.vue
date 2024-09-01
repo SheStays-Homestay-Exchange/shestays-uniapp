@@ -14,7 +14,7 @@
 			</view>
 		</view>
 		<view class="contact" v-if="item?.houseImgs?.length > 0">
-			房东：{{ item.xiaohongshuUsername }}
+			房东：{{ item.xiaohongshuUsername || item.userName }}
 		</view>
 		<view class="content-body" v-else>
 			<view class="left">

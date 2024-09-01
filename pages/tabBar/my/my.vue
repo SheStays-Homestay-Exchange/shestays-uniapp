@@ -58,8 +58,8 @@
 			<view class="title">
 				设置
 			</view>
-			<view class="fn-li">
-				<view class="left" @click="handleGoPage('/pages/tabBar/my/updateMyInfo/updateMyInfo')">
+			<view class="fn-li" @click="handleGoPage('/pages/tabBar/my/updateMyInfo/updateMyInfo')">
+				<view class="left">
 					<image class="fn-icon" src="../../../static/image/user-square.png" mode=""></image>
 					<text class="fn-li-title">个人信息</text>
 				</view>
