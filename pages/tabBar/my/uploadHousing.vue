@@ -272,6 +272,12 @@
 					return false
 				}
 				
+				let picSize = e.tempFiles[0].size/(1024*1024)
+				if (picSize>3) {
+					msg('暂不支持上传超过3M的图片，请重新选择后上传')
+					return false
+				}
+				
 				uploadHouseImg(e.tempFilePaths).then(res => {
 					if(res?.length>0){
 						formData.value.files = formData.value.files.concat(res)

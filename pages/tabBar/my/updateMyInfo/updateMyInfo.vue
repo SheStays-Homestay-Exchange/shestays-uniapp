@@ -294,9 +294,14 @@
 			},
 			success: async(e)=>{
 				//判断文件后缀名
-				console.log('图片上传',e)
+				console.log('图片上传===',e)
 				if (e.tempFilePaths[0].split('.')[e.tempFilePaths[0].split('.').length - 1].includes('gif')) {
 					msg('暂不支持上传gif图片，请重新选择后上传')
+					return false
+				}
+				let picSize = e.tempFiles[0].size/(1024*1024)
+				if (picSize>3) {
+					msg('暂不支持上传超过3M的图片，请重新选择后上传')
 					return false
 				}
 				

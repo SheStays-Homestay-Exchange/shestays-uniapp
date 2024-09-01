@@ -32,7 +32,7 @@
 		
 	</view>
 	<!-- 联系弹窗 -->
-	<DetailPopup :show="popShow" @tapClose="popShow=false"/>
+	<DetailPopup :show="popShow" :name="itemInfo.userName" :id="itemInfo.xiaohongshuId" :avatar="itemInfo.avatarUrl" @tapClose="popShow=false"/>
 </template>
 
 <script setup> 
@@ -87,7 +87,12 @@
 	
 	//打开联系房主弹窗
 	const popShow = ref(false)
+	// itemInfo.id = item.xiaohongshuId || '-'
+	// itemInfo.name = item.xiaohongshuUsername || '-'
+	const itemInfo = ref({})
 	const contactHost = (item)=>{
+		console.log('item===',item)
+		itemInfo.value = item
 		popShow.value = true
 	}
 	
