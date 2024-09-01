@@ -91,7 +91,7 @@
 		</view>
 	</view>
 	
-	<Location @popupClick="popupClick" :show="provinceShow" :chooseArea="chooseArea" :totalLevel="4"></Location>
+	<Location @popupClick="popupClick" :show="provinceShow" :chooseArea="chooseArea"></Location>
 </template>
 
 <script setup>
@@ -172,11 +172,11 @@
 			formData.value.countryCode = editHouse.countryCode;
 			formData.value.cityCode = editHouse.cityCode;
 			formData.value.regionCode = editHouse.regionCode;
-			formData.value.districtCode = editHouse.districtCode;
+			// formData.value.districtCode = editHouse.districtCode;
 			formData.value.countryName = editHouse.countryName;
 			formData.value.regionName = editHouse.regionName;
 			formData.value.cityName = editHouse.cityName;
-			formData.value.districtName = editHouse.districtName;   //县级
+			// formData.value.districtName = editHouse.districtName;   //县级
 			
 			console.log(formData.value)
 			//地址
@@ -200,13 +200,13 @@
 				form.address = houseArea[0].countryName+'-'+houseArea[1].regionName+'-'+ houseArea[2].cityName
 			}
 			//含区县
-			if(editHouse.districtCode){
-				chooseArea.value.push({
-					districtName: editHouse.districtName,
-					districtCode: editHouse.districtCode
-				})
-				form.address = houseArea[0].countryName+'-'+houseArea[1].regionName+'-'+ houseArea[2].cityName+'-'+ houseArea[3].districtName
-			}
+			// if(editHouse.districtCode){
+			// 	chooseArea.value.push({
+			// 		districtName: editHouse.districtName,
+			// 		districtCode: editHouse.districtCode
+			// 	})
+			// 	form.address = houseArea[0].countryName+'-'+houseArea[1].regionName+'-'+ houseArea[2].cityName+'-'+ houseArea[3].districtName
+			// }
 			console.log('editHouse',formData.value)
 			// 图片回显
 			
@@ -235,7 +235,7 @@
 		  chooseArea.value = e.value
 		  provinceShow.value = false   //关闭地址弹窗
 		  // console.log('选址的地址====',chooseArea.value)
-		  form.address = chooseArea.value[0].countryName+'-'+chooseArea.value[1].regionName+'-'+chooseArea.value[2].cityName+'-'+chooseArea.value[3].districtName
+		  form.address = chooseArea.value[0].countryName+'-'+chooseArea.value[1].regionName+'-'+chooseArea.value[2].cityName
 		  // 获取code
 		  formData.value.countryCode = chooseArea.value[0].countryCode;
 		  formData.value.regionCode = chooseArea.value[1].regionCode;
@@ -243,8 +243,8 @@
 		  formData.value.countryName= chooseArea.value[0].countryName;
 		  formData.value.regionName = chooseArea.value[1].regionName;
 		  formData.value.cityName = chooseArea.value[2].cityName;
-		  formData.value.districtName = chooseArea.value[3].districtName;
-		  formData.value.districtCode = chooseArea.value[3].districtCode;
+		  // formData.value.districtName = chooseArea.value[3].districtName;
+		  // formData.value.districtCode = chooseArea.value[3].districtCode;
 	  }
 	}
 	

@@ -122,7 +122,7 @@
 		  chooseArea.value = e.value
 		  provinceShow.value = false   //关闭地址弹窗
 		  console.log(chooseArea.value)
-		  form.address = chooseArea.value[0].countryName+'-'+chooseArea.value[1].regionName+'-'+chooseArea.value[2].cityName+'-'+chooseArea.value[3].districtName
+		  form.address = chooseArea.value[0].countryName+'-'+chooseArea.value[1].regionName+'-'+chooseArea.value[2].cityName
 		  // 设置对应code
 		  form.countryCode = chooseArea.value[0].countryCode //国家id
 		  form.regionCode = chooseArea.value[1].regionCode //区域id

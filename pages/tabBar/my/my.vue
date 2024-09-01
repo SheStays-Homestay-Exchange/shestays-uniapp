@@ -12,14 +12,14 @@
 						{{myInfo.userName ? myInfo.userName : myInfo.phone}}
 					</view>
 					<view class="user-home" @click="handleGoPage(`/pages/tabBar/my/myHome/myHome?userId=${userInfo.userId}`)">
-						个人主页
+						显示个人资料
 					</view>
 				</view>
 			</view>
-			<view class="user-update" @click="handleGoPage('/pages/tabBar/my/updateMyInfo/updateMyInfo')">
+			<!-- <view class="user-update" @click="handleGoPage('/pages/tabBar/my/updateMyInfo/updateMyInfo')">
 				<image class="edit-icon" src="../../../static/image/edit.png" mode=""></image>
 				个人信息
-			</view>
+			</view> -->
 		</view>
 		<!-- 我的房源 -->
 		<view class="my-house">
@@ -63,17 +63,15 @@
 					<image class="fn-icon" src="../../../static/image/user-square.png" mode=""></image>
 					<text class="fn-li-title">个人信息</text>
 				</view>
-				<!-- <image class="fn-right" src="../../../static/image/chevron-right.jpg" mode=""></image> -->
 				<uni-icons type="right" size="20" color="#909193"></uni-icons>
 			</view>
-			<view class="fn-li" @click="handleGoPage('/pages/rules/rules')">
+			<!-- <view class="fn-li" @click="handleGoPage('/pages/rules/rules')">
 				<view class="left">
 					<image class="fn-icon" src="../../../static/image/tool-02.png" mode=""></image>
 					<text class="fn-li-title">隐私和共享</text>
 				</view>
-				<!-- <image class="fn-right" src="../../../static/image/chevron-right.jpg" mode=""></image> -->
 				<uni-icons type="right" size="20" color="#909193"></uni-icons>
-			</view>
+			</view> -->
 		</view>
 		<!-- 支持 -->
 		<view class="fn-body">

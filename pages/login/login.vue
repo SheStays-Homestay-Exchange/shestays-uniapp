@@ -82,6 +82,9 @@
 							 userAuthorFun(e.detail,event.code)
 						 }
 					   
+					 },
+					 fail(err){
+						 console.log('地理位置失败',err)
 					 }
 					})
 				},
