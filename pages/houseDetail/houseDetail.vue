@@ -93,7 +93,9 @@
           alt=""
           mode="aspectFill"
         />
-        <view class="info">房主：{{ userInfo.userName }}</view>
+        <view class="info"
+          >房主：{{ userInfo.userName || userInfo.xiaohongshuUsername }}</view
+        >
       </view>
       <view>
         <button class="contact-btn" @click="contactHost">联系房主</button>
@@ -104,8 +106,8 @@
       :show="popShow"
       :avatar="userInfo.avatarUrl"
       @tapClose="popShow = false"
-      :id="userInfo.contactInfo"
-      :name="userInfo.userName"
+      :id="userInfo.contactInfo || userInfo.phone"
+      :name="userInfo.userName || userInfo.xiaohongshuUsername"
       userNameType="联系方式"
     />
 
@@ -178,15 +180,15 @@ const userInfo = reactive({
 
 const goBefore = () => {
   uni.navigateBack({
-  delta: 1,
-  fail: function () {
-    // 返回失败，说明上一个页面不存在，跳转到首页
-    uni.reLaunch({
-      url: '/pages/tabBar/index/index'
-    });
-  }
-});
-}
+    delta: 1,
+    fail: function () {
+      // 返回失败，说明上一个页面不存在，跳转到首页
+      uni.reLaunch({
+        url: "/pages/tabBar/index/index",
+      });
+    },
+  });
+};
 
 const formatDate = (time) => {
   return time ? time.split(" ")[0] : "";
