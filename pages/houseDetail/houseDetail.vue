@@ -251,6 +251,10 @@ const formData = reactive({
 });
 // 不通过
 const handleNoSubmit = async () => {
+	if(!formData.unpassReason){
+		msg('请输入审核不通过原因');
+		return
+	}
   formData.statusCode = "not_approved";
   try {
     const res = await review(formData);

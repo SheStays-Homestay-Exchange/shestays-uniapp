@@ -247,7 +247,7 @@
 			margin-right: 6rpx;
 		}
 		.search-text {
-			font-size: 28rpx;
+			font-size: 24rpx;
 			font-weight: 500;
 			color: #909193;
 		}

@@ -60,7 +60,7 @@
 			</view>
 			<view class="fn-li" @click="handleGoPage('/pages/tabBar/my/updateMyInfo/updateMyInfo')">
 				<view class="left">
-					<image class="fn-icon" src="../../../static/image/user-square.png" mode=""></image>
+					<image class="fn-icon" src="../../../static/image/user-edit.png" mode=""></image>
 					<text class="fn-li-title">个人信息</text>
 				</view>
 				<uni-icons type="right" size="20" color="#909193"></uni-icons>
