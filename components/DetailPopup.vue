@@ -26,7 +26,7 @@
         >
       </view>
       <view class="btn-box" v-if="id">
-        <view class="btn" @click="btnClick"> 复制ID </view>
+        <view class="btn" @click="btnClick"> 复制{{ userNameType }} </view>
       </view>
     </div>
   </uni-popup>

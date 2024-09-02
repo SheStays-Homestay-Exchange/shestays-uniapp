@@ -46,7 +46,7 @@
 			:style="style"
 			:clearable="false"
 			placeholderStyle="color:#909193;font-size:16px;"
-			v-model="form.phone" maxlength="20" primaryColor="#D8336D"></uni-easyinput>
+			v-model="form.phone" maxlength="30" primaryColor="#D8336D"></uni-easyinput>
 		</view>
 		<view class="user-cli">
 			<view class="user-title">
