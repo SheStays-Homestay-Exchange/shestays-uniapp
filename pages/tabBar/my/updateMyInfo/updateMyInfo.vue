@@ -288,10 +288,7 @@
 	const uploadHead = async()=>{
 		uni.chooseImage({
 			count: 1,
-			crop: {
-				width: 100,
-				height: 100
-			},
+			sizeType:['compressed'],
 			success: async(e)=>{
 				//判断文件后缀名
 				console.log('图片上传===',e)
@@ -300,8 +297,9 @@
 					return false
 				}
 				let picSize = e.tempFiles[0].size/(1024*1024)
-				if (picSize>3) {
-					msg('暂不支持上传超过3M的图片，请重新选择后上传')
+				console.log('图片尺寸==',picSize)
+				if (picSize>4) {
+					msg('暂不支持上传超过4M的图片，请重新选择后上传')
 					return false
 				}
 				
