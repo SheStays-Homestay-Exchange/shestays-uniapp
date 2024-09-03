@@ -37,6 +37,7 @@
 	import  DetailPopup from '@/components/DetailPopup.vue'
 	import  HouseItem from '@/components/HouseItem.vue'
 	import cache from '@/common/js/cache.js'
+	import {buriedPoint} from '@/common/js/burying_point.js'
 	
 	const userInfo = ref({})
 	onLoad(()=>{
@@ -45,6 +46,7 @@
 	});
 	
 	onShow(() => {
+		buriedPoint(4,{title:'SheStays借换宿'})
 		pages.pageIndex =  1;
 		listData.value = [];
 		getHouseListFun();
@@ -183,6 +185,7 @@
 			itemInfo.id = item.xiaohongshuId || '-'
 			itemInfo.name = item.xiaohongshuUsername || '-'
 			popShow.value = true
+			buriedPoint(3,{houseId:item.houseId})
 		}
 	}
 	

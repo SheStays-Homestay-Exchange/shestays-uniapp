@@ -32,7 +32,7 @@
 	import { userAuthor, saveBuriedPoint } from '@/common/api/common'
 	import cache from '@/common/js/cache.js'
 	import store from '@/store';
-	
+	import {buriedPoint} from '@/common/js/burying_point.js'
 	
 	// 打开协议勾选提示
 	const checked = ref(false)
@@ -114,9 +114,10 @@
 		userAuthor(params).then(res=>{
 			if(res.code == 200){
 				//调用埋点接口
-				pointFun(res.data.userId)
+				// pointFun(res.data.userId)
 				//保存登录信息
 				cache.put('userInfo',res.data)
+				buriedPoint(0)
 				uni.switchTab({
 					url:'/pages/tabBar/index/index'
 				})
@@ -132,12 +133,13 @@
 	
 	const pointFun = async (userId)=>{
 		try{
+			const equipment = cache.get('device')
 			const res = await saveBuriedPoint({
-				buried_id:'USER_REGISTRATION',
+				buriedId:'USER_REGISTRATION',
 				key: userId,
 				location: JSON.stringify(locatcionObj),
 				operation_type:'login',
-				equipment: cache.get('device')
+				equipment:equipment||''
 			})
 		}catch(err){
 			console.log('埋点接口错误',err)

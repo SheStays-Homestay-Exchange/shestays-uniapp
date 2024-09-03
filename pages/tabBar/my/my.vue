@@ -104,9 +104,10 @@
 	import { getUserInfoByOpenId, getUnderViewHouse } from '@/common/api/common'
 	import  {msg}  from '@/common/js/util.js'
 	import cache from "@/common/js/cache.js";
-	
+	import {buriedPoint} from '@/common/js/burying_point.js'
 	
 	onShow(()=>{
+		buriedPoint(4,{title:'我的'})
 		getUserInfo()
 		getUnderViewHouseFun()
 	})

@@ -110,7 +110,7 @@
 
 <script setup>
 	import { reactive, ref } from 'vue';
-	import { onLoad } from '@dcloudio/uni-app'
+	import { onLoad ,onShow} from '@dcloudio/uni-app'
 	import editHousing from './components/editHousing.vue';
 	import Modal from './components/modal' 
 	import { 
@@ -120,6 +120,7 @@
 	} from '@/common/api/common'
 	import cache from "@/common/js/cache.js";
 	import  {msg}  from '@/common/js/util.js'
+	import {buriedPoint} from '@/common/js/burying_point.js'
 	
 	const userInfo = ref({})
 	onLoad(()=>{
@@ -127,6 +128,9 @@
 		getHouse()
 	})
 	
+	onShow(()=>{
+		buriedPoint(4,{title:'我的房源'})
+	})
 	const status = {
 		1:'房源审核中',
 		2:'房源已上线',
