@@ -106,7 +106,7 @@
       :show="popShow"
       :avatar="userInfo.avatarUrl"
       @tapClose="popShow = false"
-      :id="userInfo.contactInfo || userInfo.phone"
+      :id="userInfo.contactInfo || '未知'"
       :name="userInfo.userName || userInfo.xiaohongshuUsername"
       userNameType="联系方式"
     />

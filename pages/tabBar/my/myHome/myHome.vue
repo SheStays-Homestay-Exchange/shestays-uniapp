@@ -20,7 +20,7 @@
 				</view>
 				<view class="my-info">
 					<view class="phone">
-						<text>手机号：{{userInfo.phone}}</text>
+						<text>联系方式：{{userInfo.phone || '未知'}}</text>
 					</view>
 				</view>
 			</view>
