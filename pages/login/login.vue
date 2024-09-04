@@ -12,14 +12,14 @@
 				<image src="@/static/image/union.svg" class="btn-img"></image>
 				手机号快捷登录
 			</button>
-			<view class="argument" @click="handleClickChecked">
+			<view class="argument">
 				<radio-group>
 					<label class="radio">
-						<radio :checked="checked" color="#d8336d" @click="checked=!checked"/>
+						<radio :checked="checked" color="#d8336d" @click="handleClickChecked"/>
 					</label>
 				</radio-group>
 				<view class="argument-text">
-					<text>我确认已年满18周岁，且已认真阅读并同意</text><text class="policy" @click="goRule">《SheStays换宿小程序隐私政策》</text>
+					<text>我确认已年满18周岁，且已认真阅读并同意</text><text class="policy" @click="goRule">《SheStays借换宿小程序用户协议》</text>
 				</view>
 			</view>
 		</view>
@@ -46,6 +46,10 @@
 		} else {
 			return Promise.resolve(true)
 		}
+	}
+	
+	const handleClickChecked = ()=>{
+		checked.value = !checked.value
 	}
 	
 	const goRule = ()=>{

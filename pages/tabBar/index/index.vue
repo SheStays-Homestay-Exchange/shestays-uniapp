@@ -42,14 +42,14 @@
 	const userInfo = ref({})
 	onLoad(()=>{
 		 userInfo.value = cache.get('userInfo') || {}
-		console.log('userInfo',userInfo)
+		 buriedPoint(4,{title:'SheStays借换宿'})
+		 pages.pageIndex =  1;
+		 listData.value = [];
+		 getHouseListFun();
 	});
 	
 	onShow(() => {
-		buriedPoint(4,{title:'SheStays借换宿'})
-		pages.pageIndex =  1;
-		listData.value = [];
-		getHouseListFun();
+		
 		
 		// 获取地址位置
 		// uni.authorize({

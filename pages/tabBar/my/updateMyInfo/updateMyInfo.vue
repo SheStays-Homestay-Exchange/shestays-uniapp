@@ -190,7 +190,9 @@
 				form.avatarUrl = res.data.avatarUrl
 				form.sex = res.data.genderDictCode
 				form.userName = res.data.userName
-				form.date = `${bdYear}-${bdMonth}-${bdDay}`
+				if(bdYear && bdMonth && bdDay){
+					form.date = `${bdYear}-${bdMonth}-${bdDay}`
+				}
 				form.countryCode = res.data.countryCode
 				form.regionCode = res.data.regionCode
 				form.cityCode = res.data.cityCode
