@@ -63,7 +63,11 @@
 </template>
 
 <script setup>
-	
+	import { onShow } from '@dcloudio/uni-app'
+	import {buriedPoint} from '@/common/js/burying_point.js'
+	onShow(() => {
+		buriedPoint(4,{title:'关于SheStays'})
+	})
 	const goPage = ()=>{
 		uni.navigateTo({
 			url:'/pages/tabBar/my/uploadHousing'

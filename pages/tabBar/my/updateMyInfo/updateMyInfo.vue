@@ -190,7 +190,12 @@
 				form.avatarUrl = res.data.avatarUrl
 				form.sex = res.data.genderDictCode
 				form.userName = res.data.userName
-				form.date = `${bdYear}-${bdMonth}-${bdDay}`
+				if(bdYear && bdMonth && bdDay){
+					form.date = `${bdYear}-${bdMonth}-${bdDay}`
+				}
+				form.countryCode = res.data.countryCode
+				form.regionCode = res.data.regionCode
+				form.cityCode = res.data.cityCode
 				//地址回显
 				var houseArea = []
 				if(res.data.cityCode){
@@ -288,7 +293,11 @@
 	const uploadHead = async()=>{
 		uni.chooseImage({
 			count: 1,
-			sizeType:['compressed'],
+			sizeType: ['compressed'],
+			crop: {
+				width: 100,
+				height: 100
+			},
 			success: async(e)=>{
 				//判断文件后缀名
 				console.log('图片上传===',e)
