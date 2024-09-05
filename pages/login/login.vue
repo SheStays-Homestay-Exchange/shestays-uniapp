@@ -61,7 +61,7 @@
 	const wxLogin = ()=>{
 		if(!checked.value){
 			uni.showToast({
-				title:'请阅读并勾选《SheStays换宿小程序隐私政策》',
+				title:'请阅读并勾选《SheStays借换宿小程序用户协议》',
 				icon:'none'
 			})
 		}
