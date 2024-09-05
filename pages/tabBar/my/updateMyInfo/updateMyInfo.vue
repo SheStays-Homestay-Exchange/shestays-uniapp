@@ -324,11 +324,11 @@
 					}
 					
 				}else{
-					uploadFun(e.tempFilePaths[0])
+					uploadFun(e.tempFilePaths)
 				}
 			},
 			fail(e) {
-				console.log('选择图片错误', e)
+				msg(e.msg || '图片上传失败，请稍后重试')
 			}
 		})
 	}

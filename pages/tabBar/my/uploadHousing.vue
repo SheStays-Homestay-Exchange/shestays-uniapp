@@ -5,7 +5,7 @@
 				请上传您的房源照片（至少一张）
 			</view>
 			<scroll-view class="uploade-scroll" :scroll-x="true" >
-				<view class="uploade" @click="uploadHead">
+				<view class="uploade" @click="uploadHead" v-if="formData.files?.length<10">
 					<image src="../../../static/image/union.png" mode=""></image>
 				</view>
 				<template v-for="(item, index) in formData.files">
@@ -263,36 +263,55 @@
 		uni.chooseImage({
 			count: 10,
 			sizeType: ['compressed'],
-			crop: {
-				width: 100,
-				height: 100
-			},
 			success: async(e)=>{
-				console.log('图片上传====',e)
-				//判断文件后缀名
-				if (e.tempFilePaths[0].split('.')[e.tempFilePaths[0].split('.').length - 1].includes('gif')) {
-					msg('暂不支持上传gif图片，请重新选择后上传')
-					return false
-				}
-				
-				let picSize = e.tempFiles[0].size/(1024*1024)
-				if (picSize>3) {
-					msg('暂不支持上传超过3M的图片，请重新选择后上传')
-					return false
-				}
-				
-				uploadHouseImg(e.tempFilePaths).then(res => {
-					if(res?.length>0){
-						formData.value.files = formData.value.files.concat(res)
+				// console.log('图片上传====',e)
+				e.tempFilePaths.forEach((item,i)=>{
+					//判断文件后缀名
+					let imgName = e.tempFilePaths[i].split('.')[e.tempFilePaths[i].split('.').length - 1]
+					if (imgName.includes('gif')) {
+						msg('暂不支持上传gif图片，请重新选择后上传')
+						return false
 					}
-				}).catch(err=>{
-					msg(err.msg || '图片上传失败，请稍后重试')
+					
+					let picSize = e.tempFiles[i].size/(1024*1024)
+					if (picSize>4) {
+						const compreeArr = ['jpg','JPG','jpej','JPEG']
+						if(compreeArr.includes(imgName)){
+							//压缩图片,值支持jpg
+							uni.compressImage({
+							  src: e.tempFilePaths[i],
+							  quality: 30,
+							  success: response => {
+								uploadFun([response.tempFilePath])
+							  },
+							  fail(err) {
+							  	console.log('图片压缩失败',err)
+							  }
+							})
+						}else{
+							msg('暂不支持上传超过4M的图片，请重新选择后上传')
+							return false
+						}
+					}else{
+						uploadFun([e.tempFilePaths[i]])
+					}
 				})
 				
 			},
 			fail(e) {
 				console.log('选择图片错误', e)
 			}
+		})
+	}
+	
+	const uploadFun = (arr=[])=>{
+		uploadHouseImg(arr).then(res => {
+			console.log('图片上传返回',res)
+			if(res?.length>0){
+				formData.value.files = formData.value.files.concat(res)
+			}
+		}).catch(err=>{
+				msg(err.msg || '图片上传失败，请稍后重试')
 		})
 	}
 	
@@ -305,6 +324,9 @@
 	const validateFun = ()=>{
 		if(formData.value.files.length == 0){
 			msg('请至少上传一张图片')
+			return false
+		}else if(formData.value.files.length > 10){
+			msg('最多上传十张图片')
 			return false
 		}else if(!form.address){
 			msg('请选择房源所在地区')
@@ -395,7 +417,7 @@
 
 <style lang="scss" scoped>
 	.uploade {
-		margin-top: 24rpx;
+		// margin-top: 24rpx;
 		.uploade-button {
 			.title {
 				font-weight: 500;

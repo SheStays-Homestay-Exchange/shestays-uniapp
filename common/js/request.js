@@ -162,6 +162,7 @@ export function uploadFile(fileList,data={}) {
 }
 
 export function uploadHouseImg(fileList,data={}) {
+	console.log('进入request上传',fileList)
 	const userId =cache.get('userInfo').userId
 	const uploadTasks = fileList.map((file, index) => {
 		console.log(file, userId);
