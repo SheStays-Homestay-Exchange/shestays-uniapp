@@ -294,57 +294,53 @@
 		uni.chooseImage({
 			count: 1,
 			sizeType: ['compressed'],
-			crop: {
-				width: 100,
-				height: 100
-			},
 			success: async(e)=>{
 				//判断文件后缀名
 				console.log('图片上传===',e)
-				if (e.tempFilePaths[0].split('.')[e.tempFilePaths[0].split('.').length - 1].includes('gif')) {
+				let imgName = e.tempFilePaths[0].split('.')[e.tempFilePaths[0].split('.').length - 1]
+				if (imgName.includes('gif')) {
 					msg('暂不支持上传gif图片，请重新选择后上传')
 					return false
 				}
 				let picSize = e.tempFiles[0].size/(1024*1024)
-				console.log('图片尺寸==',picSize)
+				// console.log('图片尺寸==',picSize)
 				if (picSize>4) {
-					msg('暂不支持上传超过4M的图片，请重新选择后上传')
-					return false
-				}
-				
-				uploadFile(e.tempFilePaths).then(res => {
-					console.log('图片上传返回',res)
-					if(res?.length>0){
-						form.avatarUrl = res[0]
+					const compreeArr = ['jpg','JPG','jpej','JPEG']
+					if(compreeArr.includes(imgName)){
+						//压缩图片,值支持jpg
+						uni.compressImage({
+						  src: e.tempFilePaths[0],
+						  quality: 30,
+						  success: response => {
+							uploadFun([response.tempFilePath])
+						  },
+						  fail(err) {
+						  	console.log('图片压缩失败',err)
+						  }
+						})
+					}else{
+						msg('暂不支持上传超过4M的图片，请重新选择后上传')
+						return false
 					}
-				}).catch(err=>{
-					console.log('图片上传返回失败',err)
-				})
-				
-				// form.avatar = e.tempFiles[0]
-				
-				// try{
-				// 	const base = await imgToBase64(e.tempFiles[0].path)
-				// 	const avatarRes = await uploadAvatar({
-				// 		avatar: base,
-				// 		userId:userInfo.value.userId ||351
-				// 	})
-				// 	form.avatar = avatarRes.data
-				// }catch(e){
-				// 	msg(e.msg)
-				// }
-				
-				
-				// uploadFile(e.tempFilePaths).then(res => {
-				// 	console.log('图片上传成功',res)
-				// 	form.avatar = res[0]
-				// }).catch(e => {
-				// 	console.log('图片上传错误', e)
-				// })
+					
+				}else{
+					uploadFun(e.tempFilePaths[0])
+				}
 			},
 			fail(e) {
 				console.log('选择图片错误', e)
 			}
+		})
+	}
+	
+	const uploadFun = (arr=[])=>{
+		uploadFile(arr).then(res => {
+			console.log('图片上传返回',res)
+			if(res?.length>0){
+				form.avatarUrl = res[0]
+			}
+		}).catch(err=>{
+			console.log('图片上传返回失败',err)
 		})
 	}
 </script>
