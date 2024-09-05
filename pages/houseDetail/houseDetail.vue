@@ -134,19 +134,23 @@
 <script setup>
 import { reactive, ref, onMounted } from "vue";
 import { onLoad, useRoute, onShow } from "@dcloudio/uni-app";
-import { getHouseDetail, review } from "@/common/api/common";
+import { getHouseDetail, review,saveBuriedPoint } from "@/common/api/common";
 import DetailPopup from "@/components/DetailPopup.vue";
 import holdImage from "@/static/image/avatar.png";
 import holdBannerImage from "@/static/image/about.png";
 import { msg } from "../../common/js/util";
 import cache from "/common/js/cache.js";
+import {buriedPoint} from '@/common/js/burying_point.js'
 
 const current = ref(0);
 
 //打开联系房主弹窗
 const popShow = ref(false);
+const houseId = ref(0);
+
 const contactHost = (item) => {
   popShow.value = true;
+  buriedPoint(3,{houseId:houseId.value})
 };
 
 const dotsStyles = {
@@ -203,9 +207,11 @@ const onSwiperChange = (e) => {
 };
 
 onLoad((options) => {
+  const that = this
   uni.showLoading({
     title: "加载中",
   });
+  houseId.value = options?.id 
   getHouseDetail({ houseId: options?.id })
     .then((res) => {
       uni.hideLoading();
@@ -223,6 +229,8 @@ onLoad((options) => {
             }
           });
         }
+		buriedPoint(1)
+		// pointFun()
       }
     })
     .catch((error) => {
@@ -234,6 +242,20 @@ onLoad((options) => {
   formData.houseId = options?.id;
 });
 
+	const pointFun = async ()=>{
+		try{
+			const {userId} = cache.get("userInfo")
+			const equipment = cache.get('device')
+			const res = await saveBuriedPoint({
+				buriedId:'PROPERTY_VIEW',
+				key: userId,
+				equipment:equipment||''
+			})
+		}catch(err){
+			console.log('埋点接口错误',err)
+		}
+	}
+	
 // 审核不通过弹框
 const noRef = ref(null);
 function handleNoBtn() {
@@ -296,6 +318,7 @@ function handleGoPage() {
 // 用户权限
 const roleDictCode = ref([]);
 onShow(() => {
+	buriedPoint(4,{title:'房源详情'})
   roleDictCode.value = cache.get("roles");
 });
 </script>

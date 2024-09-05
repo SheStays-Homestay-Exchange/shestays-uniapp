@@ -137,8 +137,8 @@ export function houseOffline(params = {}) {
 }
 
 // 接口埋点
-export function saveBuriedPoint(params = {}) {
-	return post('saveBuriedPoint', params)
+export function saveBuriedPoint(params = {},options={show:true}) {
+	return post('saveBuriedPoint', params,options)
 }
 
 // 根据用户ID查询用户信息

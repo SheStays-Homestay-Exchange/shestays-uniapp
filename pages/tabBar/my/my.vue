@@ -9,7 +9,7 @@
 				</view> -->
 				<view class="user-name">
 					<view class="user-title" @click="handleGoPage('/pages/tabBar/my/updateMyInfo/updateMyInfo')">
-						{{myInfo.userName ? myInfo.userName : myInfo.phone}}
+						{{myInfo.userName ? myInfo.userName : "SheStays用户"}}
 					</view>
 					<view class="user-home" @click="handleGoPage(`/pages/tabBar/my/myHome/myHome?userId=${userInfo.userId}`)">
 						显示个人资料
@@ -104,9 +104,10 @@
 	import { getUserInfoByOpenId, getUnderViewHouse } from '@/common/api/common'
 	import  {msg}  from '@/common/js/util.js'
 	import cache from "@/common/js/cache.js";
-	
+	import {buriedPoint} from '@/common/js/burying_point.js'
 	
 	onShow(()=>{
+		buriedPoint(4,{title:'我的'})
 		getUserInfo()
 		getUnderViewHouseFun()
 	})

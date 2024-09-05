@@ -9,6 +9,7 @@
 
 	export default {
 		onLaunch: function() {
+			console.log(99)
 			//获取设备
 			uni.getSystemInfo({
 				success(res){

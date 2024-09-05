@@ -42,6 +42,7 @@
 	import  HouseItem from '@/components/HouseItem.vue'
 	import  DetailPopup from '@/components/DetailPopup.vue'
 	import cache from '@/common/js/cache';
+	import {buriedPoint} from '@/common/js/burying_point.js'
 	
 	const userInfo = ref()
 	onLoad(()=>{
@@ -131,12 +132,15 @@
 	//埋点
 	const pointFun = async ()=>{
 		try{
-			const res = await saveBuriedPoint({
-				buried_id:'PROPERTY_SEARCH',
-				key: userInfo.userId,
-				search_keywords: region.value,
-				equipment: cache.get('device') || ''
-			})
+			// const {userId} = cache.get("userInfo")
+			// const equipment = cache.get('device')
+			// const res = await saveBuriedPoint({
+			// 	buriedId:'PROPERTY_SEARCH',
+			// 	key: userId,
+			// 	search_keywords: region.value,
+			// 	equipment: equipment || ''
+			// })
+			buriedPoint(2,{searchKeywords:region.value})
 		}catch(err){
 			console.log('搜索埋点接口错误',err)
 		}

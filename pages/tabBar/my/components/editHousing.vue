@@ -43,7 +43,7 @@
 			<!-- 审核未通过原因 -->
 			<template v-else>
 				<view class="edit-title">
-					<text>审核未通过</text>
+					<text>管理房源</text>
 					<view class="close" @click="close">
 						<image class="close-icon" src="../../../../static/image/x-close.png" mode=""></image>
 					</view>
@@ -51,8 +51,23 @@
 				<view class="no-hous-title">
 					{{ popUnpassReason }}
 				</view>
-				<view class="edit-hous"  @click="downAction('edit')">
-					编辑房源
+				<view class="edit-fn">
+				<view class="edit-fn-col" @click="downAction('edit')">
+					<view class="edit-fn-col-icon">
+						<image class="edit-fn-col-image" src="../../../../static/image/edit-05.png" mode=""></image>
+					</view>
+					<view class="edit-fn-col-title">
+						编辑房源
+					</view>
+				</view>
+					<view class="edit-fn-col" @click="downAction('del')">
+						<view class="edit-fn-col-icon">
+							<image class="edit-fn-col-image" src="../../../../static/image/trash-01.png" mode=""></image>
+						</view>
+						<view class="edit-fn-col-title delete-title">
+							删除房源
+						</view>
+					</view>
 				</view>
 			</template>
 		</view>
@@ -187,11 +202,12 @@
 			}
 		}
 		.no-hous-title {
-			padding: 44rpx;
+			margin-top: 20rpx;
+			// padding: 44rpx;
 			text-align: center;
 			font-size: 32rpx;
 			font-weight: 400;
-			height: 260rpx;
+			// height: 260rpx;
 			overflow: hidden;
 			overflow-y: auto;
 		}

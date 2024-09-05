@@ -1,6 +1,8 @@
 import config from '@/common/config';
 import cache from '@/common/js/cache';
+import {buriedPoint} from '@/common/js/burying_point.js';
 import store from '@/store';
+
 import {
 	msg,
 	confirm
@@ -74,6 +76,12 @@ function request(options = {}) {
 				}else{
 					// msg('请求失败')
 					return rej(error)
+				}
+			},
+			complete:()=>{
+				if(!options.hasOwnProperty("show")){
+					const arr = options.url.split("/")
+					buriedPoint(5,{key:arr[arr.length-1]})
 				}
 			}
 		})

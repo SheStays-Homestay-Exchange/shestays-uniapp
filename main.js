@@ -1,5 +1,6 @@
 import App from './App'
 import store from './store'
+import {buriedPoint} from "@/common/js/burying_point.js";
 
 // #ifndef VUE3
 import Vue from 'vue'
@@ -11,6 +12,7 @@ Vue.prototype.$backgroundAudioData = {
 	playTime: 0,
 	formatedPlayTime: '00:00:00'
 }
+
 App.mpType = 'app'
 const app = new Vue({
 	store,

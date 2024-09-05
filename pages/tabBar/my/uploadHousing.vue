@@ -103,6 +103,7 @@
 	import { onLoad, onShow, onReady, onUnload } from '@dcloudio/uni-app'
 	import cache from '/common/js/cache.js'
 	import { uploadFile, uploadHouseImg } from '@/common/js/request';
+	import {buriedPoint} from '@/common/js/burying_point.js'
 	
 	const styles = reactive({
 		"borderColor": "#ffffff",
@@ -143,6 +144,7 @@
 	});
 	
 	onShow(() => {
+		buriedPoint(4,{title:'上传房源'})
 		userInfo.value = uni.getStorageSync('userInfo');
 	});
 	
@@ -260,6 +262,7 @@
 	const uploadHead = async()=>{
 		uni.chooseImage({
 			count: 10,
+			sizeType: ['compressed'],
 			crop: {
 				width: 100,
 				height: 100
