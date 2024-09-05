@@ -64,7 +64,7 @@
 				联系方式
 			</view>
 			<view class="col-select">
-				<uni-easyinput :inputBorder="false" maxlength="30" :autoHeight="false"
+				<uni-easyinput :inputBorder="false" maxlength="30" 
 				:placeholderStyle="placeholderStyle"
 				 placeholder="请输入联系方式" :styles="concatStyle" v-model="formData.contactInfo"></uni-easyinput>
 			</view>

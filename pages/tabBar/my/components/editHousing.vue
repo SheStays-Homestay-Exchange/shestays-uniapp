@@ -6,12 +6,15 @@
 		:safe-area="false"
 	>
 		<view class="edit-housing">
-			<template v-if="!notPass">
+			<template>
 				<view class="edit-title">
 					<text>管理房源</text>
 					<view class="close" @click="close">
 						<image class="close-icon" src="../../../../static/image/x-close.png" mode=""></image>
 					</view>
+				</view>
+				<view class="no-hous-title" v-if="popStatus == 3 && notPass">
+					{{ popUnpassReason }}
 				</view>
 				<view class="edit-fn">
 					<view class="edit-fn-col" @click="downAction('edit')">
@@ -41,7 +44,7 @@
 				</view>
 			</template>
 			<!-- 审核未通过原因 -->
-			<template v-else>
+			<!-- <template v-else>
 				<view class="edit-title">
 					<text>管理房源</text>
 					<view class="close" @click="close">
@@ -69,7 +72,7 @@
 						</view>
 					</view>
 				</view>
-			</template>
+			</template> -->
 		</view>
 	</uni-popup>
 </template>
@@ -210,6 +213,7 @@
 			// height: 260rpx;
 			overflow: hidden;
 			overflow-y: auto;
+			word-break: break-all;
 		}
 		// 不通过样式
 		.edit-hous {

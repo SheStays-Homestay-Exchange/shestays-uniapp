@@ -11,7 +11,7 @@
 			<view class="my-head-content">
 				<view class="my-head-name">
 					<view class="name">
-						{{userInfo.userName}}
+						{{userInfo.userName || 'SheStays用户'}}
 					</view>
 				</view>
 				<view class="address">

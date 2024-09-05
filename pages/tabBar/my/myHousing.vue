@@ -51,8 +51,8 @@
 				</view>
 				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
 			</view>
-			<view class="lis" @click="handleEditHousing(3,item.houseId, item)" v-if="item.statusCode == 'not_approved'">
-				<view class="lis-title error" @click.stop="handleEditHousing(4,item.houseId, item,true)">
+			<view class="lis" @click="handleEditHousing(3,item.houseId, item, true)" v-if="item.statusCode == 'not_approved'">
+				<view class="lis-title error">
 					<image class="housing-image" :src="item.houseImgs?.length>0 ?item.houseImgs[0].imgUrl:''" mode="aspectFill"></image>
 					<view class="title">
 						<text>房源审核未通过</text>
