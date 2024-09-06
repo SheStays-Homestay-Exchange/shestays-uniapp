@@ -328,7 +328,7 @@
 		}else if(formData.value.files.length > 10){
 			msg('最多上传十张图片')
 			return false
-		}else if(!form.address){
+		}else if(form.address == '请选择'){
 			msg('请选择房源所在地区')
 			return false
 		}else if(!formData.value.contactInfo){

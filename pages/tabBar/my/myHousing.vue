@@ -29,7 +29,8 @@
 			 			<image class="title-icon" src="../../../static/image/released.jpg" mode=""></image>
 			 		</view>
 			 	</view>
-			 	<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
+				<uni-icons type="more-filled" size="24" color="#000" class="more-icon"></uni-icons>
+
 			</view>
 			<view class="lis" @click="handleEditHousing(1,item.houseId, item)" v-if="item.statusCode == 'reviewing'">
 				<view class="lis-title">
@@ -39,7 +40,7 @@
 						<image class="title-icon" src="../../../static/image/search-refraction.png" mode="aspectFill"></image>
 					</view>
 				</view>
-				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image> 
+				<uni-icons type="more-filled" size="24" color="#000" class="more-icon"></uni-icons>
 			</view>
 			<view class="lis" @click="handleEditHousing(2,item.houseId, item)" v-if="item.statusCode == 'online'">
 				<view class="lis-title">
@@ -49,7 +50,7 @@
 						<image class="title-icon" src="../../../static/image/success.png" mode=""></image>
 					</view>
 				</view>
-				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
+				<uni-icons type="more-filled" size="24" color="#000" class="more-icon"></uni-icons>
 			</view>
 			<view class="lis" @click="handleEditHousing(3,item.houseId, item, true)" v-if="item.statusCode == 'not_approved'">
 				<view class="lis-title error">
@@ -59,7 +60,7 @@
 						<image class="title-icon" src="../../../static/image/error.png" mode=""></image>
 					</view>
 				</view>
-				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
+				<uni-icons type="more-filled" size="24" color="#000" class="more-icon"></uni-icons>
 			</view>
 			<view class="lis" @click="handleEditHousing(4,item.houseId, item)" v-if="item.statusCode == 'offline'">
 				<view class="lis-title disabled">
@@ -69,7 +70,7 @@
 						<image class="title-icon" src="../../../static/image/slash-circle-01.png" mode="" ></image>
 					</view>
 				</view>
-				<image class="right-icon" src="../../../static/image/right-Icon.jpg" mode=""></image>
+				<uni-icons type="more-filled" size="24" color="#000" class="more-icon"></uni-icons>
 			</view>
 		</view>
 		<view class="no-text" v-else>
@@ -360,7 +361,9 @@ page {
 			background-color: #D1D1D1;
 		}
 	}
-	
+	.more-icon{
+		margin-left: 28rpx;
+	}
 	.uploade-button {
 		position: fixed;
 		bottom: 80rpx;

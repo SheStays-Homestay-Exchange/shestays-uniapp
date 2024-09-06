@@ -14,7 +14,7 @@
 			</view>
 		</view>
 		<view class="contact" v-if="item?.houseImgs?.length > 0">
-			房东：{{ item.xiaohongshuUsername || item.userName }}
+			房东：{{ item.xiaohongshuUsername || item.userName || 'shestays用户'}}
 		</view>
 		<view class="content-body" v-else>
 			<view class="left">
@@ -22,7 +22,7 @@
 					备注：{{item.describle}}
 				</view>
 				<view class="fold" @click="handleSetExpand(index, true)" v-if="idx == index && !isExpand">
-					<image class="flod-icon" src="../static/image/chevron-home-right.png" mode=""></image>
+					<uni-icons type="right" size="13" color="#909193"></uni-icons>
 					<text>展开全部</text>
 				</view>
 				<view class="fold" @click="handleSetExpand(index, false)" v-else>
@@ -113,7 +113,7 @@
 	}
 	.content-body {
 		display: flex;
-		align-items: center;
+		align-items: flex-end;
 		.left {
 			flex: 1;
 			overflow: hidden;
@@ -131,8 +131,8 @@
 				margin-right: 6rpx;
 			}
 			.flod-icon {
-				width: 28rpx;
-				height: 28rpx;
+				width: 30rpx;
+				height: 30rpx;
 			}
 			
 		}

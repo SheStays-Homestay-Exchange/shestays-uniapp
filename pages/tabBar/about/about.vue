@@ -39,6 +39,59 @@
 						<text class="text">你可以在「个人主页-发布房源」中发布你的房源，提交房源后，SheStays 管理员将审核你的房源，通过后将开启你的互换旅程！</text>
 					</view>
 				</uni-collapse-item>
+				<uni-collapse-item title="【预告】姐妹币规则" :show-animation="true">
+					<view class="content">
+						<text class="text">姐妹币可以用于支付平台上的换宿费用，帮助您轻松入住心仪的房源。更棒的是，您还可以在我们的合作酒店和民宿中使用姐妹币，甚至能部分抵扣全球优质品牌五星级酒店和特色民宿的费用。此外，我们还为您准备了专属的姐妹币兑换专区，您可以用姐妹币换取各种精美礼品。</text>
+						<text>姐妹币将会在下个小程序版本正式上线，在下个版本上线之前完成注册的用户将会在姐妹币规则生效时获得一定数额的姐妹币补偿。</text>
+					</view>
+				</uni-collapse-item>
+				<uni-collapse-item title="【预告】如何获取姐妹币" :show-animation="true">
+					<view class="content mg-b-20">
+						<text class="text bold">1、注册新用户</text>
+						<text class="text">成为 SheStays 平台的新用户，注册完成后即可获取一定数量的姐妹币。作为我们的欢迎礼物，<text class="bold">第一批注册用户将享受更多姐妹币的特别赠送，</text>帮助您更快开启换宿之旅。</text>
+					</view>
+					<view class="content mg-b-20">
+						<text class="text bold">2、实名认证</text>
+						<text class="text">完成实名认证，验证身份后将获得额外的姐妹币奖励。</text>
+					</view>
+					<view class="content mg-b-20">
+						<text class="text bold">3、发布房源</text>
+						<text class="text">成功发布一个房源，并通过平台审核，即可根据房源质量获得相应的姐妹币。</text>
+					</view>
+					<view class="content mg-b-20">
+						<text class="text bold">4、完成换宿</text>
+						<text class="text">当您完成一次成功的换宿交易时，您将获得房客支付的姐妹币。</text>
+					</view>
+					<view class="content mg-b-20">
+						<text class="text bold">5、邀请奖励</text>
+						<text class="text">如果您邀请朋友加入SheStays平台，每当您的朋友成功注册并完成首次换宿，您和您的朋友都会获得额外的姐妹币奖励。</text>
+					</view>
+				</uni-collapse-item>
+				<uni-collapse-item title="【预告】姐妹币的使用方式" :show-animation="true">
+					<view class="content mg-b-20">
+						<text class="text bold">1、换宿支付</text>
+						<text class="text">姐妹币可用于在平台上支付换宿费用，直接用于支付给房东。</text>
+					</view>
+					<view class="content mg-b-20">
+						<text class="text bold">2、合作酒店/民宿换宿</text>
+						<text class="text">姐妹币可在 SheStays 平台合作的酒店或民宿中进行换宿支付。</text>
+					</view>
+					<view class="content mg-b-20">
+						<text class="text bold">3、线下女性赋能优质活动参与</text>
+						<text class="text">姐妹币可用于兑换各类线下女性赋能优质活动的入场券，如瑜伽营、女性健身房、心理疗愈工作坊、学习成长活动、职业规划、财商培养、理财规划等各类主题项目，助力您在旅行之外依然能从SheStay获取源源不断的能量，与来自不同背景的姐妹相互赋能、共同前行。</text>
+					</view>
+					<view class="content mg-b-20">
+						<text class="text bold">4、部分抵扣</text>
+						<text class="text">姐妹币可部分抵扣全球优质品牌五星级酒店或特色民宿项目的费用。</text>
+					</view>
+					<view class="content mg-b-20">
+						<text class="text bold">5、福利兑换 </text>
+						<text class="text">姐妹币还可用于在兑换专区兑换各种礼品或福利等。</text>
+					</view>
+					<view class="content mg-b-20">
+						<text class="text">……更多获取和使用方式陆续推出，敬请期待惊喜。 </text>
+					</view>
+				</uni-collapse-item>
 				<uni-collapse-item title="我该如何确保旅程的安全？" :show-animation="true">
 					<view class="content">
 						<text class="text">
@@ -77,6 +130,9 @@
 
 <style lang="scss" scoped>
 	// 顶部图片
+	.bold{
+		font-weight: bold;
+	}
 	.bg-box{
 		width: 100%;
 		display: flex;
@@ -135,6 +191,9 @@
 			font-size: 28upx;
 			color: #696A6D;
 			padding-bottom: 60upx;
+			&.mg-b-20{
+				padding-bottom: 20rpx;
+			}
 			.text{
 				display: block;
 				margin-bottom: 8upx;

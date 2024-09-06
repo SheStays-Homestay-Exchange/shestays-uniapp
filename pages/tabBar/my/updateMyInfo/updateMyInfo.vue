@@ -46,7 +46,7 @@
 			:style="style"
 			:clearable="false"
 			placeholderStyle="color:#909193;font-size:16px;"
-			v-model="form.phone" maxlength="30" primaryColor="#D8336D"></uni-easyinput>
+			v-model="form.contactInfo" maxlength="30" primaryColor="#D8336D"></uni-easyinput>
 		</view>
 		<view class="user-cli">
 			<view class="user-title">
@@ -139,7 +139,7 @@
 	const form = reactive({
 		date:'请选择生日',
 		sex:'1',
-		phone:'',
+		contactInfo:'',
 		wechatId:'',
 		des:'',
 		avatarUrl:'',
@@ -186,7 +186,7 @@
 				}
 				const {bdYear,bdMonth,bdDay} = res.data
 				form.des = res.data.personalProfile
-				form.phone = res.data.phone
+				form.contactInfo = res.data.contactInfo
 				form.avatarUrl = res.data.avatarUrl
 				form.sex = res.data.genderDictCode
 				form.userName = res.data.userName
@@ -237,7 +237,7 @@
 		}else if(!form.date){
 			msg('请选择生日')
 			return false
-		}else if(!form.phone) {
+		}else if(!form.contactInfo) {
 			msg('请输入联系方式')
 			return false
 		}
@@ -268,7 +268,7 @@
 			editUserDataFun({
 				userName : form.userName,
 				genderDictCode: form.sex,
-				phone: form.phone,
+				contactInfo: form.contactInfo,
 				personalProfile: form.des,
 				avatarUrl: form.avatarUrl,
 			    bdYear:  Number(dateArr[0]),

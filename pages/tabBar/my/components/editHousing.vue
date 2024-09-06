@@ -16,7 +16,7 @@
 				<view class="no-hous-title" v-if="popStatus == 3 && notPass">
 					{{ popUnpassReason }}
 				</view>
-				<view class="edit-fn">
+				<view :class="['edit-fn',popStatus == 2?'more-padding':'less-padding']">
 					<view class="edit-fn-col" @click="downAction('edit')">
 						<view class="edit-fn-col-icon">
 							<image class="edit-fn-col-image" src="../../../../static/image/edit-05.png" mode=""></image>
@@ -173,8 +173,13 @@
 		.edit-fn {
 			display: flex;
 			align-items: center;
-			padding: 140rpx 80rpx 0 80rpx;
 			justify-content: space-between;
+			&.more-padding{
+				padding: 140rpx 80rpx 0 80rpx;
+			}
+			&.less-padding{
+				padding: 140rpx 200rpx 0 200rpx;
+			}
 			.edit-fn-col {
 				display: flex;
 				align-items: center;
