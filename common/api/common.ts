@@ -11,8 +11,8 @@ import config from "@/common/config";
  * 获取用户信息
  * @returns {Promise}
  */
-export function getUserInfo(params,type) {
-  return get('user/get/info',params,options)
+export function getUserInfo(params, type) {
+	return get('user/get/info', params, options)
 }
 
 /**
@@ -70,22 +70,22 @@ export function getNation() {
 
 //接口名称：省查询接口
 export function getRegion(params) {
-	return get('getRegion',params)
+	return get('getRegion', params)
 }
 
 //接口名称：地区查询接口
 export function getCity(params) {
-	return get('getCity',params)
+	return get('getCity', params)
 }
 
 //接口名称：城市查询接口
 export function getDistrict(params) {
-	return get('getDistrict',params)
+	return get('getDistrict', params)
 }
 
 //接口名称：房源详情接口
 export function getHouseDetail(params) {
-	return get('getHouseById',params)
+	return get('getHouseById', params)
 }
 
 /**
@@ -98,17 +98,17 @@ export function editUserData(param) {
 
 //接口名称：根据id查询用户详情接口
 export function getUserInfoByOpenId(params) {
-	return get('getUserInfoByOpenId',params)
+	return get('getUserInfoByOpenId', params)
 }
 
 //接口名称：个人房源管理查询接口
 export function getHouseByUserId(params) {
-	return get('getHouseByUserId',params)
+	return get('getHouseByUserId', params)
 }
 
 //接口名称：头像上传
 export function uploadAvatar(params) {
-	return post('uploadAvatar',params)
+	return post('uploadAvatar', params)
 }
 
 // 查看房源待审核
@@ -128,7 +128,7 @@ export function review(params = {}) {
 
 //接口名称：删除房源
 export function houseDel(params) {
-	return deletes('houseDel',params)
+	return deletes('houseDel', params)
 }
 
 // 房源审核接口
@@ -137,8 +137,8 @@ export function houseOffline(params = {}) {
 }
 
 // 接口埋点
-export function saveBuriedPoint(params = {},options={show:true}) {
-	return post('saveBuriedPoint', params,options)
+export function saveBuriedPoint(params = {}, options = { show: true }) {
+	return post('saveBuriedPoint', params, options)
 }
 
 // 根据用户ID查询用户信息
@@ -149,4 +149,9 @@ export function getUserInfoByUserId(params = {}) {
 // 根据用户ID，查询上线房源
 export function getOnlineHouseInfoByUserId(params = {}) {
 	return get('getOnlineHouseInfoByUserId', params)
+}
+
+// 注销用户
+export function delUserById(params = {}) {
+	return post('delUserById', params)
 }

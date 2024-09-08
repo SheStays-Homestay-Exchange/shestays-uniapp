@@ -94,7 +94,7 @@
           mode="aspectFill"
         />
         <view class="info"
-          >房主：{{ userInfo.userName || userInfo.xiaohongshuUsername || 'shestays用户' }}</view
+          >房主：{{ userInfo.userName || userInfo.xiaohongshuUsername || 'SheStays用户' }}</view
         >
       </view>
       <view>
@@ -107,7 +107,7 @@
       :avatar="userInfo.avatarUrl"
       @tapClose="popShow = false"
       :id="userInfo.contactInfo || '未知'"
-      :name="userInfo.userName || userInfo.xiaohongshuUsername || 'shestays用户'"
+      :name="userInfo.userName || userInfo.xiaohongshuUsername || 'SheStays用户'"
       userNameType="联系方式"
     />
 
