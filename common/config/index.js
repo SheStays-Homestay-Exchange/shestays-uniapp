@@ -33,10 +33,14 @@ if (env === 'test') {  // （运行）
 	/** 测试环境 */
 	shareType = 2
 	envVersion = 'trial'
+	shreUrl = 'https://shestays.life/'
+	baseUrl = 'https://shestays.life/'
 } else {
 	/** 正式环境 */
 	shareType = 0
 	envVersion = 'release'
+	shreUrl = 'https://shestays.life/'
+	baseUrl = 'https://shestays.life/'
 }
 
 
