@@ -24,8 +24,7 @@
 	</view>
 	<view class="btn-box" v-if="!userInfo?.openId">
 		<button class="login-btn" style="margin-top: 20px;" @click="isLogin">
-			<image src="@/static/image/union.svg" class="btn-img"></image>
-			微信授权登录
+			手机号快捷登录
 		</button>
 	</view>
 </template>
@@ -264,11 +263,6 @@
 		width: 80%;
 		display: inline-block;
 		align-items: center;
-		.btn-img{
-			width: 38upx;
-			height: 34upx;
-			margin-right: 10rpx;
-		}
 		.login-btn{
 			background: #D8336D;
 			color: #fff;

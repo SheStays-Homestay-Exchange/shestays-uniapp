@@ -5,11 +5,9 @@
 		</view>
 		<view class="login-btn-box">
 			<button class="login-btn" @click="wxLogin" v-if="!checked">
-				<image src="@/static/image/union.svg" class="btn-img"></image>
 				手机号快捷登录
 			</button>
 			<button class="login-btn" open-type="getPhoneNumber" @getphonenumber="getphonenumber" style="margin-top: 20px;" v-else>
-				<image src="@/static/image/union.svg" class="btn-img"></image>
 				手机号快捷登录
 			</button>
 			<view class="argument">
