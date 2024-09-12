@@ -200,6 +200,7 @@ const getUserInfo = async (type) => {
   }
   uni.showToast({
     title: "加载中",
+	icon:"loading"
   });
   try {
     const res = await getUserInfoByOpenId({

@@ -1,7 +1,8 @@
 // export const baseUrl = "" //正式
-const env = process.env.NODE_ENV === 'development' ? 'test' : 'prod'
-let baseUrl
-let shreUrl
+// const env = process.env.NODE_ENV === 'development' ? 'test' : 'prod'
+const env = 'prod'
+let baseUrl = 'https://shestays.life/'
+let shreUrl = 'https://shestays.life/'
 let shareType
 let envVersion
 
@@ -22,9 +23,10 @@ let myWechatNextVersion = '1.0.0'	//将要提审发布的版本号
 
 
 if (env === 'test') {  // （运行）   
-  baseUrl = 'http://122.51.248.243:9090/'   //开发
- //  // 请勿注释
-	shreUrl = 'http://122.51.248.243:9090/' //上传接口
+ //  baseUrl = 'http://122.51.248.243:9090/'   //开发
+	// shreUrl = 'http://122.51.248.243:9090/' //上传接口
+	shreUrl = 'http://shestays.life/'
+	baseUrl = 'http://shestays.life/'
 	shareType = 2
 	envVersion = 'develop'
 

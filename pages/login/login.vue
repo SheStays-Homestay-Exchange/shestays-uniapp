@@ -68,32 +68,27 @@
 	var locatcionObj = {}
 	const getphonenumber=(e)=>{
 		console.log('手机号返回',e)
+		if(!loginCode.value){
+			getLoginCode()
+		}
 		// #ifdef MP-WEIXIN
-			uni.login({
-				"provider": "weixin",
-				"onlyAuthorize": true, // 微信登录仅请求授权认证
-				success(event) {
-					wx.getFuzzyLocation({
-					 type: 'wgs84',
-					 success (res) {
-						 if(res.errMsg.includes('ok')){
-							 locatcionObj.latitude = res.latitude
-							 locatcionObj.longitude = res.longitude
-							 console.log('地理位置信息成功',res)
-							 //去登录
-							 userAuthorFun(e.detail,event.code)
-						 }
-					   
-					 },
-					 fail(err){
-						 console.log('地理位置失败',err)
-					 }
-					})
-				},
-				fail(err){
-					console.log('手机号授权',err)
-				}
+			wx.getFuzzyLocation({
+			 type: 'wgs84',
+			 success (res) {
+				 if(res.errMsg.includes('ok')){
+					 locatcionObj.latitude = res.latitude
+					 locatcionObj.longitude = res.longitude
+					 console.log('地理位置信息成功',res)
+					 //去登录
+					 userAuthorFun(e.detail)
+				 }
+			   
+			 },
+			 fail(err){
+				 console.log('地理位置失败',err)
+			 }
 			})
+				
 		// #endif
 		// #ifndef MP-WEIXIN
 		uni.showToast({
@@ -104,11 +99,11 @@
 		
 	}
 	
-	const userAuthorFun = (param,loginCode)=>{
+	const userAuthorFun = (param)=>{
 		let params = {
 			encryptedData: param.encryptedData,
 			iv: param.iv,
-			code: loginCode,
+			code: loginCode.value,
 		}
 		if(xhsId.value){
 			params.xhsId = xhsId.value
@@ -148,14 +143,30 @@
 		}
 	}
 	
+	const loginCode = ref('')
+	const getLoginCode = ()=>{
+		uni.login({
+			"provider": "weixin",
+			"onlyAuthorize": true, // 微信登录仅请求授权认证
+			success(event) {
+				loginCode.value = event.code
+			},
+			fail(err){
+				console.log('手机号授权',err)
+			}
+		})
+	}
+	
 	//场景：通过网页扫描二维码进入小程序
 	const xhsId = ref('')
 	onLoad((option)=>{
+		getLoginCode()   //提前获取登录code
 		let a = getCurrentPages()
 		let indexCurrent = a[a.length-1].$page.fullPath
-		console.log('获取当前页面全路径：',indexCurrent)
-		console.log('登录页option',option)
+		// console.log('获取当前页面全路径：',indexCurrent)
+		// console.log('登录页option',option)
 		xhsId.value = option.xhsId || ''
+		
 	})
 
 </script>
