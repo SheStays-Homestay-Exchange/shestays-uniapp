@@ -66,10 +66,11 @@
 	}
 	
 	var locatcionObj = {}
-	const getphonenumber=(e)=>{
-		console.log('手机号返回',e)
+	const getphonenumber= async(e)=>{
+		// console.log('手机号返回',e)
 		if(!loginCode.value){
-			getLoginCode()
+			console.log('没有获取到登录code')
+			await getLoginCode()
 		}
 		// #ifdef MP-WEIXIN
 			wx.getFuzzyLocation({
@@ -81,11 +82,20 @@
 					 console.log('地理位置信息成功',res)
 					 //去登录
 					 userAuthorFun(e.detail)
+				 }else{
+					 uni.showToast({
+					 	title:'获取定位失败，请重试',
+					 	icon:'none'
+					 })
 				 }
 			   
 			 },
 			 fail(err){
 				 console.log('地理位置失败',err)
+				 uni.showToast({
+				 	title:'定位失败，请重试',
+				 	icon:'none'
+				 })
 			 }
 			})
 				
@@ -122,7 +132,7 @@
 		}).catch(err=>{
 			console.log('登录失败')
 			uni.showToast({
-				title:err.msg,
+				title:err?.msg || '系统繁忙，请稍后重试',
 				 icon:'none'
 			})
 		})
@@ -144,7 +154,7 @@
 	}
 	
 	const loginCode = ref('')
-	const getLoginCode = ()=>{
+	const getLoginCode = async ()=>{
 		uni.login({
 			"provider": "weixin",
 			"onlyAuthorize": true, // 微信登录仅请求授权认证
