@@ -148,9 +148,23 @@ const current = ref(0);
 const popShow = ref(false);
 const houseId = ref(0);
 
+//是否登录
+const isLogin =()=>{
+	const {openId} = cache.get("userInfo")
+	if(!openId){
+		uni.reLaunch({
+			url:'/pages/login/login'
+		})
+		return false
+	}
+	return true
+}
+	
 const contactHost = (item) => {
-  popShow.value = true;
-  buriedPoint(3,{houseId:houseId.value})
+	if(isLogin()){
+		popShow.value = true;
+		buriedPoint(3,{houseId:houseId.value})
+	}
 };
 
 const dotsStyles = {

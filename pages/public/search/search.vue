@@ -92,15 +92,30 @@
 	// itemInfo.name = item.xiaohongshuUsername || '-'
 	const itemInfo = ref({})
 	const contactHost = (item)=>{
-		console.log('item===',item)
-		itemInfo.value = item
-		popShow.value = true
+		if(isLogin()){
+			itemInfo.value = item
+			popShow.value = true
+		}
+		// console.log('item===',item)
+	}
+	
+	//是否登录
+	const isLogin =()=>{
+		if(!userInfo.value?.openId){
+			uni.reLaunch({
+				url:'/pages/login/login'
+			})
+			return false
+		}
+		return true
 	}
 	
 	const itemClick=(item)=>{
-		uni.navigateTo({
-			url:'/pages/houseDetail/houseDetail?id='+item.houseId
-		})
+		if(isLogin()){
+			uni.navigateTo({
+				url:'/pages/houseDetail/houseDetail?id='+item.houseId
+			})
+		}
 	}
 	
 	const search = ()=>{

@@ -133,9 +133,9 @@
 	
 	// 搜索
 	function handleSearch() {
-		if(isLogin()){
+		// if(isLogin()){
 			goPage('/pages/public/search/search')
-		}
+		// }
 	}
 	
 	//测试接口
@@ -206,9 +206,9 @@
 	}
 	
 	const itemClick=(item)=>{
-		if(isLogin()){
+		// if(isLogin()){
 			goPage('/pages/houseDetail/houseDetail?id='+item.houseId)
-		}
+		// }
 	}
 </script>
 

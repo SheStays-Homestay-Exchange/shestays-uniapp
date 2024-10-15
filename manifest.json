@@ -111,14 +111,14 @@
         },
         "usingComponents" : true,
         "permission" : {
-			"scope.userFuzzyLocation" : {
-			    "desc" : "演示定位能力"
-			},
-			"scope.userLocation": {
-				"desc": "您的位置信息将用于获取附近相关房源"
-			}
+            "scope.userFuzzyLocation" : {
+                "desc" : "演示定位能力"
+            },
+            "scope.userLocation" : {
+                "desc" : "您的位置信息将用于获取附近相关房源"
+            }
         },
-		 "requiredPrivateInfos" : ["getFuzzyLocation"],
+        "requiredPrivateInfos" : [ "getFuzzyLocation" ],
         "uniStatistics" : {
             "enable" : false
         }
