@@ -11,7 +11,30 @@
 		<view class="search-body" @click="handleSearch">
 			<image src="../../../static/image/search.png" class="search-image" mode=""></image>
 			<text class="search-text">搜索目的地（仅支持国家和城市关键词搜索）</text>
+		
 		</view>
+		<!-- 首页轮播图-->
+		<view class="swi">
+			<swiper :autoplay="true" :interval="3000" :duration="500" circular :indicator-dots="$" indicator-active-color="#D8336D">
+					<swiper-item class="item">
+						<image src="../../../static/image/sw-p1.png" class="pic" mode=""></image>
+					</swiper-item>
+			
+				<swiper-item >
+					<image src="../../../static/image/sw-p2.png"class="pic" mode=""></image>
+				</swiper-item>
+				<swiper-item>
+					<image src="../../../static/image/sw-p3.png"class="pic" mode=""></image>
+					</swiper-item>
+				<!-- 通过页面id进行跳转 -->
+				<!-- 通过页面id进行跳转  <navigator class="swiper-item" :url="'/subpkg/pic_detail/pic_detail?pic_id-' + item.pic_id">
+			-->  
+			</swiper>		
+		</view>
+	
+		
+		
+		
 		<!-- 房源 -->
 		<view class="list-box">
 			<HouseItem v-for="(item,i) in listData" :key="i" :item="item" @contactHost="contactHost" @itemClick="itemClick"/>
@@ -38,6 +61,9 @@
 	import cache from '@/common/js/cache.js'
 	import {buriedPoint} from '@/common/js/burying_point.js'
 	
+
+
+			
 	const userInfo = ref({})
 	onLoad(()=>{
 		 userInfo.value = cache.get('userInfo') || {}
@@ -210,6 +236,8 @@
 			goPage('/pages/houseDetail/houseDetail?id='+item.houseId)
 		// }
 	}
+	
+	
 </script>
 
 <style lang="scss" scoped>
@@ -279,4 +307,31 @@
 			height: 100%;
 		}
 	}
+/* 轮播图布局样式 */
+	
+.pic{
+	width: 100%;
+	height: 100%;
+	border-radius: 18px;
+}.swi{
+	margin-bottom: 40rpx;
+	margin-top: 40rpx;
+}
+.swiper{
+	    width: 300vw;
+		height: 500rpx;
+		.swiper-item{
+			  width: 100%;
+			height: 100%;
+		 
+		}
+		
+		.swiper image {
+		  width: 100%;
+		 height: 496rpx !important;
+		 border-radius: 32rpx;
+		  
+		}
+
+}
 </style>
