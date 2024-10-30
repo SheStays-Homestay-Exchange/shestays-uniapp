@@ -11,39 +11,35 @@
 		<view class="search-body" @click="handleSearch">
 			<image src="../../../static/image/search.png" class="search-image" mode=""></image>
 			<text class="search-text">搜索目的地（仅支持国家和城市关键词搜索）</text>
-		
+
 		</view>
 		<!-- 首页轮播图-->
-		<view class="swi">
-			<swiper :autoplay="true" :interval="3000" :duration="500" circular :indicator-dots="$" indicator-active-color="#D8336D">
-					<swiper-item class="item">
-						<image src="../../../static/image/sw-p1.png" class="pic" mode=""></image>
-					</swiper-item>
-			
-				<swiper-item >
-					<image src="../../../static/image/sw-p2.png"class="pic" mode=""></image>
+		<view class="content" >
+			<swiper :autoplay="true" :interval="3000" :duration="500" circular indicator-dots="true"
+				indicator-active-color="#D8336D" @change="change">
+				<swiper-item v-for="(item, index) in list" :key="index">
+					<image :src="item"></image>
 				</swiper-item>
-				<swiper-item>
-					<image src="../../../static/image/sw-p3.png"class="pic" mode=""></image>
-					</swiper-item>
 				<!-- 通过页面id进行跳转 -->
 				<!-- 通过页面id进行跳转  <navigator class="swiper-item" :url="'/subpkg/pic_detail/pic_detail?pic_id-' + item.pic_id">
-			-->  
-			</swiper>		
+			-->
+			</swiper>
+			<swiper-dot class="dot" :current="current" :list="list"></swiper-dot>
 		</view>
-	
-		
-		
-		
+
+
+
 		<!-- 房源 -->
 		<view class="list-box">
-			<HouseItem v-for="(item,i) in listData" :key="i" :item="item" @contactHost="contactHost" @itemClick="itemClick"/>
+			<HouseItem v-for="(item,i) in listData" :key="i" :item="item" @contactHost="contactHost"
+				@itemClick="itemClick" />
 		</view>
 		<!-- 加载更多 -->
-		<uni-load-more :status="loadStatus" :contentText="contentText" ></uni-load-more>
-		
+		<uni-load-more :status="loadStatus" :contentText="contentText"></uni-load-more>
+
 		<!-- 联系弹窗 -->
-		<DetailPopup :show="popShow" @tapClose="popShow=false" :name="itemInfo.name" :id="itemInfo.id" :avatar="itemInfo.avatarUrl"/>
+		<DetailPopup :show="popShow" @tapClose="popShow=false" :name="itemInfo.name" :id="itemInfo.id"
+			:avatar="itemInfo.avatarUrl" />
 	</view>
 	<view class="btn-box" v-if="!userInfo?.openId">
 		<button class="login-btn" style="margin-top: 20px;" @click="isLogin">
@@ -53,29 +49,48 @@
 </template>
 
 <script setup>
-	import { reactive, ref, onMounted,computed  } from 'vue'
-	import { onShow, onLoad, onReachBottom, onPullDownRefresh , onShareAppMessage } from '@dcloudio/uni-app'
-	import { getHouseList } from '@/common/api/common'
-	import  DetailPopup from '@/components/DetailPopup.vue'
-	import  HouseItem from '@/components/HouseItem.vue'
+	import {
+		reactive,
+		ref,
+		onMounted,
+		computed
+	} from 'vue'
+	import {
+		onShow,
+		onLoad,
+		onReachBottom,
+		onPullDownRefresh,
+		onShareAppMessage
+	} from '@dcloudio/uni-app'
+	import {
+		getHouseList
+	} from '@/common/api/common'
+	import DetailPopup from '@/components/DetailPopup.vue'
+	import HouseItem from '@/components/HouseItem.vue'
 	import cache from '@/common/js/cache.js'
-	import {buriedPoint} from '@/common/js/burying_point.js'
-	
+	import {
+		buriedPoint
+	} from '@/common/js/burying_point.js'
 
 
-			
+
+
+
+
 	const userInfo = ref({})
-	onLoad(()=>{
-		 userInfo.value = cache.get('userInfo') || {}
-		 buriedPoint(4,{title:'SheStays借换宿'})
-		 pages.pageIndex =  1;
-		 listData.value = [];
-		 getHouseListFun();
+	onLoad(() => {
+		userInfo.value = cache.get('userInfo') || {}
+		buriedPoint(4, {
+			title: 'SheStays借换宿'
+		})
+		pages.pageIndex = 1;
+		listData.value = [];
+		getHouseListFun();
 	});
-	
+
 	onShow(() => {
-		
-		
+
+
 		// 获取地址位置
 		// uni.authorize({
 		// 	scope: 'scope.userLocation',
@@ -130,168 +145,198 @@
 		// 	}
 		// })
 	});
-	
+
 	onShareAppMessage(() => {
-		
+
 	});
-	
+
 	//页面触底
-	onReachBottom(()=>{
-		if(loadStatus.value != 'noMore'){
+	onReachBottom(() => {
+		if (loadStatus.value != 'noMore') {
 			pages.pageIndex++
 			getHouseListFun()
 		}
 	})
-	
+
 	//下拉刷新
-	onPullDownRefresh(()=>{
+	onPullDownRefresh(() => {
 		// uni.startPullDownRefresh()
 		pages.pageIndex = 1
 		listData.value = []
 		getHouseListFun('refresh')
 	})
-	
+
 	const contentText = {
-			contentdown: '上拉显示更多',
-			contentrefresh: '正在加载...',
-			contentnomore: '暂时没有更多房源啦，期待更多寄宿家庭加入我们'
-		}
-	
+		contentdown: '上拉显示更多',
+		contentrefresh: '正在加载...',
+		contentnomore: '暂时没有更多房源啦，期待更多寄宿家庭加入我们'
+	}
+
 	// 搜索
 	function handleSearch() {
 		// if(isLogin()){
-			goPage('/pages/public/search/search')
+		goPage('/pages/public/search/search')
 		// }
 	}
-	
+
 	//测试接口
 	//加载更多状态
-	const loadStatus = ref('contentdown')	
+	const loadStatus = ref('contentdown')
 	const listData = ref([])
 	const pages = reactive({
-		pageIndex:1,
-		totalPage: 0   //总共有多少页数据
+		pageIndex: 1,
+		totalPage: 0 //总共有多少页数据
 	})
-	const getHouseListFun = async (type)=>{
-		loadStatus.value ='loading'
-		try{
+	const getHouseListFun = async (type) => {
+		loadStatus.value = 'loading'
+		try {
 			const res = await getHouseList({
 				pageIndex: pages.pageIndex,
 			})
-			if(res.code == 200){
+			if (res.code == 200) {
 				listData.value = listData.value.concat(res.data.data)
 				pages.totalPage = res.data.pageCount
 			}
-			if(type == 'refresh'){
+			if (type == 'refresh') {
 				uni.stopPullDownRefresh()
 			}
 			// 已请求完所有数据
-			if(pages.pageIndex >= res.data.pageCount){
+			if (pages.pageIndex >= res.data.pageCount) {
 				loadStatus.value = 'noMore'
 			}
-		}catch(e){
+		} catch (e) {
 			//TODO handle the exception
 			uni.showToast({
-				title:e.msg,
-				icon:'none'
+				title: e.msg,
+				icon: 'none'
 			})
 			uni.stopPullDownRefresh()
 		}
 	}
-	
+
 	//打开联系房主弹窗
 	const popShow = ref(false)
 	const itemInfo = reactive({
 		id: '',
-		name:''
+		name: ''
 	})
-	const contactHost = (item)=>{
-		if(isLogin()){
+	const contactHost = (item) => {
+		if (isLogin()) {
 			itemInfo.id = item.xiaohongshuId || '-'
 			itemInfo.name = item.xiaohongshuUsername || '-'
 			popShow.value = true
-			buriedPoint(3,{houseId:item.houseId})
+			buriedPoint(3, {
+				houseId: item.houseId
+			})
 		}
 	}
-	
-	const goPage = (url)=>{
+
+	const goPage = (url) => {
 		uni.navigateTo({
 			url
 		})
 	}
-	
+
 	//是否登录
-	const isLogin =()=>{
-		if(!userInfo.value?.openId){
+	const isLogin = () => {
+		if (!userInfo.value?.openId) {
 			uni.reLaunch({
-				url:'/pages/login/login'
+				url: '/pages/login/login'
 			})
 			return false
 		}
 		return true
 	}
-	
-	const itemClick=(item)=>{
+
+	const itemClick = (item) => {
 		// if(isLogin()){
-			goPage('/pages/houseDetail/houseDetail?id='+item.houseId)
+		goPage('/pages/houseDetail/houseDetail?id=' + item.houseId)
 		// }
 	}
-	
-	
+</script>
+<!-- 兼容 setup 无法使用 export default 限制 -->
+<script>
+	export default {
+		data() {
+			return {
+				list: [
+					'../../../static/image/sw-p1.png',
+					'../../../static/image/sw-p2.png',
+					'../../../static/image/sw-p3.png',
+
+				],
+				current: 0
+			};
+		},
+		onLoad() {},
+		methods: {
+			change(e) {
+				this.current = e.detail.current;
+			}
+		}
+	};
 </script>
 
+
 <style lang="scss" scoped>
-	
-.home-index-body {
-	padding: 0 48rpx;
-	.title {
-		font-size: 40rpx;
-		color: #000B3B;
-		font-weight: 500;
-		padding: 23rpx 0;
-		.title-arrow {
-			width: 32rpx;
-			height: 24rpx;
-			margin-left: 16rpx;
-		}
-	}
-	.list-box{
-		padding-top: 40rpx;
-	}
-	.search-body {
-		background-color: #ffffff;
-		height: 80rpx;
-		border-radius: 40rpx;
-		position: sticky;
-		top: 0rpx;
-		display: flex;
-		align-items: center;
-		padding: 0 24rpx;
-		z-index: 999;
-		box-shadow: rgba(0, 11, 59, 0.1) 10rpx 20rpx 70rpx;
-		margin-top: -40upx;
-		z-index: 5;
-		.search-image {
-			width: 48rpx;
-			height: 48rpx;
-			margin-right: 6rpx;
-		}
-		.search-text {
-			font-size: 24rpx;
+	.home-index-body {
+		padding: 0 48rpx;
+
+		.title {
+			font-size: 40rpx;
+			color: #000B3B;
 			font-weight: 500;
-			color: #909193;
+			padding: 23rpx 0;
+
+			.title-arrow {
+				width: 32rpx;
+				height: 24rpx;
+				margin-left: 16rpx;
+			}
 		}
+
+		.list-box {
+			padding-top: 40rpx;
+		}
+
+		.search-body {
+			background-color: #ffffff;
+			height: 80rpx;
+			border-radius: 40rpx;
+			position: sticky;
+			top: 0rpx;
+			display: flex;
+			align-items: center;
+			padding: 0 24rpx;
+			z-index: 999;
+			box-shadow: rgba(0, 11, 59, 0.1) 10rpx 20rpx 70rpx;
+			margin-top: -40upx;
+			z-index: 5;
+
+			.search-image {
+				width: 48rpx;
+				height: 48rpx;
+				margin-right: 6rpx;
+			}
+
+			.search-text {
+				font-size: 24rpx;
+				font-weight: 500;
+				color: #909193;
+			}
+		}
+
 	}
 
-}
-.btn-box{
+	.btn-box {
 		position: fixed;
 		bottom: 40upx;
 		left: 10%;
 		width: 80%;
 		display: inline-block;
 		align-items: center;
-		.login-btn{
+
+		.login-btn {
 			background: #D8336D;
 			color: #fff;
 			border-radius: 40upx;
@@ -300,38 +345,43 @@
 			align-items: center;
 		}
 	}
-	.baner-box{
+
+	.baner-box {
 		height: 160upx;
-		image{
+
+		image {
 			width: 100%;
 			height: 100%;
 		}
 	}
-/* 轮播图布局样式 */
-	
-.pic{
-	width: 100%;
-	height: 100%;
-	border-radius: 18px;
-}.swi{
-	margin-bottom: 40rpx;
-	margin-top: 40rpx;
-}
-.swiper{
-	    width: 300vw;
-		height: 500rpx;
-		.swiper-item{
-			  width: 100%;
-			height: 100%;
-		 
-		}
-		
-		.swiper image {
-		  width: 100%;
-		 height: 496rpx !important;
-		 border-radius: 32rpx;
-		  
+
+	/* 轮播图布局样式 */
+	.content {
+		border-radius: 20px;
+		position: relative;
+		top: 40rpx;
+		overflow :hidden;
+		/* 兼容IOS，否则在swiper组件内的布局都不受border-radius和overflow的约束 */
+		transform: translateY(0);
+        
+		swiper {
+			width: 650rpx;
+			height: 430rpx;
+			border-radius: 10px;
+
+			image {
+				width: 100%;
+				height: 88%;
+				border-radius: 10px;
+				
+			}
 		}
 
-}
+	}
+	/* 轮播图显示点位置 */
+	.dot {
+		position: absolute;
+		bottom: -10px;
+		right: 10px;
+	}
 </style>
