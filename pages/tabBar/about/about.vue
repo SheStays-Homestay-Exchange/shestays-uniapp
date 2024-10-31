@@ -118,13 +118,29 @@
 <script setup>
 	import { onShow } from '@dcloudio/uni-app'
 	import {buriedPoint} from '@/common/js/burying_point.js'
+	import { reactive,ref } from 'vue';
+	
+	const userInfo = ref()
 	onShow(() => {
 		buriedPoint(4,{title:'关于SheStays'})
+		userInfo.value = typeof(cache.get('userInfo')) == 'string' ? JSON.parse( cache.get('userInfo') ) : cache.get('userInfo')
 	})
+	//是否登录
+	const isLogin =()=>{
+		if(!userInfo.value?.openId){
+			uni.reLaunch({
+				url:'/pages/login/login'
+			})
+			return false
+		}
+		return true
+	}
 	const goPage = ()=>{
-		uni.navigateTo({
-			url:'/pages/tabBar/my/uploadHousing'
-		});
+		if(isLogin()){
+			uni.navigateTo({
+				url:'/pages/tabBar/my/uploadHousing'
+			});
+		}
 	}
 </script>
 

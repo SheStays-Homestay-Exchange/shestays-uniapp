@@ -111,11 +111,11 @@
 	}
 	
 	const itemClick=(item)=>{
-		if(isLogin()){
+		
 			uni.navigateTo({
 				url:'/pages/houseDetail/houseDetail?id='+item.houseId
 			})
-		}
+		
 	}
 	
 	const search = ()=>{
