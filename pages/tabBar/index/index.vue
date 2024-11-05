@@ -16,7 +16,7 @@
 		<!-- 首页轮播图-->
 		<view class="content" >
 			<swiper :autoplay="true" :interval="3000" :duration="500" circular indicator-dots="true"
-				indicator-active-color="#D8336D">
+				indicator-active-color="#D8336D" @change="change">
 				<swiper-item v-for="(item, index) in list" :key="index">
 					<image :src="item"></image>
 				</swiper-item>
@@ -200,8 +200,10 @@
 			// 已请求完所有数据
 			if (pages.pageIndex >= res.data.pageCount) {
 				loadStatus.value = 'noMore'
+			}else{
+				loadStatus.value = 'more'
 			}
-			loadStatus.value = 'more'
+			
 		} catch (e) {
 			//TODO handle the exception
 			uni.showToast({
