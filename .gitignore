@@ -7,3 +7,5 @@ dist/
 *.idea
 *.hbuilderx
 package-lock.json
+node_modules/
+.vscode

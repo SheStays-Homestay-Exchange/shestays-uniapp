@@ -16,7 +16,7 @@
 		<!-- 首页轮播图-->
 		<view class="content" >
 			<swiper :autoplay="true" :interval="3000" :duration="500" circular indicator-dots="true"
-				indicator-active-color="#D8336D" @change="change">
+				indicator-active-color="#D8336D">
 				<swiper-item v-for="(item, index) in list" :key="index">
 					<image :src="item"></image>
 				</swiper-item>
@@ -35,8 +35,9 @@
 				@itemClick="itemClick" />
 		</view>
 		<!-- 加载更多 -->
-		<uni-load-more :status="loadStatus" :contentText="contentText"></uni-load-more>
-
+		<!-- <uni-load-more :status="loadStatus" :contentText="contentText"></uni-load-more> -->
+		<loadingAnimation :status="loadStatus"></loadingAnimation>
+		
 		<!-- 联系弹窗 -->
 		<DetailPopup :show="popShow" @tapClose="popShow=false" :name="itemInfo.name" :id="itemInfo.id"
 			:avatar="itemInfo.avatarUrl" />
@@ -71,11 +72,7 @@
 	import {
 		buriedPoint
 	} from '@/common/js/burying_point.js'
-
-
-
-
-
+	import loadingAnimation from '@/components/loadingAnimation/loadingAnimation.vue'
 
 	const userInfo = ref({})
 	onLoad(() => {
@@ -204,6 +201,7 @@
 			if (pages.pageIndex >= res.data.pageCount) {
 				loadStatus.value = 'noMore'
 			}
+			loadStatus.value = 'more'
 		} catch (e) {
 			//TODO handle the exception
 			uni.showToast({
@@ -211,6 +209,7 @@
 				icon: 'none'
 			})
 			uni.stopPullDownRefresh()
+			loadStatus.value = 'more'
 		}
 	}
 
@@ -253,6 +252,8 @@
 		goPage('/pages/houseDetail/houseDetail?id=' + item.houseId)
 		// }
 	}
+	
+	
 </script>
 <!-- 兼容 setup 无法使用 export default 限制 -->
 <script>
@@ -384,4 +385,6 @@
 		bottom: -10px;
 		right: 10px;
 	}
+	
+	
 </style>
