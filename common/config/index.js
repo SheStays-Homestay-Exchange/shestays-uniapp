@@ -21,12 +21,12 @@ let myWechatNextVersion = '1.0.0'	//将要提审发布的版本号
 
 
 
-
+console.log(env);
 if (env === 'test') {  // （运行）   
  //  baseUrl = 'http://122.51.248.243:9090/'   //开发
 	// shreUrl = 'http://122.51.248.243:9090/' //上传接口
-	shreUrl = 'http://shestays.life/'
-	baseUrl = 'http://shestays.life/'
+	shreUrl = '/api/'
+	baseUrl = '/api/'
 	shareType = 2
 	envVersion = 'develop'
 

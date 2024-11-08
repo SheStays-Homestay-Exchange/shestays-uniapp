@@ -133,7 +133,7 @@
 
 <script setup>
 import { reactive, ref, onMounted } from "vue";
-import { onLoad, useRoute, onShow } from "@dcloudio/uni-app";
+import { onLoad, onShow } from "@dcloudio/uni-app";
 import { getHouseDetail, review,saveBuriedPoint } from "@/common/api/common";
 import DetailPopup from "@/components/DetailPopup.vue";
 import holdImage from "@/static/image/avatar.png";

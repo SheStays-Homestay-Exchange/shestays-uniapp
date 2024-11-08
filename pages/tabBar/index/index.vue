@@ -36,7 +36,12 @@
 		</view>
 		<!-- 加载更多 -->
 		<!-- <uni-load-more :status="loadStatus" :contentText="contentText"></uni-load-more> -->
+		<!-- #ifdef APP-PLUS || MP-WEIXIN -->
+		<loadingAnimationMini :status="loadStatus"></loadingAnimationMini>
+		<!-- #endif -->
+		<!-- #ifndef APP-PLUS || MP-WEIXIN -->
 		<loadingAnimation :status="loadStatus"></loadingAnimation>
+		<!-- #endif -->
 		
 		<!-- 联系弹窗 -->
 		<DetailPopup :show="popShow" @tapClose="popShow=false" :name="itemInfo.name" :id="itemInfo.id"
@@ -47,6 +52,7 @@
 			手机号快捷登录
 		</button>
 	</view>
+	
 </template>
 
 <script setup>
@@ -72,7 +78,13 @@
 	import {
 		buriedPoint
 	} from '@/common/js/burying_point.js'
+	
+	// #ifdef APP-PLUS || MP-WEIXIN
+	import loadingAnimationMini from '@/components/loadingAnimationMini/loadingAnimationMini.vue'
+	// #endif
+	// #ifndef APP-PLUS || MP-WEIXIN
 	import loadingAnimation from '@/components/loadingAnimation/loadingAnimation.vue'
+	// #endif
 
 	const userInfo = ref({})
 	onLoad(() => {
