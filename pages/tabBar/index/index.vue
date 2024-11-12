@@ -18,7 +18,7 @@
 			<swiper :autoplay="true" :interval="3000" :duration="500" circular indicator-dots="true"
 				indicator-active-color="#D8336D" @change="change">
 				<swiper-item v-for="(item, index) in list" :key="index">
-					<image :src="item"></image>
+					<image :src="item" @click="goToLink(index)"></image>
 				</swiper-item>
 				<!-- 通过页面id进行跳转 -->
 				<!-- 通过页面id进行跳转  <navigator class="swiper-item" :url="'/subpkg/pic_detail/pic_detail?pic_id-' + item.pic_id">
@@ -278,16 +278,24 @@
 					'../../../static/image/sw-p1.png',
 					'../../../static/image/sw-p2.png',
 					'../../../static/image/sw-p3.png',
-
 				],
-				current: 0
+				current: 0,
+        linkList: [
+          'http://xhslink.com/a/ZFTVhUQ7M25X',
+          'xhslink.com/a/KGvNqOiFP25X',
+          'www.xiaohongshu.com/user/profile/6196856c0000000010008bd5'
+        ]
 			};
 		},
 		onLoad() {},
 		methods: {
 			change(e) {
 				this.current = e.detail.current;
-			}
+			},
+      goToLink(index) {
+        const link = this.linkList[index];
+        window.open(link, '_blank');
+      }
 		}
 	};
 </script>
