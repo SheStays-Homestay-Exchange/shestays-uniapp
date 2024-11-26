@@ -18,7 +18,10 @@
 			<swiper :autoplay="true" :interval="3000" :duration="500" circular indicator-dots="true"
 				indicator-active-color="#D8336D" @change="change">
 				<swiper-item v-for="(item, index) in list" :key="index">
-					<image :src="item" @click="goToLink(index)"></image>
+<!--					<image :src="item" @click="goToLink(index)"></image>-->
+          <navigator class="swiper-item" :url="'static/redirect/redirect' + (index + 1) + '.html'">
+            <image :src="item"></image>
+          </navigator>
 				</swiper-item>
 				<!-- 通过页面id进行跳转 -->
 				<!-- 通过页面id进行跳转  <navigator class="swiper-item" :url="'/subpkg/pic_detail/pic_detail?pic_id-' + item.pic_id">
@@ -281,10 +284,10 @@
 				],
 				current: 0,
         linkList: [
-          'http://xhslink.com/a/ZFTVhUQ7M25X',
-          'xhslink.com/a/KGvNqOiFP25X',
-          'www.xiaohongshu.com/user/profile/6196856c0000000010008bd5'
-        ]
+          'https://xhslink.com/a/ZFTVhUQ7M25X',
+          'https://xhslink.com/a/KGvNqOiFP25X',
+          'https://www.xiaohongshu.com/user/profile/6196856c0000000010008bd5'
+        ],
 			};
 		},
 		onLoad() {},
@@ -294,7 +297,10 @@
 			},
       goToLink(index) {
         const link = this.linkList[index];
-        window.open(link, '_blank');
+        // 设置当前要打开的链接到currentLink变量
+        this.currentLink = link;
+        // 设置shouldShowWebView为true，以便显示web-view组件来加载链接内容
+        this.shouldShowWebView = true;
       }
 		}
 	};
