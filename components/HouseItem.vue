@@ -46,6 +46,10 @@
 			default: ()=>{},
 			type: Object
 		},
+		 index: {
+		    type: Number,
+		    default: null
+		  }
 	})
 	
 	const houseClick = ()=>{

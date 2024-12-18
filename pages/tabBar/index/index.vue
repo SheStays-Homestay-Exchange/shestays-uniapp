@@ -7,21 +7,29 @@
 			<text>欢迎姐妹住我家</text>
 			<image class="title-arrow" src="../../../static/image/arrow.png" mode=""></image>
 		</view> -->
-		<!-- 搜索 -->
-		<view class="search-body" @click="handleSearch">
-			<image src="../../../static/image/search.png" class="search-image" mode=""></image>
-			<text class="search-text">搜索目的地（仅支持国家和城市关键词搜索）</text>
-
+		<!-- 搜索 --> 
+		  <view
+		    class="search-area"
+		    :style="{
+		          backgroundColor: `rgba(245, 245, 245, ${opacity})`,
+		          boxShadow: `0 4px 10px rgba(0, 0, 0, ${shadowOpacity})`
+		        }" 
+		  >
+			<view class="search-body" @click="handleSearch">
+				<image src="../../../static/image/search.png" class="search-image" mode=""></image>
+				<text class="search-text">搜索目的地（仅支持国家和城市关键词搜索）</text>
+			</view>
 		</view>
+
 		<!-- 首页轮播图-->
-		<view class="content" >
+		<view class="content">
 			<swiper :autoplay="true" :interval="3000" :duration="500" circular indicator-dots="true"
 				indicator-active-color="#D8336D" @change="change">
 				<swiper-item v-for="(item, index) in list" :key="index">
-<!--					<image :src="item" @click="goToLink(index)"></image>-->
-          <navigator class="swiper-item" :url="'static/redirect/redirect' + (index + 1) + '.html'">
-            <image :src="item"></image>
-          </navigator>
+					<!--					<image :src="item" @click="goToLink(index)"></image>-->
+					<navigator class="swiper-item" :url="'static/redirect/redirect' + (index + 1) + '.html'">
+						<image :src="item"></image>
+					</navigator>
 				</swiper-item>
 				<!-- 通过页面id进行跳转 -->
 				<!-- 通过页面id进行跳转  <navigator class="swiper-item" :url="'/subpkg/pic_detail/pic_detail?pic_id-' + item.pic_id">
@@ -29,8 +37,6 @@
 			</swiper>
 			<swiper-dot class="dot" :current="current" :list="list"></swiper-dot>
 		</view>
-
-
 
 		<!-- 房源 -->
 		<view class="list-box">
@@ -45,7 +51,7 @@
 		<!-- #ifndef APP-PLUS || MP-WEIXIN -->
 		<loadingAnimation :status="loadStatus"></loadingAnimation>
 		<!-- #endif -->
-		
+
 		<!-- 联系弹窗 -->
 		<DetailPopup :show="popShow" @tapClose="popShow=false" :name="itemInfo.name" :id="itemInfo.id"
 			:avatar="itemInfo.avatarUrl" />
@@ -55,7 +61,7 @@
 			手机号快捷登录
 		</button>
 	</view>
-	
+
 </template>
 
 <script setup>
@@ -70,7 +76,8 @@
 		onLoad,
 		onReachBottom,
 		onPullDownRefresh,
-		onShareAppMessage
+		onShareAppMessage,
+		onPageScroll
 	} from '@dcloudio/uni-app'
 	import {
 		getHouseList
@@ -81,7 +88,7 @@
 	import {
 		buriedPoint
 	} from '@/common/js/burying_point.js'
-	
+
 	// #ifdef APP-PLUS || MP-WEIXIN
 	import loadingAnimationMini from '@/components/loadingAnimationMini/loadingAnimationMini.vue'
 	// #endif
@@ -90,6 +97,10 @@
 	// #endif
 
 	const userInfo = ref({})
+	
+	const opacity = ref(0);
+	const shadowOpacity = ref(0); 
+
 	onLoad(() => {
 		userInfo.value = cache.get('userInfo') || {}
 		buriedPoint(4, {
@@ -99,6 +110,14 @@
 		listData.value = [];
 		getHouseListFun();
 	});
+
+	onPageScroll((e) => {
+	  const scrollTop = e.scrollTop; // 滚动距离
+	  const threshold = 100; // 渐变的滚动距离
+	  opacity.value = Math.min(scrollTop / threshold, 1); // 根据滚动距离计算透明度，范围 0 ~ 1
+	  shadowOpacity.value = opacity.value/10;
+	});
+
 
 	onShow(() => {
 
@@ -199,6 +218,13 @@
 		pageIndex: 1,
 		totalPage: 0 //总共有多少页数据
 	})
+
+	// onPageScroll((e) => {
+	//   const scrollTop = e.scrollTop; 
+	//   const threshold = 100; 
+	//   opacity.value = Math.min(scrollTop / threshold, 1); 
+	// });
+
 	const getHouseListFun = async (type) => {
 		loadStatus.value = 'loading'
 		try {
@@ -215,10 +241,10 @@
 			// 已请求完所有数据
 			if (pages.pageIndex >= res.data.pageCount) {
 				loadStatus.value = 'noMore'
-			}else{
+			} else {
 				loadStatus.value = 'more'
 			}
-			
+
 		} catch (e) {
 			//TODO handle the exception
 			uni.showToast({
@@ -269,8 +295,6 @@
 		goPage('/pages/houseDetail/houseDetail?id=' + item.houseId)
 		// }
 	}
-	
-	
 </script>
 <!-- 兼容 setup 无法使用 export default 限制 -->
 <script>
@@ -283,11 +307,11 @@
 					'../../../static/image/sw-p3.png',
 				],
 				current: 0,
-        linkList: [
-          'https://xhslink.com/a/ZFTVhUQ7M25X',
-          'https://xhslink.com/a/KGvNqOiFP25X',
-          'https://www.xiaohongshu.com/user/profile/6196856c0000000010008bd5'
-        ],
+				linkList: [
+					'https://xhslink.com/a/ZFTVhUQ7M25X',
+					'https://xhslink.com/a/KGvNqOiFP25X',
+					'https://www.xiaohongshu.com/user/profile/6196856c0000000010008bd5'
+				],
 			};
 		},
 		onLoad() {},
@@ -295,13 +319,13 @@
 			change(e) {
 				this.current = e.detail.current;
 			},
-      goToLink(index) {
-        const link = this.linkList[index];
-        // 设置当前要打开的链接到currentLink变量
-        this.currentLink = link;
-        // 设置shouldShowWebView为true，以便显示web-view组件来加载链接内容
-        this.shouldShowWebView = true;
-      }
+			goToLink(index) {
+				const link = this.linkList[index];
+				// 设置当前要打开的链接到currentLink变量
+				this.currentLink = link;
+				// 设置shouldShowWebView为true，以便显示web-view组件来加载链接内容
+				this.shouldShowWebView = true;
+			}
 		}
 	};
 </script>
@@ -310,6 +334,7 @@
 <style lang="scss" scoped>
 	.home-index-body {
 		padding: 0 48rpx;
+	
 
 		.title {
 			font-size: 40rpx;
@@ -328,32 +353,40 @@
 			padding-top: 40rpx;
 		}
 
-		.search-body {
-			background-color: #ffffff;
-			height: 80rpx;
-			border-radius: 40rpx;
+		.search-area {
+			margin: -48rpx;
+			padding: 10rpx 48rpx;
 			position: sticky;
-			top: 0rpx;
-			display: flex;
-			align-items: center;
-			padding: 0 24rpx;
-			z-index: 999;
-			box-shadow: rgba(0, 11, 59, 0.1) 10rpx 20rpx 70rpx;
+			top: 0;
 			margin-top: -40upx;
-			z-index: 5;
+			// box-shadow:  0 4px 10px rgba(0, 0, 0, 0);
+			transition: background-color 0.3s ease, box-shadow 0.3s ease;
+			z-index: 999;
 
-			.search-image {
-				width: 48rpx;
-				height: 48rpx;
-				margin-right: 6rpx;
-			}
+			.search-body {
+				background-color: #ffffff;
+				border-radius: 40rpx;
+				display: flex;
+				align-items: center;
+				height: 70rpx;
+				padding: 0 24rpx;
+				box-shadow: rgba(0, 11, 59, 0.1) 10rpx 20rpx 70rpx;
 
-			.search-text {
-				font-size: 24rpx;
-				font-weight: 500;
-				color: #909193;
+				.search-image {
+					width: 48rpx;
+					height: 48rpx;
+					margin-right: 6rpx;
+				}
+
+				.search-text {
+					font-size: 24rpx;
+					font-weight: 500;
+					color: #909193;
+				}
 			}
 		}
+
+
 
 	}
 
@@ -389,10 +422,10 @@
 		border-radius: 20px;
 		position: relative;
 		top: 40rpx;
-		overflow :hidden;
+		overflow: hidden;
 		/* 兼容IOS，否则在swiper组件内的布局都不受border-radius和overflow的约束 */
 		transform: translateY(0);
-        
+
 		swiper {
 			width: 650rpx;
 			height: 430rpx;
@@ -402,17 +435,16 @@
 				width: 100%;
 				height: 88%;
 				border-radius: 10px;
-				
+
 			}
 		}
 
 	}
+
 	/* 轮播图显示点位置 */
 	.dot {
 		position: absolute;
 		bottom: -10px;
 		right: 10px;
 	}
-	
-	
 </style>

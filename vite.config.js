@@ -3,6 +3,7 @@ import uni from '@dcloudio/vite-plugin-uni';
 
 export default defineConfig({
 	plugins: [uni()],
+	logLevel: 'error',
 	// rollupOptions:{
 	//     output:{
 	//         assetFileNames(assetInfo) {
@@ -19,6 +20,7 @@ export default defineConfig({
 	//         }
 	//     }
 	// },
+	
 	server: {
 	    proxy: {
 	      '/api': {
